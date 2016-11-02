@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildServer", "UnityBuildServer\UnityBuildServer.csproj", "{96AEC5D7-D646-4A04-8624-383CC86C047C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildServerConsole", "UnityBuildServerConsole\UnityBuildServerConsole.csproj", "{64E2D8F1-B08C-4B87-A283-252C31693DC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{96AEC5D7-D646-4A04-8624-383CC86C047C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96AEC5D7-D646-4A04-8624-383CC86C047C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96AEC5D7-D646-4A04-8624-383CC86C047C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64E2D8F1-B08C-4B87-A283-252C31693DC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64E2D8F1-B08C-4B87-A283-252C31693DC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64E2D8F1-B08C-4B87-A283-252C31693DC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64E2D8F1-B08C-4B87-A283-252C31693DC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

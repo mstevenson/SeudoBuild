@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{96AEC5D7-D646-4A04-8624-383CC86C047C}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>UnityBuildServer</RootNamespace>
-    <AssemblyName>UnityBuildServer</AssemblyName>
+    <ProjectGuid>{64E2D8F1-B08C-4B87-A283-252C31693DC6}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>UnityBuildServerConsole</RootNamespace>
+    <AssemblyName>UnityBuildServerConsole</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -17,43 +17,27 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
+    <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
+    <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyClass.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Project.cs" />
-    <Compile Include="Target.cs" />
-    <Compile Include="BuildStep.cs" />
-    <Compile Include="UnityBuildSettings.cs" />
-    <Compile Include="UnityVersion.cs" />
-    <Compile Include="TargetBuilder.cs" />
-    <Compile Include="UnityProcess.cs" />
-    <Compile Include="RunProcessAsTask\ProcessEx.cs" />
-    <Compile Include="RunProcessAsTask\ProcessEx.overloads.cs" />
-    <Compile Include="RunProcessAsTask\ProcessResults.cs" />
-    <Compile Include="Workspace.cs" />
-    <Compile Include="GitProcess.cs" />
-    <Compile Include="Repository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="RunProcessAsTask\" />
+    <ProjectReference Include="..\UnityBuildServer\UnityBuildServer.csproj">
+      <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
+      <Name>UnityBuildServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
