@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class FTPDistributionConfig : DistributionConfig
+    public class FTPDistributeConfig : DistributeConfig
     {
         public string URL { get; set; }
         public int Port { get; set; } = 21;

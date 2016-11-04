@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class GitVCSConfiguration : IVCSConfiguration
+    public class GitVCSConfig : VCSConfig
     {
         public string RepositoryURL { get; set; }
         public string RepositoryBranchName { get; set; }

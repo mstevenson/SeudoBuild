@@ -13,15 +13,15 @@ namespace UnityBuildServerConsole
                 BuildTargets = new List<BuildTargetConfig> {
                     new BuildTargetConfig {
                         Name = "Windows",
-                        VCSConfiguration = new GitVCSConfiguration {
+                        VCSConfiguration = new GitVCSConfig {
                             RepositoryURL = "",
                             RepositoryBranchName = "",
                             User = "",
                             Password = ""
                         },
                         BuildSteps = new List<BuildStepConfig> {
-                            new UnityBuildStepConfig {
-                                TargetPlatform = UnityBuildStepConfig.Platform.Windows,
+                            new UnityBuildConfig {
+                                TargetPlatform = UnityBuildConfig.Platform.Windows,
                                 UnityVersionNumber = new VersionNumber { Major = 5, Minor = 4, Patch = 1 },
                                 ExecutableName = "UnityTestBuild",
                                 ExecuteMethod = "Builder.BuildForWindows",
@@ -31,13 +31,13 @@ namespace UnityBuildServerConsole
                             }
                         },
                         ArchiveSteps = new List<ArchiveStepConfig> {
-                            new ZipArchiveStepConfig { Id = "ZipFile", Filename = "UnityTestProject_%platform%_%version%.zip" }
+                            new ZipArchiveConfig { Id = "ZipFile", Filename = "UnityTestProject_%platform%_%version%.zip" }
                         },
-                        DistributionSteps = new List<DistributionConfig> {
-                            new FTPDistributionConfig { ArchiveFileName = "ZipFile", URL = "ftp://abcd.xyz" }
+                        DistributeSteps = new List<DistributeConfig> {
+                            new FTPDistributeConfig { ArchiveFileName = "ZipFile", URL = "ftp://abcd.xyz" }
                         },
-                        NotificationSteps = new List<NotificationConfig> {
-                            new EmailNotificationConfig { Id = "Standard Email" }
+                        NotifySteps = new List<NotifyConfig> {
+                            new EmailNotifyConfig { Id = "Standard Email" }
                         }
                     }
                 }

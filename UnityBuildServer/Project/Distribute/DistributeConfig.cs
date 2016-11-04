@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public abstract class DistributionConfig
+    public abstract class DistributeConfig
     {
         public string Id { get; set; }
 

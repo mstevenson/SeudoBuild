@@ -1,11 +1,11 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class SteamDistributionStep : DistributionStep
+    public class SteamDistributeStep : DistributeStep
     {
-        SteamDistributionConfig config;
+        SteamDistributeConfig config;
 
-        public SteamDistributionStep(SteamDistributionConfig config)
+        public SteamDistributeStep(SteamDistributeConfig config)
         {
             this.config = config;
         }

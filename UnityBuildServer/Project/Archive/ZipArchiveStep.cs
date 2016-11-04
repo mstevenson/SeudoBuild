@@ -5,9 +5,9 @@ namespace UnityBuildServer
 {
     public class ZipArchiveStep : ArchiveStep
     {
-        ZipArchiveStepConfig config;
+        ZipArchiveConfig config;
 
-        public ZipArchiveStep(ZipArchiveStepConfig config)
+        public ZipArchiveStep(ZipArchiveConfig config)
         {
             this.config = config;
         }

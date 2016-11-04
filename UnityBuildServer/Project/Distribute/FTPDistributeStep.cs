@@ -5,11 +5,11 @@ using System.Text;
 
 namespace UnityBuildServer
 {
-    public class FTPDistributionStep : DistributionStep
+    public class FTPDistributeStep : DistributeStep
     {
-        FTPDistributionConfig config;
+        FTPDistributeConfig config;
 
-        public FTPDistributionStep(FTPDistributionConfig config)
+        public FTPDistributeStep(FTPDistributeConfig config)
         {
             this.config = config;
         }

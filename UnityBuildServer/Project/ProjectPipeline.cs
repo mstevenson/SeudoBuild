@@ -13,8 +13,8 @@ namespace UnityBuildServer
         public IVCS VersionControlSystem { get; private set; }
         public List<BuildStep> BuildSteps { get; private set; }
         public List<ArchiveStep> ArchiveSteps { get; private set; }
-        public List<DistributionStep> DistributionSteps { get; private set; }
-        public List<NotificationStep> NotificationSteps { get; private set; }
+        public List<DistributeStep> DistributeSteps { get; private set; }
+        public List<NotifyStep> NotifySteps { get; private set; }
 
         public static ProjectPipeline Create(string baseDirectory, ProjectConfig config, string buildTargetName)
         {
@@ -49,8 +49,8 @@ namespace UnityBuildServer
             //VersionControlSystem = InitializeVersionControlSystem();
             BuildSteps = GenerateBuildSteps();
             ArchiveSteps = GenerateArchiveSteps();
-            DistributionSteps = GenerateDistributionSteps();
-            NotificationSteps = GenerateNotificationSteps();
+            DistributeSteps = GenerateDistributeSteps();
+            NotifySteps = GenerateNotifySteps();
         }
 
         BuildTargetConfig GetBuildTargetConfig(string targetName)
@@ -67,9 +67,9 @@ namespace UnityBuildServer
 
         IVCS InitializeVersionControlSystem()
         {
-            if (target.VCSConfiguration is GitVCSConfiguration)
+            if (target.VCSConfiguration is GitVCSConfig)
             {
-                var gitConfig = (GitVCSConfiguration)target.VCSConfiguration;
+                var gitConfig = (GitVCSConfig)target.VCSConfiguration;
                 var vcs = new GitVCS(workspace.WorkingDirectory, gitConfig.User, gitConfig.Password, gitConfig.IsLFS);
                 return vcs;
             }
@@ -81,9 +81,9 @@ namespace UnityBuildServer
             var steps = new List<BuildStep>();
             foreach (var stepConfig in target.BuildSteps)
             {
-                if (stepConfig is UnityBuildStepConfig)
+                if (stepConfig is UnityBuildConfig)
                 {
-                    steps.Add(new UnityBuildStep((UnityBuildStepConfig)stepConfig));
+                    steps.Add(new UnityBuildStep((UnityBuildConfig)stepConfig));
                 }
                 else if (stepConfig is ShellBuildStepConfig)
                 {
@@ -98,9 +98,9 @@ namespace UnityBuildServer
             var steps = new List<ArchiveStep>();
             foreach (var stepConfig in target.ArchiveSteps)
             {
-                if (stepConfig is ZipArchiveStepConfig)
+                if (stepConfig is ZipArchiveConfig)
                 {
-                    steps.Add(new ZipArchiveStep((ZipArchiveStepConfig)stepConfig));
+                    steps.Add(new ZipArchiveStep((ZipArchiveConfig)stepConfig));
                 }
                 else if (stepConfig is FolderArchiveStepConfig)
                 {
@@ -110,31 +110,31 @@ namespace UnityBuildServer
             return steps;
         }
 
-        List<DistributionStep> GenerateDistributionSteps()
+        List<DistributeStep> GenerateDistributeSteps()
         {
-            var steps = new List<DistributionStep>();
-            foreach (var stepConfig in target.DistributionSteps)
+            var steps = new List<DistributeStep>();
+            foreach (var stepConfig in target.DistributeSteps)
             {
-                if (stepConfig is FTPDistributionConfig)
+                if (stepConfig is FTPDistributeConfig)
                 {
-                    steps.Add(new FTPDistributionStep((FTPDistributionConfig)stepConfig));
+                    steps.Add(new FTPDistributeStep((FTPDistributeConfig)stepConfig));
                 }
-                else if (stepConfig is SteamDistributionConfig)
+                else if (stepConfig is SteamDistributeConfig)
                 {
-                    steps.Add(new SteamDistributionStep((SteamDistributionConfig)stepConfig));
+                    steps.Add(new SteamDistributeStep((SteamDistributeConfig)stepConfig));
                 }
             }
             return steps;
         }
 
-        List<NotificationStep> GenerateNotificationSteps()
+        List<NotifyStep> GenerateNotifySteps()
         {
-            var steps = new List<NotificationStep>();
-            foreach (var stepConfig in target.NotificationSteps)
+            var steps = new List<NotifyStep>();
+            foreach (var stepConfig in target.NotifySteps)
             {
-                if (stepConfig is EmailNotificationConfig)
+                if (stepConfig is EmailNotifyConfig)
                 {
-                    steps.Add(new EmailNotificationStep((EmailNotificationConfig)stepConfig));
+                    steps.Add(new EmailNotifyStep((EmailNotifyConfig)stepConfig));
                 }
             }
             return steps;

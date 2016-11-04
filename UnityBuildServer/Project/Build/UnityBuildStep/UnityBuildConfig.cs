@@ -2,7 +2,7 @@
 
 namespace UnityBuildServer
 {
-    public class UnityBuildStepConfig : BuildStepConfig
+    public class UnityBuildConfig : BuildStepConfig
     {
         public override string Type
         {

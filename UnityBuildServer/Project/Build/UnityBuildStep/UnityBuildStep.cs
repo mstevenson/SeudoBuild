@@ -3,9 +3,9 @@ namespace UnityBuildServer
 {
     public class UnityBuildStep : BuildStep
     {
-        UnityBuildStepConfig config;
+        UnityBuildConfig config;
 
-        public UnityBuildStep(UnityBuildStepConfig config)
+        public UnityBuildStep(UnityBuildConfig config)
         {
             this.config = config;
         }

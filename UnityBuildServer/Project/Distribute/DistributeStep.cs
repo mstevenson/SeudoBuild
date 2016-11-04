@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public abstract class DistributionStep
+    public abstract class DistributeStep
     {
         public abstract void Distribute(string archivePath, Workspace workspace);
     }

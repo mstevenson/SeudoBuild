@@ -1,6 +1,6 @@
 ﻿namespace UnityBuildServer
 {
-    public class EmailNotificationConfig : NotificationConfig
+    public class EmailNotifyConfig : NotifyConfig
     {
         public string FromAddress { get; set; }
         public string SMTPUser { get; set; }

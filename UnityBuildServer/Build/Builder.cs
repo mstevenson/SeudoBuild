@@ -74,7 +74,7 @@ namespace UnityBuildServer
 
             List<DistributeInfo> distributeInfos = new List<DistributeInfo>();
 
-            foreach (var step in pipeline.DistributionSteps)
+            foreach (var step in pipeline.DistributeSteps)
             {
                 //step.Distribute (
             }
@@ -84,7 +84,7 @@ namespace UnityBuildServer
 
         void Notify(List<DistributeInfo> distributeInfos, ProjectPipeline pipeline)
         {
-            foreach (var step in pipeline.NotificationSteps)
+            foreach (var step in pipeline.NotifySteps)
             {
                 //step.Notify();
             }
