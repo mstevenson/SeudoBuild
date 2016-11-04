@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.IO;
+using Ionic.Zip;
+
 namespace UnityBuildServer
 {
     public class ZipArchive : ArchiveConfig
@@ -7,8 +9,12 @@ namespace UnityBuildServer
 
         public override void CreateArchive(string workingDirectory, string archivesDirectory)
         {
-            // TODO create a ZIP file from the contents of the working directory,
-            // save it into the archives directory
+            using (var zipFile = new ZipFile())
+            {
+                zipFile.AddDirectory(workingDirectory);
+                string filename = "test.zip";
+                zipFile.Save($"{archivesDirectory}/{filename}");
+            }
         }
     }
 }
