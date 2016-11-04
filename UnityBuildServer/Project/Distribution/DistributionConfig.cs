@@ -8,6 +8,6 @@ namespace UnityBuildServer
         /// <summary>
         /// The name of the archive to distribute.
         /// </summary>
-        public string Archive { get; set; }
+        public string ArchiveFileName { get; set; }
     }
 }

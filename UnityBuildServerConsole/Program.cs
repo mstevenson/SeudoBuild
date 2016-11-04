@@ -35,7 +35,7 @@ namespace UnityBuildServerConsole
                             new ZipArchiveStepConfig { Id = "ZipFile", Filename = "UnityTestProject_%platform%_%version%.zip" }
                         },
                         Distributions = new List<DistributionConfig> {
-                            new FTPDistributionConfig { Archive = "ZipFile", URL = "ftp://abcd.xyz" }
+                            new FTPDistributionConfig { ArchiveFileName = "ZipFile", URL = "ftp://abcd.xyz" }
                         },
                         Notifications = new List<NotificationConfig> {
                             new EmailNotificationConfig { Id = "Standard Email" }

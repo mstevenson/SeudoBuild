@@ -72,6 +72,9 @@
     <Compile Include="Project\Archival\ArchiveStep.cs" />
     <Compile Include="Project\Archival\ZipArchiveStepConfig.cs" />
     <Compile Include="Project\Notification\EmailNotificationStep.cs" />
+    <Compile Include="Project\Distribution\FTPDistributionStep.cs" />
+    <Compile Include="Project\Distribution\DistributionStep.cs" />
+    <Compile Include="Project\Distribution\SteamDistributionStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
