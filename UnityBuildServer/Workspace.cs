@@ -24,8 +24,18 @@ namespace UnityBuildServer
 
         public void InitializeDirectories()
         {
-            Directory.CreateDirectory(WorkingDirectory);
-            Directory.CreateDirectory(BuildProductDirectory);
+            if (!Directory.Exists(WorkingDirectory))
+            {
+                Directory.CreateDirectory(WorkingDirectory);
+            }
+            if (!Directory.Exists(BuildProductDirectory))
+            {
+                Directory.CreateDirectory(BuildProductDirectory);
+            }
+            if (!Directory.Exists(ArchivesDirectory))
+            {
+                Directory.CreateDirectory(ArchivesDirectory);
+            }
         }
 
         /// <summary>

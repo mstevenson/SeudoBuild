@@ -1,16 +1,19 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class Project
+    public class ProjectPipeline
     {
+        ProjectConfig config;
+        string buildTargetName;
         Workspace workspace;
 
-        public static Project Create(ProjectConfig config, string projectsBaseDirectory)
+        public ProjectPipeline (ProjectConfig config, string buildTargetName)
         {
-            return new Project(config, projectsBaseDirectory);
+            this.config = config;
+            this.buildTargetName = buildTargetName;
         }
 
-        Project(ProjectConfig config, string projectsBaseDirectory)
+        public void Initialize(string projectsBaseDirectory)
         {
             string projectNameSanitized = config.Id.Replace(' ', '_');
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";

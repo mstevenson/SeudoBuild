@@ -5,7 +5,7 @@ namespace UnityBuildServer
 {
     public class BuildTargetConfig
     {
-        public string Id { get; set; }
+        public string Name { get; set; }
         public IVCSConfiguration VCSConfiguration { get; set; }
         public List<BuildStepConfig> BuildSteps { get; set; } = new List<BuildStepConfig>();
         public List<ArchiveStepConfig> Archives { get; set; } = new List<ArchiveStepConfig>();

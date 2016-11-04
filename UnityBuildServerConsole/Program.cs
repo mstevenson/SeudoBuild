@@ -13,7 +13,7 @@ namespace UnityBuildServerConsole
                 Id = "Unity Test Project",
                 BuildTargets = new List<BuildTargetConfig> {
                     new BuildTargetConfig {
-                        Id = "Windows",
+                        Name = "Windows",
                         VCSConfiguration = new GitConfiguration {
                             RepositoryURL = "",
                             RepositoryBranchName = "",
@@ -44,7 +44,10 @@ namespace UnityBuildServerConsole
                 }
             };
 
-            Project.Create(projectConfig, "/Users/mike/Desktop/UnityBuildServerTestProject");
+            var builder = new Builder(new BuilderConfig { ProjectsPath = "/Users/mike/Desktop/UnityBuildServerTest/Projects/" });
+            builder.ExecuteBuild(projectConfig, "Windows");
+
+            //var pipeline = new ProjectPipeline.Create(projectConfig, "/Users/mike/Desktop/UnityBuildServerTestProject");
         }
     }
 }

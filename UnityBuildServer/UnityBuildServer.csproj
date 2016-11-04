@@ -65,7 +65,7 @@
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityBuildStep.cs" />
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityInstallation.cs" />
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityProcess.cs" />
-    <Compile Include="Project\Project.cs" />
+    <Compile Include="Project\ProjectPipeline.cs" />
     <Compile Include="Project\Notification\NotificationConfig.cs" />
     <Compile Include="Project\Notification\EmailNotificationConfig.cs" />
     <Compile Include="BuildInfo.cs" />
@@ -75,6 +75,7 @@
     <Compile Include="Project\Distribution\FTPDistributionStep.cs" />
     <Compile Include="Project\Distribution\DistributionStep.cs" />
     <Compile Include="Project\Distribution\SteamDistributionStep.cs" />
+    <Compile Include="BuilderConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
