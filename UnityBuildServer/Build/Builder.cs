@@ -25,7 +25,7 @@ namespace UnityBuildServer
             }
             if (targetConfig == null)
             {
-                throw new System.Exception("Could not find target named " + buildTargetName);
+                throw new Exception("Could not find target named " + buildTargetName);
             }
 
             var pipeline = ProjectPipeline.Create(config.ProjectsPath, projectConfig, buildTargetName);

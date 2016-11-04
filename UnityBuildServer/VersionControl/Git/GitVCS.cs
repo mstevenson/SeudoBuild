@@ -6,7 +6,7 @@ using LibGit2Sharp;
 
 namespace UnityBuildServer
 {
-    public class GitVCS : IVCS
+    public class GitVCS : VCS
     {
         string workingDirectory;
         bool isLFS;
@@ -35,7 +35,7 @@ namespace UnityBuildServer
             lfsFilter = GlobalSettings.RegisterFilter(filter);
         }
 
-        public bool IsWorkingCopyInitialized
+        public override bool IsWorkingCopyInitialized
         {
             get
             {
@@ -44,7 +44,7 @@ namespace UnityBuildServer
         }
 
         // Clone
-        public void Download(string url)
+        public override void Download(string url)
         {
             // Clone repo
 
@@ -54,7 +54,7 @@ namespace UnityBuildServer
         }
 
         // Pull
-        public void Update(string url)
+        public override void Update(string url)
         {
             // run 'git clean'
 
@@ -62,7 +62,7 @@ namespace UnityBuildServer
         }
 
         // Checkout
-        public void ChangeBranch(string branchName)
+        public override void ChangeBranch(string branchName)
         {
         }
     }

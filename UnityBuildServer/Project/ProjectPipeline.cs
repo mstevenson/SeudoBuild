@@ -10,7 +10,7 @@ namespace UnityBuildServer
         Workspace workspace;
         BuildTargetConfig target;
 
-        public IVCS VersionControlSystem { get; private set; }
+        public VCS VersionControlSystem { get; private set; }
         public List<BuildStep> BuildSteps { get; private set; }
         public List<ArchiveStep> ArchiveSteps { get; private set; }
         public List<DistributeStep> DistributeSteps { get; private set; }
@@ -45,8 +45,7 @@ namespace UnityBuildServer
 
             target = GetBuildTargetConfig(buildTargetName);
 
-            // FIXME linker appears to be stripping out GitVCS type
-            //VersionControlSystem = InitializeVersionControlSystem();
+            VersionControlSystem = InitializeVersionControlSystem();
             BuildSteps = GenerateBuildSteps();
             ArchiveSteps = GenerateArchiveSteps();
             DistributeSteps = GenerateDistributeSteps();
@@ -65,7 +64,7 @@ namespace UnityBuildServer
             return null;
         }
 
-        IVCS InitializeVersionControlSystem()
+        VCS InitializeVersionControlSystem()
         {
             if (target.VCSConfiguration is GitVCSConfig)
             {

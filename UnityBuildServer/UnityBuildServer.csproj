@@ -47,7 +47,7 @@
     <Compile Include="VersionControl\Git\GitVCS.cs" />
     <Compile Include="VersionControl\Git\LFSFilter.cs" />
     <Compile Include="Project\ProjectConfig.cs" />
-    <Compile Include="VersionControl\IVCS.cs" />
+    <Compile Include="VersionControl\VCS.cs" />
     <Compile Include="Project\BuildStepConfig.cs" />
     <Compile Include="VersionControl\VCSConfig.cs" />
     <Compile Include="VersionControl\Git\GitVCSConfig.cs" />
