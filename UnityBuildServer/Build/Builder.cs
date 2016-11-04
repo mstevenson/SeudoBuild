@@ -86,7 +86,7 @@ namespace UnityBuildServer
         {
             foreach (var step in pipeline.NotifySteps)
             {
-                //step.Notify();
+                step.Notify();
             }
 
             Console.WriteLine("Notifying");

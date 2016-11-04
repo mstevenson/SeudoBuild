@@ -1,4 +1,5 @@
-﻿using System.Net.Mail;
+﻿using System.Net;
+using System.Net.Mail;
 
 namespace UnityBuildServer
 {
@@ -11,20 +12,25 @@ namespace UnityBuildServer
             this.config = config;
         }
 
-        public void SendMessage(string subject, string body)
+        public override void Notify()
+        {
+            SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");
+        }
+
+        void SendMessage(string from, string to, string subject, string body)
         {
             SmtpClient client = new SmtpClient
             {
-                Port = config.Port,
                 Host = config.Host,
+                Port = config.Port,
                 EnableSsl = config.UseSSL,
                 Timeout = 10000,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
-                Credentials = new System.Net.NetworkCredential(config.SMTPUser, config.SMTPPassword)
+                Credentials = new NetworkCredential(config.SMTPUser, config.SMTPPassword)
             };
 
-            MailMessage message = new MailMessage(config.FromAddress, config.ToAddress);
+            MailMessage message = new MailMessage(from, to);
             message.Subject = subject;
             message.Body = body;
             client.Send(message);
