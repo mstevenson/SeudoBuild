@@ -12,6 +12,14 @@ namespace UnityBuildServer
             this.config = config;
         }
 
+        public override string TypeName
+        {
+            get
+            {
+                return "Email Notification";
+            }
+        }
+
         public override void Notify()
         {
             SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");

@@ -10,6 +10,14 @@ namespace UnityBuildServer
             this.config = config;
         }
 
+        public override string TypeName
+        {
+            get
+            {
+                return "Steam Upload";
+            }
+        }
+
         public override void Distribute(string archivePath, Workspace workspace)
         {
             // TODO

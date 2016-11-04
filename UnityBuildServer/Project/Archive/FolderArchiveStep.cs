@@ -11,12 +11,23 @@ namespace UnityBuildServer
             this.config = config;
         }
 
-        public override void CreateArchive(BuildInfo buildInfo, Workspace workspace)
+        public override string TypeName
+        {
+            get
+            {
+                return "Folder";
+            }
+        }
+
+        public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
             string source = workspace.WorkingDirectory;
             string dest = $"{workspace.ArchivesDirectory}/{buildInfo.GenerateFileName()}";
 
             CopyDirectory(source, dest);
+
+            // TODO
+            return new ArchiveInfo();
         }
 
         void CopyDirectory(string source, string dest)

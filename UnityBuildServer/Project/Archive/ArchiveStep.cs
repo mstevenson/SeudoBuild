@@ -2,6 +2,7 @@
 {
     public abstract class ArchiveStep
     {
-        public abstract void CreateArchive(BuildInfo buildInfo, Workspace workspace);
+        public abstract string TypeName { get; }
+        public abstract ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace);
     }
 }

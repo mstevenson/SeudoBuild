@@ -9,5 +9,20 @@ namespace UnityBuildServer
         {
             this.config = config;
         }
+
+        public override string TypeName
+        {
+            get
+            {
+                return "Unity Build";
+            }
+        }
+
+        public override BuildInfo Execute()
+        {
+            // TODO
+
+            return new BuildInfo();
+        }
     }
 }

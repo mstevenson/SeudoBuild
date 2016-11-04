@@ -14,6 +14,14 @@ namespace UnityBuildServer
             this.config = config;
         }
 
+        public override string TypeName
+        {
+            get
+            {
+                return "FTP Upload";
+            }
+        }
+
         public override void Distribute(string archivePath, Workspace workspace)
         {
             // Get the object used to communicate with the server.

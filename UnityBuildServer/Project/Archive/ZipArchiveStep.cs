@@ -12,7 +12,15 @@ namespace UnityBuildServer
             this.config = config;
         }
 
-        public override void CreateArchive(BuildInfo buildInfo, Workspace workspace)
+        public override string TypeName
+        {
+            get
+            {
+                return "Zip File";
+            }
+        }
+
+        public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
             using (var zipFile = new ZipFile())
             {
@@ -20,6 +28,9 @@ namespace UnityBuildServer
                 zipFile.AddDirectory(workspace.WorkingDirectory);
                 zipFile.Save($"{workspace.ArchivesDirectory}/{outputName}.zip");
             }
+
+            // TODO
+            return new ArchiveInfo();
         }
     }
 }
