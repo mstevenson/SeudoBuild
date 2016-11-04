@@ -3,10 +3,8 @@ using Ionic.Zip;
 
 namespace UnityBuildServer
 {
-    public class ZipArchive : ArchiveConfig
+    public class ZipArchiveStep : ArchiveStep
     {
-        public string Filename { get; set; }
-
         public override void CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
             using (var zipFile = new ZipFile())

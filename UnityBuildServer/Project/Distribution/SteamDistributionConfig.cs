@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class SteamDistribution : DistributionConfig
+    public class SteamDistributionConfig : DistributionConfig
     {
         public string PublishToBranch { get; set; }
         public string Username { get; set; }

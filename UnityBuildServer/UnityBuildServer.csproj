@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -56,19 +55,23 @@
     <Compile Include="Project\BuildTargetConfig.cs" />
     <Compile Include="VersionNumber.cs" />
     <Compile Include="Project\Distribution\DistributionConfig.cs" />
-    <Compile Include="Project\Distribution\FTPDistribution.cs" />
-    <Compile Include="Project\Distribution\SteamDistribution.cs" />
-    <Compile Include="Project\Archival\ArchiveConfig.cs" />
-    <Compile Include="Project\Archival\FolderArchive.cs" />
-    <Compile Include="Project\Archival\ZipArchive.cs" />
+    <Compile Include="Project\Distribution\FTPDistributionConfig.cs" />
+    <Compile Include="Project\Distribution\SteamDistributionConfig.cs" />
+    <Compile Include="Project\Archival\ArchiveStepConfig.cs" />
+    <Compile Include="Project\Archival\FolderArchiveStep.cs" />
+    <Compile Include="Project\Archival\FolderArchiveStepConfig.cs" />
+    <Compile Include="Project\Archival\ZipArchiveStep.cs" />
     <Compile Include="Project\BuildSteps\ShellBuildStep\ShellBuildStep.cs" />
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityBuildStep.cs" />
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityInstallation.cs" />
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityProcess.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Project\Notification\NotificationConfig.cs" />
-    <Compile Include="Project\Notification\EmailNotification.cs" />
+    <Compile Include="Project\Notification\EmailNotificationConfig.cs" />
     <Compile Include="BuildInfo.cs" />
+    <Compile Include="Project\Archival\ArchiveStep.cs" />
+    <Compile Include="Project\Archival\ZipArchiveStepConfig.cs" />
+    <Compile Include="Project\Notification\EmailNotificationStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

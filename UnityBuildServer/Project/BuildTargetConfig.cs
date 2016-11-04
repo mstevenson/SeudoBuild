@@ -8,7 +8,7 @@ namespace UnityBuildServer
         public string Id { get; set; }
         public IVCSConfiguration VCSConfiguration { get; set; }
         public List<BuildStepConfig> BuildSteps { get; set; } = new List<BuildStepConfig>();
-        public List<ArchiveConfig> Archives { get; set; } = new List<ArchiveConfig>();
+        public List<ArchiveStepConfig> Archives { get; set; } = new List<ArchiveStepConfig>();
         public List<DistributionConfig> Distributions { get; set; } = new List<DistributionConfig>();
         public List<NotificationConfig> Notifications { get; set; } = new List<NotificationConfig>();
     }

@@ -2,7 +2,7 @@
 
 namespace UnityBuildServer
 {
-    public class FolderArchive : ArchiveConfig
+    public class FolderArchiveStep : ArchiveStep
     {
         public override void CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {

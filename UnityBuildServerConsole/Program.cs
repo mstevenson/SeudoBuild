@@ -31,14 +31,14 @@ namespace UnityBuildServerConsole
                                 Text = "ls -a"
                             }
                         },
-                        Archives = new List<ArchiveConfig> {
-                            new ZipArchive { Id = "ZipFile", Filename = "UnityTestProject_%platform%_%version%.zip" }
+                        Archives = new List<ArchiveStepConfig> {
+                            new ZipArchiveStepConfig { Id = "ZipFile", Filename = "UnityTestProject_%platform%_%version%.zip" }
                         },
                         Distributions = new List<DistributionConfig> {
-                            new FTPDistribution { Archive = "ZipFile", URL = "ftp://abcd.xyz" }
+                            new FTPDistributionConfig { Archive = "ZipFile", URL = "ftp://abcd.xyz" }
                         },
                         Notifications = new List<NotificationConfig> {
-                            new EmailNotification { Id = "Standard Email" }
+                            new EmailNotificationConfig { Id = "Standard Email" }
                         }
                     }
                 }
