@@ -1,5 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityBuildServer;
+using UnityBuildServer.VersionControl;
 
 namespace UnityBuildServerConsole
 {
@@ -7,15 +8,43 @@ namespace UnityBuildServerConsole
     {
         public static void Main(string[] args)
         {
-            var workspace = Workspace.Create ("~/Desktop/UnityBuildServer/UnityBuildServerWorkspace");
-
-            var repository = new Repository
+            var projectConfig = new ProjectConfig
             {
-                URL = "",
-                User = "test",
-                Password = "test",
-                Branch = ""
+                Id = "Unity Test Project",
+                BuildTargets = new List<BuildTargetConfig> {
+                    new BuildTargetConfig {
+                        Id = "Windows",
+                        VCSConfiguration = new GitConfiguration {
+                            RepositoryURL = "",
+                            RepositoryBranchName = "",
+                            User = "",
+                            Password = ""
+                        },
+                        BuildSteps = new List<BuildStepConfig> {
+                            new UnityBuildStep {
+                                TargetPlatform = UnityBuildStep.Platform.Windows,
+                                UnityVersionNumber = new VersionNumber { Major = 5, Minor = 4, Patch = 1 },
+                                ExecutableName = "UnityTestBuild",
+                                ExecuteMethod = "Builder.BuildForWindows",
+                            },
+                            new ShellBuildStep {
+                                Text = "ls -a"
+                            }
+                        },
+                        Archives = new List<ArchiveConfig> {
+                            new ZipArchive { Id = "ZipFile", Filename = "UnityTestProject_%platform%_%version%.zip" }
+                        },
+                        Distributions = new List<DistributionConfig> {
+                            new FTPDistribution { Archive = "ZipFile", URL = "ftp://abcd.xyz" }
+                        },
+                        Notifications = new List<NotificationConfig> {
+                            new EmailNotification { Id = "Standard Email" }
+                        }
+                    }
+                }
             };
+
+            Project.Create(projectConfig, "/Users/mike/Desktop/UnityBuildServerTestProject");
         }
     }
 }

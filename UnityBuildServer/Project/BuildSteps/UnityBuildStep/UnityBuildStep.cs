@@ -2,16 +2,25 @@
 
 namespace UnityBuildServer
 {
-    public enum Platform
+    public class UnityBuildStep : BuildStepConfig
     {
-        Mac,
-        Windows,
-        Linux
-    }
+        public override string Type
+        {
+            get
+            {
+                return "Unity";
+            }
+        }
 
-    public class UnityBuildSettings
-    {
+        public enum Platform
+        {
+            Mac,
+            Windows,
+            Linux
+        }
+
         public Platform TargetPlatform { get; set; }
+        public VersionNumber UnityVersionNumber { get; set; }
         public string ExecutableName { get; set; }
         public string ExecuteMethod { get; set; }
         //public bool DevelopmentBuild { get; set; }

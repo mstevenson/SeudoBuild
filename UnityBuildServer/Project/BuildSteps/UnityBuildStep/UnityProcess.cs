@@ -9,7 +9,7 @@ namespace UnityBuildServer
 {
     public class UnityProcess
     {
-        public static Task<ProcessResults> Run(UnityVersion unity, UnityBuildSettings unityBuildSettings, Workspace workspace)
+        public static Task<ProcessResults> Run(UnityInstallation unity, UnityBuildStep unityBuildSettings, Workspace workspace)
         {
             if (!File.Exists(unity.Path))
             {
@@ -23,7 +23,7 @@ namespace UnityBuildServer
             return task;
         }
 
-        static string BuildArgs(UnityBuildSettings settings, Workspace workspace)
+        static string BuildArgs(UnityBuildStep settings, Workspace workspace)
         {
             var args = new List<string>();
             args.Add("-quit");
@@ -35,7 +35,7 @@ namespace UnityBuildServer
 
             switch (settings.TargetPlatform)
             {
-                case Platform.Mac:
+                case UnityBuildStep.Platform.Mac:
                     args.Add("-buildTarget osx");
                     if (!hasExecuteMethod)
                     {
@@ -43,7 +43,7 @@ namespace UnityBuildServer
                         executableExtension = ".app";
                     }
                     break;
-                case Platform.Windows:
+                case UnityBuildStep.Platform.Windows:
                     args.Add("-buildTarget win64");
                     if (!hasExecuteMethod)
                     {
@@ -51,7 +51,7 @@ namespace UnityBuildServer
                         executableExtension = ".exe";
                     }
                     break;
-                case Platform.Linux:
+                case UnityBuildStep.Platform.Linux:
                     args.Add("-buildTarget linux64");
                     if (!hasExecuteMethod)
                     {
@@ -62,7 +62,7 @@ namespace UnityBuildServer
 
             if (!hasExecuteMethod)
             {
-                string exePath = $"{workspace.Path}/Output/{settings.ExecutableName}.{executableExtension}";
+                string exePath = $"{workspace.WorkingDirectory}/Output/{settings.ExecutableName}.{executableExtension}";
                 args.Add(exePath);
             }
 

@@ -1,9 +1,9 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class TargetBuilder
+    public class Builder
     {
-        public void Build(Target target)
+        public void Build(BuildTargetConfig target)
         {
             
         }
