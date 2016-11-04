@@ -30,7 +30,7 @@ namespace UnityBuildServer
 
             var pipeline = ProjectPipeline.Create(config.ProjectsPath, projectConfig, buildTargetName);
 
-            UpdateSource(pipeline);
+            UpdateWorkingCopy(pipeline);
             var buildInfos = Build(pipeline);
             var archiveInfos = Archive(buildInfos, pipeline);
             var distributeInfos = Distribute(archiveInfos, pipeline);
@@ -40,10 +40,22 @@ namespace UnityBuildServer
             BuildConsole.WriteLine("Build completed.");
         }
 
-        void UpdateSource(ProjectPipeline pipeline)
+        void UpdateWorkingCopy(ProjectPipeline pipeline)
         {
+            VCS vcs = pipeline.VersionControlSystem;
+
             BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteLine("Updating source files");
+            BuildConsole.WriteLine($"+ Update working copy ({vcs.TypeName})");
+            BuildConsole.IndentLevel = 1;
+
+            if (vcs.IsWorkingCopyInitialized)
+            {
+                vcs.Update();
+            }
+            else
+            {
+                vcs.Download();
+            }
         }
 
         List<BuildInfo> Build(ProjectPipeline pipeline)

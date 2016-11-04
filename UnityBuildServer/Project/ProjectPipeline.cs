@@ -5,33 +5,32 @@ namespace UnityBuildServer
 {
     public class ProjectPipeline
     {
-        ProjectConfig config;
-        string buildTargetName;
-        Workspace workspace;
-        BuildTargetConfig target;
-
         public VCS VersionControlSystem { get; private set; }
         public List<BuildStep> BuildSteps { get; private set; }
         public List<ArchiveStep> ArchiveSteps { get; private set; }
         public List<DistributeStep> DistributeSteps { get; private set; }
         public List<NotifyStep> NotifySteps { get; private set; }
 
+        ProjectConfig ProjectConfig { get; set; }
+        BuildTargetConfig TargetConfig { get; set; }
+
+        Workspace workspace;
+
         public static ProjectPipeline Create(string baseDirectory, ProjectConfig config, string buildTargetName)
         {
             var pipeline = new ProjectPipeline(config, buildTargetName);
-            pipeline.Initialize(baseDirectory);
+            pipeline.Initialize(baseDirectory, buildTargetName);
             return pipeline;
         }
 
         ProjectPipeline (ProjectConfig config, string buildTargetName)
         {
-            this.config = config;
-            this.buildTargetName = buildTargetName;
+            this.ProjectConfig = config;
         }
 
-        void Initialize(string projectsBaseDirectory)
+        void Initialize(string projectsBaseDirectory, string buildTargetName)
         {
-            string projectNameSanitized = config.Id.Replace(' ', '_');
+            string projectNameSanitized = ProjectConfig.Id.Replace(' ', '_');
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
 
             workspace = new Workspace
@@ -43,7 +42,7 @@ namespace UnityBuildServer
 
             workspace.InitializeDirectories();
 
-            target = GetBuildTargetConfig(buildTargetName);
+            TargetConfig = GetBuildTargetConfig(buildTargetName);
 
             VersionControlSystem = InitializeVersionControlSystem();
             BuildSteps = GenerateBuildSteps();
@@ -54,9 +53,9 @@ namespace UnityBuildServer
 
         BuildTargetConfig GetBuildTargetConfig(string targetName)
         {
-            foreach (var t in config.BuildTargets)
+            foreach (var t in ProjectConfig.BuildTargets)
             {
-                if (t.Name == buildTargetName)
+                if (t.Name == targetName)
                 {
                     return t;
                 }
@@ -66,10 +65,10 @@ namespace UnityBuildServer
 
         VCS InitializeVersionControlSystem()
         {
-            if (target.VCSConfiguration is GitVCSConfig)
+            if (TargetConfig.VCSConfiguration is GitVCSConfig)
             {
-                var gitConfig = (GitVCSConfig)target.VCSConfiguration;
-                var vcs = new GitVCS(workspace.WorkingDirectory, gitConfig.User, gitConfig.Password, gitConfig.IsLFS);
+                var gitConfig = (GitVCSConfig)TargetConfig.VCSConfiguration;
+                var vcs = new GitVCS(workspace.WorkingDirectory, gitConfig);
                 return vcs;
             }
             throw new Exception("Could not identify VCS type from target configuration");
@@ -78,7 +77,7 @@ namespace UnityBuildServer
         List<BuildStep> GenerateBuildSteps()
         {
             var steps = new List<BuildStep>();
-            foreach (var stepConfig in target.BuildSteps)
+            foreach (var stepConfig in TargetConfig.BuildSteps)
             {
                 if (stepConfig is UnityBuildConfig)
                 {
@@ -95,7 +94,7 @@ namespace UnityBuildServer
         List<ArchiveStep> GenerateArchiveSteps()
         {
             var steps = new List<ArchiveStep>();
-            foreach (var stepConfig in target.ArchiveSteps)
+            foreach (var stepConfig in TargetConfig.ArchiveSteps)
             {
                 if (stepConfig is ZipArchiveConfig)
                 {
@@ -112,7 +111,7 @@ namespace UnityBuildServer
         List<DistributeStep> GenerateDistributeSteps()
         {
             var steps = new List<DistributeStep>();
-            foreach (var stepConfig in target.DistributeSteps)
+            foreach (var stepConfig in TargetConfig.DistributeSteps)
             {
                 if (stepConfig is FTPDistributeConfig)
                 {
@@ -129,7 +128,7 @@ namespace UnityBuildServer
         List<NotifyStep> GenerateNotifySteps()
         {
             var steps = new List<NotifyStep>();
-            foreach (var stepConfig in target.NotifySteps)
+            foreach (var stepConfig in TargetConfig.NotifySteps)
             {
                 if (stepConfig is EmailNotifyConfig)
                 {
