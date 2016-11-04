@@ -5,6 +5,6 @@ namespace UnityBuildServer
     {
         public string Id { get; set; }
 
-        public abstract void CreateArchive(string workingDirectory, string archivesDirectory);
+        public abstract void CreateArchive(BuildInfo buildInfo, Workspace workspace);
     }
 }

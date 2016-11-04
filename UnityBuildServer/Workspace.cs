@@ -15,17 +15,17 @@ namespace UnityBuildServer
         /// Contains intermediate build files
         /// </summary>
         /// <value>The output directory.</value>
-        public string IntermediateBuildDirectory { get; set; }
+        public string BuildProductDirectory { get; set; }
 
         /// <summary>
         /// Contains products resulting from a build.
         /// </summary>
-        public string ArchiveDirectory { get; set; }
+        public string ArchivesDirectory { get; set; }
 
         public void InitializeDirectories()
         {
             Directory.CreateDirectory(WorkingDirectory);
-            Directory.CreateDirectory(IntermediateBuildDirectory);
+            Directory.CreateDirectory(BuildProductDirectory);
         }
 
         /// <summary>

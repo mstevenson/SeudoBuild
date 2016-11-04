@@ -18,8 +18,8 @@ namespace UnityBuildServer
             workspace = new Workspace
             {
                 WorkingDirectory = $"{projectDirectory}/Workspace",
-                IntermediateBuildDirectory = $"{projectDirectory}/Intermediate",
-                ArchiveDirectory = $"{projectDirectory}/Products",
+                BuildProductDirectory = $"{projectDirectory}/Intermediate",
+                ArchivesDirectory = $"{projectDirectory}/Products",
             };
 
             workspace.InitializeDirectories();

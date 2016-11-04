@@ -68,6 +68,7 @@
     <Compile Include="Project\Project.cs" />
     <Compile Include="Project\Notification\NotificationConfig.cs" />
     <Compile Include="Project\Notification\EmailNotification.cs" />
+    <Compile Include="BuildInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

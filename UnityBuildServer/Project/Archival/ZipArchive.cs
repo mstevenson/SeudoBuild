@@ -7,13 +7,13 @@ namespace UnityBuildServer
     {
         public string Filename { get; set; }
 
-        public override void CreateArchive(string workingDirectory, string archivesDirectory)
+        public override void CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
             using (var zipFile = new ZipFile())
             {
-                zipFile.AddDirectory(workingDirectory);
-                string filename = "test.zip";
-                zipFile.Save($"{archivesDirectory}/{filename}");
+                string outputName = buildInfo.GenerateFileName();
+                zipFile.AddDirectory(workspace.WorkingDirectory);
+                zipFile.Save($"{workspace.ArchivesDirectory}/{outputName}.zip");
             }
         }
     }
