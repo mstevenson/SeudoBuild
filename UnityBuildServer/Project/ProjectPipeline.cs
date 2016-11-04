@@ -37,8 +37,8 @@ namespace UnityBuildServer
             workspace = new Workspace
             {
                 WorkingDirectory = $"{projectDirectory}/Workspace",
-                BuildProductDirectory = $"{projectDirectory}/Intermediate",
-                ArchivesDirectory = $"{projectDirectory}/Products",
+                BuildProductDirectory = $"{projectDirectory}/BuildOutput",
+                ArchivesDirectory = $"{projectDirectory}/Archives",
             };
 
             workspace.InitializeDirectories();
