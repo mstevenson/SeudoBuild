@@ -5,6 +5,13 @@ namespace UnityBuildServer
 {
     public class ZipArchiveStep : ArchiveStep
     {
+        ZipArchiveStepConfig config;
+
+        public ZipArchiveStep(ZipArchiveStepConfig config)
+        {
+            this.config = config;
+        }
+
         public override void CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
             using (var zipFile = new ZipFile())

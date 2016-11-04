@@ -9,7 +9,7 @@ namespace UnityBuildServer
 {
     public class UnityProcess
     {
-        public static Task<ProcessResults> Run(UnityInstallation unity, UnityBuildStep unityBuildSettings, Workspace workspace)
+        public static Task<ProcessResults> Run(UnityInstallation unity, UnityBuildStepConfig unityBuildSettings, Workspace workspace)
         {
             if (!File.Exists(unity.Path))
             {
@@ -23,7 +23,7 @@ namespace UnityBuildServer
             return task;
         }
 
-        static string BuildArgs(UnityBuildStep settings, Workspace workspace)
+        static string BuildArgs(UnityBuildStepConfig settings, Workspace workspace)
         {
             var args = new List<string>();
             args.Add("-quit");
@@ -35,7 +35,7 @@ namespace UnityBuildServer
 
             switch (settings.TargetPlatform)
             {
-                case UnityBuildStep.Platform.Mac:
+                case UnityBuildStepConfig.Platform.Mac:
                     args.Add("-buildTarget osx");
                     if (!hasExecuteMethod)
                     {
@@ -43,7 +43,7 @@ namespace UnityBuildServer
                         executableExtension = ".app";
                     }
                     break;
-                case UnityBuildStep.Platform.Windows:
+                case UnityBuildStepConfig.Platform.Windows:
                     args.Add("-buildTarget win64");
                     if (!hasExecuteMethod)
                     {
@@ -51,7 +51,7 @@ namespace UnityBuildServer
                         executableExtension = ".exe";
                     }
                     break;
-                case UnityBuildStep.Platform.Linux:
+                case UnityBuildStepConfig.Platform.Linux:
                     args.Add("-buildTarget linux64");
                     if (!hasExecuteMethod)
                     {

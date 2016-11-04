@@ -2,7 +2,7 @@
 
 namespace UnityBuildServer
 {
-    public class EmailNotificationStep
+    public class EmailNotificationStep : NotificationStep
     {
         EmailNotificationConfig config;
 

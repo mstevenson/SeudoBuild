@@ -4,6 +4,13 @@ namespace UnityBuildServer
 {
     public class FolderArchiveStep : ArchiveStep
     {
+        FolderArchiveStepConfig config;
+
+        public FolderArchiveStep(FolderArchiveStepConfig config)
+        {
+            this.config = config;
+        }
+
         public override void CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
             string source = workspace.WorkingDirectory;

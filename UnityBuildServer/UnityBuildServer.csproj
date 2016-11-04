@@ -40,18 +40,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Builder.cs" />
     <Compile Include="RunProcessAsTask\ProcessEx.cs" />
     <Compile Include="RunProcessAsTask\ProcessEx.overloads.cs" />
     <Compile Include="RunProcessAsTask\ProcessResults.cs" />
     <Compile Include="Workspace.cs" />
-    <Compile Include="VersionControl\Git\Git.cs" />
+    <Compile Include="VersionControl\Git\GitVCS.cs" />
     <Compile Include="VersionControl\Git\LFSFilter.cs" />
     <Compile Include="Project\ProjectConfig.cs" />
-    <Compile Include="VersionControl\IVersionControlSystem.cs" />
+    <Compile Include="VersionControl\IVCS.cs" />
     <Compile Include="Project\BuildStepConfig.cs" />
     <Compile Include="VersionControl\IVCSConfiguration.cs" />
-    <Compile Include="VersionControl\Git\GitConfiguration.cs" />
+    <Compile Include="VersionControl\Git\GitVCSConfiguration.cs" />
     <Compile Include="Project\BuildTargetConfig.cs" />
     <Compile Include="VersionNumber.cs" />
     <Compile Include="Project\Distribution\DistributionConfig.cs" />
@@ -61,21 +60,28 @@
     <Compile Include="Project\Archival\FolderArchiveStep.cs" />
     <Compile Include="Project\Archival\FolderArchiveStepConfig.cs" />
     <Compile Include="Project\Archival\ZipArchiveStep.cs" />
-    <Compile Include="Project\BuildSteps\ShellBuildStep\ShellBuildStep.cs" />
-    <Compile Include="Project\BuildSteps\UnityBuildStep\UnityBuildStep.cs" />
+    <Compile Include="Project\BuildSteps\ShellBuildStep\ShellBuildStepConfig.cs" />
+    <Compile Include="Project\BuildSteps\UnityBuildStep\UnityBuildStepConfig.cs" />
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityInstallation.cs" />
     <Compile Include="Project\BuildSteps\UnityBuildStep\UnityProcess.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
     <Compile Include="Project\Notification\NotificationConfig.cs" />
     <Compile Include="Project\Notification\EmailNotificationConfig.cs" />
-    <Compile Include="BuildInfo.cs" />
     <Compile Include="Project\Archival\ArchiveStep.cs" />
     <Compile Include="Project\Archival\ZipArchiveStepConfig.cs" />
     <Compile Include="Project\Notification\EmailNotificationStep.cs" />
     <Compile Include="Project\Distribution\FTPDistributionStep.cs" />
     <Compile Include="Project\Distribution\DistributionStep.cs" />
     <Compile Include="Project\Distribution\SteamDistributionStep.cs" />
-    <Compile Include="BuilderConfig.cs" />
+    <Compile Include="Project\Notification\NotificationStep.cs" />
+    <Compile Include="Project\BuildSteps\BuildStep.cs" />
+    <Compile Include="Project\BuildSteps\ShellBuildStep\ShellBuildStep.cs" />
+    <Compile Include="Project\BuildSteps\UnityBuildStep\UnityBuildStep.cs" />
+    <Compile Include="Build\BuilderConfig.cs" />
+    <Compile Include="Build\Builder.cs" />
+    <Compile Include="Build\ArchiveInfo.cs" />
+    <Compile Include="Build\BuildInfo.cs" />
+    <Compile Include="Build\DistributeInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -89,6 +95,7 @@
     <Folder Include="Project\Archival\" />
     <Folder Include="Project\BuildSteps\" />
     <Folder Include="Project\Notification\" />
+    <Folder Include="Build\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

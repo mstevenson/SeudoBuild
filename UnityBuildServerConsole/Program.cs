@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityBuildServer;
-using UnityBuildServer.VersionControl;
 
 namespace UnityBuildServerConsole
 {
@@ -14,30 +13,30 @@ namespace UnityBuildServerConsole
                 BuildTargets = new List<BuildTargetConfig> {
                     new BuildTargetConfig {
                         Name = "Windows",
-                        VCSConfiguration = new GitConfiguration {
+                        VCSConfiguration = new GitVCSConfiguration {
                             RepositoryURL = "",
                             RepositoryBranchName = "",
                             User = "",
                             Password = ""
                         },
                         BuildSteps = new List<BuildStepConfig> {
-                            new UnityBuildStep {
-                                TargetPlatform = UnityBuildStep.Platform.Windows,
+                            new UnityBuildStepConfig {
+                                TargetPlatform = UnityBuildStepConfig.Platform.Windows,
                                 UnityVersionNumber = new VersionNumber { Major = 5, Minor = 4, Patch = 1 },
                                 ExecutableName = "UnityTestBuild",
                                 ExecuteMethod = "Builder.BuildForWindows",
                             },
-                            new ShellBuildStep {
+                            new ShellBuildStepConfig {
                                 Text = "ls -a"
                             }
                         },
-                        Archives = new List<ArchiveStepConfig> {
+                        ArchiveSteps = new List<ArchiveStepConfig> {
                             new ZipArchiveStepConfig { Id = "ZipFile", Filename = "UnityTestProject_%platform%_%version%.zip" }
                         },
-                        Distributions = new List<DistributionConfig> {
+                        DistributionSteps = new List<DistributionConfig> {
                             new FTPDistributionConfig { ArchiveFileName = "ZipFile", URL = "ftp://abcd.xyz" }
                         },
-                        Notifications = new List<NotificationConfig> {
+                        NotificationSteps = new List<NotificationConfig> {
                             new EmailNotificationConfig { Id = "Standard Email" }
                         }
                     }

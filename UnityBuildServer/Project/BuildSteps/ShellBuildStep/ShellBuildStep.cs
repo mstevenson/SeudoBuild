@@ -1,16 +1,13 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class ShellBuildStep : BuildStepConfig
+    public class ShellBuildStep : BuildStep
     {
-        public override string Type
-        {
-            get
-            {
-                return "Shell";
-            }
-        }
+        ShellBuildStepConfig config;
 
-        public string Text { get; set; }
+        public ShellBuildStep(ShellBuildStepConfig config)
+        {
+            this.config = config;
+        }
     }
 }

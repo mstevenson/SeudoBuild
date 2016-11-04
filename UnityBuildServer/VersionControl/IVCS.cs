@@ -1,6 +1,6 @@
 ﻿namespace UnityBuildServer
 {
-    public interface IVersionControlSystem
+    public interface IVCS
     {
         bool IsWorkingCopyInitialized { get; }
         void Download(string url);

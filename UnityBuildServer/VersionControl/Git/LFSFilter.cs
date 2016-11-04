@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using LibGit2Sharp;
 
-namespace UnityBuildServer.VersionControl
+namespace UnityBuildServer
 {
     public class LFSFilter : Filter
     {

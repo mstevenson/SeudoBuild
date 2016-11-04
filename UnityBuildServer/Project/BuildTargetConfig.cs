@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityBuildServer.VersionControl;
 
 namespace UnityBuildServer
 {
@@ -8,8 +7,8 @@ namespace UnityBuildServer
         public string Name { get; set; }
         public IVCSConfiguration VCSConfiguration { get; set; }
         public List<BuildStepConfig> BuildSteps { get; set; } = new List<BuildStepConfig>();
-        public List<ArchiveStepConfig> Archives { get; set; } = new List<ArchiveStepConfig>();
-        public List<DistributionConfig> Distributions { get; set; } = new List<DistributionConfig>();
-        public List<NotificationConfig> Notifications { get; set; } = new List<NotificationConfig>();
+        public List<ArchiveStepConfig> ArchiveSteps { get; set; } = new List<ArchiveStepConfig>();
+        public List<DistributionConfig> DistributionSteps { get; set; } = new List<DistributionConfig>();
+        public List<NotificationConfig> NotificationSteps { get; set; } = new List<NotificationConfig>();
     }
 }

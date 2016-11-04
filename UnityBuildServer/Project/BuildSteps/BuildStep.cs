@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public interface IVCSConfiguration
+    public class BuildStep
     {
     }
 }

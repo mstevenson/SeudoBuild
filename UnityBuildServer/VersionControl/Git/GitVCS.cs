@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using RunProcessAsTask;
 using LibGit2Sharp;
 
-namespace UnityBuildServer.VersionControl
+namespace UnityBuildServer
 {
-    public class Git : IVersionControlSystem
+    public class GitVCS : IVCS
     {
         string workingDirectory;
         bool isLFS;
@@ -15,7 +15,7 @@ namespace UnityBuildServer.VersionControl
         //public static Signature signature;
         FilterRegistration lfsFilter;
 
-        public Git(string workingDirectory, string username, string password, bool isLFS)
+        public GitVCS(string workingDirectory, string username, string password, bool isLFS)
         {
             // Register git-lfs Smudge and Clean filters here
             // https://github.com/libgit2/libgit2sharp/issues/1236
