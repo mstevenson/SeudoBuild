@@ -51,7 +51,7 @@ namespace UnityBuildServer
                 fileStream.Close();
 
                 FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-                Console.WriteLine("Upload File Complete, status {0}", response.StatusDescription);
+                BuildConsole.WriteLine($"Upload File Complete, status {response.StatusDescription}");
                 response.Close();
             }
             catch (Exception ex)

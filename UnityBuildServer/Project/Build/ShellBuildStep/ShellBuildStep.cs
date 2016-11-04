@@ -40,7 +40,7 @@ namespace UnityBuildServer
                 string line = process.StandardOutput.ReadLine();
 
                 // TODO do something with line
-                System.Console.WriteLine("    " + line);
+                BuildConsole.WriteLine(line);
             }
 
             return new BuildInfo();

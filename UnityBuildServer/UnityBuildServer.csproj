@@ -82,6 +82,7 @@
     <Compile Include="Build\ArchiveInfo.cs" />
     <Compile Include="Build\BuildInfo.cs" />
     <Compile Include="Build\DistributeInfo.cs" />
+    <Compile Include="BuildConsole.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -35,22 +35,29 @@ namespace UnityBuildServer
             var archiveInfos = Archive(buildInfos, pipeline);
             var distributeInfos = Distribute(archiveInfos, pipeline);
             Notify(distributeInfos, pipeline);
+
+            BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteLine("Build completed.");
         }
 
         void UpdateSource(ProjectPipeline pipeline)
         {
-            Console.WriteLine("Updating source files");
+            BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteLine("Updating source files");
         }
 
         List<BuildInfo> Build(ProjectPipeline pipeline)
         {
-            Console.WriteLine("+ Build");
+            BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteLine("+ Build");
+            BuildConsole.IndentLevel = 1;
 
             List<BuildInfo> buildInfos = new List<BuildInfo>();
 
             foreach (var step in pipeline.BuildSteps)
             {
-                Console.WriteLine("  + " + step.TypeName);
+                BuildConsole.WriteLine("+ " + step.TypeName);
+                BuildConsole.IndentLevel = 2;
                 var info = step.Execute();
                 buildInfos.Add(info);
             }
@@ -60,13 +67,16 @@ namespace UnityBuildServer
 
         List<ArchiveInfo> Archive(List<BuildInfo> buildInfos, ProjectPipeline pipeline)
         {
-            Console.WriteLine("+ Archive");
+            BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteLine("+ Archive");
+            BuildConsole.IndentLevel = 1;
 
             List<ArchiveInfo> archiveInfos = new List<ArchiveInfo>();
 
             foreach (var step in pipeline.ArchiveSteps)
             {
-                Console.WriteLine("  + " + step.TypeName);
+                BuildConsole.WriteLine("+ " + step.TypeName);
+                BuildConsole.IndentLevel = 2;
                 //step.CreateArchive(buildInfo);
             }
 
@@ -75,13 +85,16 @@ namespace UnityBuildServer
 
         List<DistributeInfo> Distribute(List<ArchiveInfo> archiveInfos, ProjectPipeline pipeline)
         {
-            Console.WriteLine("+ Distribute");
+            BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteLine("+ Distribute");
+            BuildConsole.IndentLevel = 1;
 
             List<DistributeInfo> distributeInfos = new List<DistributeInfo>();
 
             foreach (var step in pipeline.DistributeSteps)
             {
-                Console.WriteLine($"  + {step.TypeName}");
+                BuildConsole.WriteLine($"+ {step.TypeName}");
+                BuildConsole.IndentLevel = 2;
                 //step.Distribute (
             }
 
@@ -90,11 +103,14 @@ namespace UnityBuildServer
 
         void Notify(List<DistributeInfo> distributeInfos, ProjectPipeline pipeline)
         {
-            Console.WriteLine("+ Notify");
+            BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteLine("+ Notify");
+            BuildConsole.IndentLevel = 1;
 
             foreach (var step in pipeline.NotifySteps)
             {
-                Console.WriteLine("  + " + step.TypeName);
+                BuildConsole.WriteLine("+ " + step.TypeName);
+                BuildConsole.IndentLevel = 2;
                 step.Notify();
             }
         }
