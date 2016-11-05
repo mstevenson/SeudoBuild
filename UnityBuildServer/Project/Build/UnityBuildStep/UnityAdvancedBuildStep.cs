@@ -1,12 +1,12 @@
 ﻿using System;
 namespace UnityBuildServer
 {
-    public class UnityBuildStep : BuildStep
+    public class UnityAdvancedBuildStep : BuildStep
     {
-        UnityBuildConfig config;
+        UnityAdvancedBuildConfig config;
         Workspace workspace;
 
-        public UnityBuildStep(UnityBuildConfig config, Workspace workspace)
+        public UnityAdvancedBuildStep(UnityAdvancedBuildConfig config, Workspace workspace)
         {
             this.config = config;
             this.workspace = workspace;
@@ -16,7 +16,7 @@ namespace UnityBuildServer
         {
             get
             {
-                return "Unity Build";
+                return "Unity Advanced Build";
             }
         }
 

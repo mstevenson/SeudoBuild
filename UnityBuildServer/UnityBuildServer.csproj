@@ -64,7 +64,7 @@
     <Compile Include="Project\Archive\FolderArchiveStepConfig.cs" />
     <Compile Include="Project\Archive\ZipArchiveStep.cs" />
     <Compile Include="Project\Build\ShellBuildStep\ShellBuildStepConfig.cs" />
-    <Compile Include="Project\Build\UnityBuildStep\UnityBuildConfig.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityStandardBuildConfig.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityInstallation.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityProcess.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
@@ -79,7 +79,7 @@
     <Compile Include="Project\Notify\NotifyStep.cs" />
     <Compile Include="Project\Build\BuildStep.cs" />
     <Compile Include="Project\Build\ShellBuildStep\ShellBuildStep.cs" />
-    <Compile Include="Project\Build\UnityBuildStep\UnityBuildStep.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityStandardBuildStep.cs" />
     <Compile Include="Build\BuilderConfig.cs" />
     <Compile Include="Build\Builder.cs" />
     <Compile Include="Build\ArchiveInfo.cs" />
@@ -90,6 +90,11 @@
     <Compile Include="ConfigSerializer.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeConfig.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityAdvancedBuildConfig.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityAdvancedBuildStep.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityPlatform.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodStep.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

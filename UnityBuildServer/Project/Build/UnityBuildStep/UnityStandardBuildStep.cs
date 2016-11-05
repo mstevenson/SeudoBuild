@@ -1,15 +1,32 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using RunProcessAsTask;
-using System.Text;
-
+﻿using System;
 namespace UnityBuildServer
 {
-    public class UnityProcess
+    public class UnityStandardBuildStep : BuildStep
     {
-        //public static Task<ProcessResults> Run(UnityInstallation unity, UnityStandardBuildConfig unityBuildSettings, Workspace workspace)
+        UnityStandardBuildConfig config;
+        Workspace workspace;
+
+        public UnityStandardBuildStep(UnityStandardBuildConfig config, Workspace workspace)
+        {
+            this.config = config;
+            this.workspace = workspace;
+        }
+
+        public override string TypeName
+        {
+            get
+            {
+                return "Unity Standard Build";
+            }
+        }
+
+        public override void Execute()
+        {
+            // TODO
+        }
+
+
+        //static Task<ProcessResults> Run(UnityInstallation unity, UnityStandardBuildConfig unityBuildSettings, Workspace workspace)
         //{
         //    if (!File.Exists(unity.Path))
         //    {
@@ -23,7 +40,7 @@ namespace UnityBuildServer
         //    return task;
         //}
 
-        //static string BuildArgs(UnityStandardBuildConfig settings, Workspace workspace)
+        //string BuildArgs(UnityStandardBuildConfig settings, Workspace workspace)
         //{
         //    var args = new List<string>();
         //    args.Add("-quit");
@@ -68,7 +85,7 @@ namespace UnityBuildServer
 
         //    args.Add($"-executeMethod {settings.MethodName}");
 
-        //    return string.Join(" ", args.ToArray ());
+        //    return string.Join(" ", args.ToArray());
         //}
     }
 }

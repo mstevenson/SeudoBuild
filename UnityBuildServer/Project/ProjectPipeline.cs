@@ -73,9 +73,17 @@ namespace UnityBuildServer
             var steps = new List<BuildStep>();
             foreach (var stepConfig in TargetConfig.BuildSteps)
             {
-                if (stepConfig is UnityBuildConfig)
+                if (stepConfig is UnityStandardBuildConfig)
                 {
-                    steps.Add(new UnityBuildStep((UnityBuildConfig)stepConfig, Workspace));
+                    steps.Add(new UnityStandardBuildStep((UnityStandardBuildConfig)stepConfig, Workspace));
+                }
+                if (stepConfig is UnityExecuteMethodConfig)
+                {
+                    steps.Add(new UnityExecuteMethodStep((UnityExecuteMethodConfig)stepConfig, Workspace));
+                }
+                if (stepConfig is UnityAdvancedBuildConfig)
+                {
+                    steps.Add(new UnityAdvancedBuildStep((UnityAdvancedBuildConfig)stepConfig, Workspace));
                 }
                 else if (stepConfig is ShellBuildStepConfig)
                 {
