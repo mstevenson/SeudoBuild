@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Text;
+using System.Collections.Generic;
 
 namespace UnityBuildServer
 {
@@ -22,7 +22,7 @@ namespace UnityBuildServer
             }
         }
 
-        public override void Distribute(string archivePath, Workspace workspace)
+        public override void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace)
         {
             // Get the object used to communicate with the server.
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{config.URL}:{config.Port}/{config.BasePath}/{config.ArchiveFileName}");

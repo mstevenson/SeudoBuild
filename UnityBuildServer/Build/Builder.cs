@@ -117,7 +117,7 @@ namespace UnityBuildServer
             {
                 BuildConsole.WriteLine($"+ {step.TypeName}");
                 BuildConsole.IndentLevel = 2;
-                //step.Distribute (
+                step.Distribute(archiveInfos, pipeline.Workspace);
             }
 
             return distributeInfos;

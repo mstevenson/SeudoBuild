@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+
 namespace UnityBuildServer
 {
     public class SteamDistributeStep : DistributeStep
@@ -18,7 +19,7 @@ namespace UnityBuildServer
             }
         }
 
-        public override void Distribute(string archivePath, Workspace workspace)
+        public override void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace)
         {
             // TODO
         }

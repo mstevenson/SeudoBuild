@@ -2,6 +2,14 @@
 
 namespace UnityBuildServer
 {
+    /// <summary>
+    /// Executes an arbitrary shell script as part of a build process.
+    /// 
+    /// Available variables:
+    /// %working_directory% -- the full path of the working directory in which the un-built project files are stored
+    /// %build_output_directory% -- the directory containing build products
+    /// %archives_directory% -- the directory in which build products will be archived during a later step
+    /// </summary>
     public class ShellBuildStep : BuildStep
     {
         ShellBuildStepConfig config;
@@ -11,6 +19,10 @@ namespace UnityBuildServer
         {
             this.config = config;
             this.workspace = workspace;
+
+            workspace.Replacements.Add("working_directory", workspace.WorkingDirectory);
+            workspace.Replacements.Add("build_output_directory", workspace.BuildOutputDirectory);
+            workspace.Replacements.Add("archives_directory", workspace.ArchivesDirectory);
         }
 
         public override string TypeName
@@ -41,13 +53,15 @@ namespace UnityBuildServer
             var process = new Process { StartInfo = startInfo };
             process.Start();
 
+            System.Console.ForegroundColor = System.ConsoleColor.DarkGreen;
+
             while (!process.StandardOutput.EndOfStream)
             {
                 string line = process.StandardOutput.ReadLine();
-
-                // TODO do something with line
                 BuildConsole.WriteLine(line);
             }
+
+            System.Console.ResetColor();
         }
     }
 }
