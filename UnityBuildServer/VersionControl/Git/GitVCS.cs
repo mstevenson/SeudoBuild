@@ -66,7 +66,7 @@ namespace UnityBuildServer
             };
             Repository.Clone(config.RepositoryURL, workingDirectory, cloneOptions);
 
-            if (config.IsLFS)
+            if (config.UseLFS)
             {
                 PullLFS();
             }
@@ -87,7 +87,7 @@ namespace UnityBuildServer
             }
 
             // Download LFS files
-            if (config.IsLFS)
+            if (config.UseLFS)
             {
                 PullLFS();
             }
