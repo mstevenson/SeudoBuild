@@ -30,7 +30,7 @@ namespace UnityBuildServer
 
         void Initialize(string projectsBaseDirectory, string buildTargetName)
         {
-            string projectNameSanitized = ProjectConfig.Name.Replace(' ', '_');
+            string projectNameSanitized = ProjectConfig.ProjectName.Replace(' ', '_');
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
 
             Workspace = new Workspace(projectDirectory);

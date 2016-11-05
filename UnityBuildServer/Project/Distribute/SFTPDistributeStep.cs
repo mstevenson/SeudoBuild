@@ -63,7 +63,7 @@ namespace UnityBuildServer
                     client.UploadFile(stream, filename);
                 }
 
-                BuildConsole.WriteLine("Upload successful");
+                BuildConsole.WriteLine("Upload succeeded");
             }
         }
     }

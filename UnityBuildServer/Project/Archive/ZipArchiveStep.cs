@@ -36,12 +36,16 @@ namespace UnityBuildServer
                 File.Delete(filepath);
             }
 
+            BuildConsole.WriteLine($"Creating zip file {filename}");
+
             // Save zip file
             using (var zipFile = new ZipFile())
             {
                 zipFile.AddDirectory(workspace.WorkingDirectory);
                 zipFile.Save(filepath);
             }
+
+            BuildConsole.WriteLine("Zip file saved");
 
             var archiveInfo = new ArchiveInfo { ArchiveFileName = filename };
             return archiveInfo;

@@ -38,10 +38,14 @@ namespace UnityBuildServer
                 Credentials = new NetworkCredential(config.SMTPUser, config.SMTPPassword)
             };
 
+            BuildConsole.WriteLine($"Sending email notification to {to}");
+
             MailMessage message = new MailMessage(from, to);
             message.Subject = subject;
             message.Body = body;
             client.Send(message);
+
+            BuildConsole.WriteLine("Email notification send");
         }
     }
 }

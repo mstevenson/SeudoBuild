@@ -6,7 +6,7 @@ namespace UnityBuildServer
 {
     /// <summary>
     /// 
-    /// Variables:
+    /// Text replacement variables:
     /// %project_name% -- the name for the entire project
     /// %build_target_name% -- the specific target that was built
     /// %app_version% -- version number as major.minor.patch
@@ -24,6 +24,12 @@ namespace UnityBuildServer
 
         public void ExecuteBuild(ProjectConfig projectConfig, string buildTargetName)
         {
+            BuildConsole.WriteLine("Starting build process:");
+            BuildConsole.IndentLevel = 1;
+            BuildConsole.WriteLine($"Project: {projectConfig.ProjectName}");
+            BuildConsole.WriteLine($"Target:  {buildTargetName}");
+            BuildConsole.WriteLine("");
+
             // Establish build target
             BuildTargetConfig targetConfig = null;
             foreach (var target in projectConfig.BuildTargets)
@@ -64,6 +70,7 @@ namespace UnityBuildServer
 
             // Done
             BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteLine("");
             BuildConsole.WriteLine("Build completed.");
         }
 
@@ -73,7 +80,7 @@ namespace UnityBuildServer
 
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine($"+ Update working copy ({vcs.TypeName})");
-            BuildConsole.IndentLevel = 1;
+            BuildConsole.IndentLevel = 2;
 
             if (vcs.IsWorkingCopyInitialized)
             {
@@ -97,7 +104,7 @@ namespace UnityBuildServer
             BuildInfo buildInfo = new BuildInfo
             {
                 BuildDate = DateTime.Now,
-                ProjectName = pipeline.ProjectConfig.Name,
+                ProjectName = pipeline.ProjectConfig.ProjectName,
                 BuildTargetName = pipeline.TargetConfig.Name
             };
 
@@ -106,7 +113,7 @@ namespace UnityBuildServer
             foreach (var step in pipeline.BuildSteps)
             {
                 BuildConsole.WriteLine("+ " + step.TypeName);
-                BuildConsole.IndentLevel = 2;
+                BuildConsole.IndentLevel = 3;
                 step.Execute();
             }
 
@@ -124,9 +131,15 @@ namespace UnityBuildServer
             foreach (var step in pipeline.ArchiveSteps)
             {
                 BuildConsole.WriteLine("+ " + step.TypeName);
-                BuildConsole.IndentLevel = 2;
+                BuildConsole.IndentLevel = 3;
                 var info = step.CreateArchive(buildInfo, pipeline.Workspace);
                 archiveInfos.Add(info);
+            }
+
+            if (pipeline.ArchiveSteps.Count == 0)
+            {
+                BuildConsole.IndentLevel = 2;
+                BuildConsole.WriteLine("No archive steps");
             }
 
             return archiveInfos;
@@ -143,8 +156,14 @@ namespace UnityBuildServer
             foreach (var step in pipeline.DistributeSteps)
             {
                 BuildConsole.WriteLine($"+ {step.TypeName}");
-                BuildConsole.IndentLevel = 2;
+                BuildConsole.IndentLevel = 3;
                 step.Distribute(archiveInfos, pipeline.Workspace);
+            }
+
+            if (pipeline.DistributeSteps.Count == 0)
+            {
+                BuildConsole.IndentLevel = 2;
+                BuildConsole.WriteLine("No distribute steps");
             }
 
             return distributeInfos;
@@ -159,8 +178,14 @@ namespace UnityBuildServer
             foreach (var step in pipeline.NotifySteps)
             {
                 BuildConsole.WriteLine("+ " + step.TypeName);
-                BuildConsole.IndentLevel = 2;
+                BuildConsole.IndentLevel = 3;
                 step.Notify();
+            }
+
+            if (pipeline.NotifySteps.Count == 0)
+            {
+                BuildConsole.IndentLevel = 2;
+                BuildConsole.WriteLine("No notify steps");
             }
         }
     }

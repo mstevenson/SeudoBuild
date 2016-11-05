@@ -5,7 +5,7 @@ namespace UnityBuildServer
     /// <summary>
     /// Executes an arbitrary shell script as part of a build process.
     /// 
-    /// Variables:
+    /// Text replacement variables:
     /// %working_directory% -- the full path of the working directory in which the un-built project files are stored
     /// %build_output_directory% -- the directory containing build products
     /// %archives_directory% -- the directory in which build products will be archived during a later step
