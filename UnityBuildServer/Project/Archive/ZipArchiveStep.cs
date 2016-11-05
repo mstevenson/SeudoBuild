@@ -22,11 +22,14 @@ namespace UnityBuildServer
 
         public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
+            // Remove file extension in case it was accidentally included in the config data
+            string filename = Path.GetFileNameWithoutExtension(config.Filename);
             // Replace in-line variables
-            string filename = workspace.Replacements.ReplaceVariablesInText(config.Filename);
+            filename = workspace.Replacements.ReplaceVariablesInText(config.Filename);
             // Sanitize
             filename = filename.Replace(' ', '_');
-            string filepath = $"{workspace.ArchivesDirectory}/{filename}.zip";
+            filename = filename + ".zip";
+            string filepath = $"{workspace.ArchivesDirectory}/{filename}";
 
             // Remove old file
             if (File.Exists(filepath)) {
