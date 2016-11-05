@@ -57,12 +57,14 @@ namespace UnityBuildServer
         {
             // Write git-lfs pointer to stdin
             input.CopyTo(process.StandardInput.BaseStream);
+            input.Flush();
         }
 
         protected override void Clean(string path, string root, Stream input, Stream output)
         {
             // Write file data to stdin
             input.CopyTo(process.StandardInput.BaseStream);
+            input.Flush();
         }
     }
 }
