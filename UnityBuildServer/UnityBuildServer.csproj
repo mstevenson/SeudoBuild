@@ -83,6 +83,7 @@
     <Compile Include="Build\BuildInfo.cs" />
     <Compile Include="Build\DistributeInfo.cs" />
     <Compile Include="BuildConsole.cs" />
+    <Compile Include="TextReplacements.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

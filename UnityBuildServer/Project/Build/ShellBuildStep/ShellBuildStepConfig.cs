@@ -11,6 +11,6 @@ namespace UnityBuildServer
             }
         }
 
-        public string Text { get; set; }
+        public string Command { get; set; }
     }
 }

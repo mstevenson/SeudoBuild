@@ -5,10 +5,12 @@ namespace UnityBuildServer
     public class ShellBuildStep : BuildStep
     {
         ShellBuildStepConfig config;
+        Workspace workspace;
 
-        public ShellBuildStep(ShellBuildStepConfig config)
+        public ShellBuildStep(ShellBuildStepConfig config, Workspace workspace)
         {
             this.config = config;
+            this.workspace = workspace;
         }
 
         public override string TypeName
@@ -21,12 +23,14 @@ namespace UnityBuildServer
 
         public override BuildInfo Execute()
         {
-            string command = config.Text.Replace(@"""", @"\""");
+            string command = TextReplacements.FillPlaceholders(config.Command);
+            command = command.Replace(@"""", @"\""");
 
             var startInfo = new ProcessStartInfo
             {
                 FileName = "bash",
                 Arguments = $"-c \"{command}\"",
+                WorkingDirectory = workspace.WorkingDirectory,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true

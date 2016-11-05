@@ -15,7 +15,7 @@ namespace UnityBuildServer
         /// Contains intermediate build files
         /// </summary>
         /// <value>The output directory.</value>
-        public string BuildProductDirectory { get; set; }
+        public string BuildOutputDirectory { get; set; }
 
         /// <summary>
         /// Contains products resulting from a build.
@@ -28,9 +28,9 @@ namespace UnityBuildServer
             {
                 Directory.CreateDirectory(WorkingDirectory);
             }
-            if (!Directory.Exists(BuildProductDirectory))
+            if (!Directory.Exists(BuildOutputDirectory))
             {
-                Directory.CreateDirectory(BuildProductDirectory);
+                Directory.CreateDirectory(BuildOutputDirectory);
             }
             if (!Directory.Exists(ArchivesDirectory))
             {

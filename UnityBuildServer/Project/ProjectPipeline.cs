@@ -36,9 +36,13 @@ namespace UnityBuildServer
             workspace = new Workspace
             {
                 WorkingDirectory = $"{projectDirectory}/Workspace",
-                BuildProductDirectory = $"{projectDirectory}/BuildOutput",
+                BuildOutputDirectory = $"{projectDirectory}/BuildOutput",
                 ArchivesDirectory = $"{projectDirectory}/Archives",
             };
+
+            TextReplacements.RegisterReplacement("working_directory", workspace.WorkingDirectory);
+            TextReplacements.RegisterReplacement("build_output_directory", workspace.BuildOutputDirectory);
+            TextReplacements.RegisterReplacement("archives_directory", workspace.ArchivesDirectory);
 
             workspace.InitializeDirectories();
 
@@ -81,11 +85,11 @@ namespace UnityBuildServer
             {
                 if (stepConfig is UnityBuildConfig)
                 {
-                    steps.Add(new UnityBuildStep((UnityBuildConfig)stepConfig));
+                    steps.Add(new UnityBuildStep((UnityBuildConfig)stepConfig, workspace));
                 }
                 else if (stepConfig is ShellBuildStepConfig)
                 {
-                    steps.Add(new ShellBuildStep((ShellBuildStepConfig)stepConfig));
+                    steps.Add(new ShellBuildStep((ShellBuildStepConfig)stepConfig, workspace));
                 }
             }
             return steps;
