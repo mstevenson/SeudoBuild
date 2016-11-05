@@ -84,6 +84,7 @@
     <Compile Include="Build\DistributeInfo.cs" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="TextReplacements.cs" />
+    <Compile Include="ConfigSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
