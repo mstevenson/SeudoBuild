@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 
 namespace UnityBuildServer
 {
@@ -32,12 +33,23 @@ namespace UnityBuildServer
 
         public void Upload(ArchiveInfo archiveInfo, Workspace workspace)
         {
-            var passwordAuthentication = new PasswordAuthenticationMethod(config.Username, config.Password);
-            ConnectionInfo connectionInfo = new ConnectionInfo(config.Host, config.Port, config.Username, passwordAuthentication);
+            // Supply the password via fake keyboard input
+            var keyboardAuthMethod = new KeyboardInteractiveAuthenticationMethod(config.Username);
+            keyboardAuthMethod.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>((sender, args) => {
+                foreach (AuthenticationPrompt prompt in args.Prompts)
+                {
+                    if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
+                    {
+                        prompt.Response = config.Password;
+                    }
+                }
+            });
+                                                                                           
+            ConnectionInfo connectionInfo = new ConnectionInfo(config.Host, config.Port, config.Username, keyboardAuthMethod);
 
             using (var client = new SftpClient(connectionInfo))
             {
-                BuildConsole.WriteLine($"Uploading {archiveInfo.ArchiveFileName} to {config.Host}/{config.WorkingDirectory}");
+                BuildConsole.WriteLine($"Uploading {archiveInfo.ArchiveFileName} to {config.Host} {config.WorkingDirectory}");
 
                 client.Connect();
                 client.ChangeDirectory(config.WorkingDirectory);
