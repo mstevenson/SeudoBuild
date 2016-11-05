@@ -38,17 +38,29 @@ namespace UnityBuildServer
             }
         }
 
-        /// <summary>
-        /// Delete all files and directories in the workspace.
-        /// </summary>
-        public void Clean()
+        public void CleanWorkingDirectory()
         {
-            if (!Directory.Exists(WorkingDirectory))
+            CleanDirectory(WorkingDirectory);
+        }
+
+        public void CleanBuildOutputDirectory()
+        {
+            CleanDirectory(BuildOutputDirectory);
+        }
+
+        public void CleanArchivesDirectory()
+        {
+            CleanDirectory(ArchivesDirectory);
+        }
+
+        void CleanDirectory (string directory)
+        {
+            if (!Directory.Exists(directory))
             {
                 return;
             }
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(WorkingDirectory);
+            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
 
             foreach (FileInfo file in directoryInfo.GetFiles())
             {

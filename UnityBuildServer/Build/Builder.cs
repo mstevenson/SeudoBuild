@@ -31,8 +31,8 @@ namespace UnityBuildServer
             var pipeline = ProjectPipeline.Create(config.ProjectsPath, projectConfig, buildTargetName);
 
             UpdateWorkingCopy(pipeline);
-            var buildInfos = Build(pipeline);
-            var archiveInfos = Archive(buildInfos, pipeline);
+            var buildInfo = Build(pipeline);
+            var archiveInfos = Archive(buildInfo, pipeline);
             var distributeInfos = Distribute(archiveInfos, pipeline);
             Notify(distributeInfos, pipeline);
 
@@ -58,26 +58,35 @@ namespace UnityBuildServer
             }
         }
 
-        List<BuildInfo> Build(ProjectPipeline pipeline)
+        BuildInfo Build(ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("+ Build");
             BuildConsole.IndentLevel = 1;
 
-            List<BuildInfo> buildInfos = new List<BuildInfo>();
+            // Delete all files in the build output directory
+            pipeline.Workspace.CleanBuildOutputDirectory();
+
+            BuildInfo buildInfo = new BuildInfo
+            {
+                BuildDate = DateTime.Now,
+                ProjectName = pipeline.ProjectConfig.Name,
+                BuildTargetName = pipeline.TargetConfig.Name
+            };
+
+            // TODO add commit identifier, app version, and build duration to BuildInfo
 
             foreach (var step in pipeline.BuildSteps)
             {
                 BuildConsole.WriteLine("+ " + step.TypeName);
                 BuildConsole.IndentLevel = 2;
-                var info = step.Execute();
-                buildInfos.Add(info);
+                step.Execute();
             }
 
-            return buildInfos;
+            return buildInfo;
         }
 
-        List<ArchiveInfo> Archive(List<BuildInfo> buildInfos, ProjectPipeline pipeline)
+        List<ArchiveInfo> Archive(BuildInfo buildInfo, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("+ Archive");
@@ -89,7 +98,8 @@ namespace UnityBuildServer
             {
                 BuildConsole.WriteLine("+ " + step.TypeName);
                 BuildConsole.IndentLevel = 2;
-                //step.CreateArchive(buildInfo);
+                // TODO pass BuildInfos
+                step.CreateArchive(buildInfo, pipeline.Workspace);
             }
 
             return archiveInfos;

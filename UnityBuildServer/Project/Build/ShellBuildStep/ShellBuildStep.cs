@@ -21,7 +21,7 @@ namespace UnityBuildServer
             }
         }
 
-        public override BuildInfo Execute()
+        public override void Execute()
         {
             string command = TextReplacements.FillPlaceholders(config.Command);
             command = command.Replace(@"""", @"\""");
@@ -46,8 +46,6 @@ namespace UnityBuildServer
                 // TODO do something with line
                 BuildConsole.WriteLine(line);
             }
-
-            return new BuildInfo();
         }
     }
 }

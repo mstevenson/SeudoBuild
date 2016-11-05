@@ -20,11 +20,9 @@ namespace UnityBuildServer
             }
         }
 
-        public override BuildInfo Execute()
+        public override void Execute()
         {
             // TODO
-
-            return new BuildInfo();
         }
     }
 }

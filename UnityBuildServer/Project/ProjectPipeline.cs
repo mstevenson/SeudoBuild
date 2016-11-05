@@ -11,10 +11,10 @@ namespace UnityBuildServer
         public List<DistributeStep> DistributeSteps { get; private set; }
         public List<NotifyStep> NotifySteps { get; private set; }
 
-        ProjectConfig ProjectConfig { get; set; }
-        BuildTargetConfig TargetConfig { get; set; }
+        public ProjectConfig ProjectConfig { get; private set; }
+        public BuildTargetConfig TargetConfig { get; private set; }
 
-        Workspace workspace;
+        public Workspace Workspace { get; private set; }
 
         public static ProjectPipeline Create(string baseDirectory, ProjectConfig config, string buildTargetName)
         {
@@ -30,21 +30,21 @@ namespace UnityBuildServer
 
         void Initialize(string projectsBaseDirectory, string buildTargetName)
         {
-            string projectNameSanitized = ProjectConfig.Id.Replace(' ', '_');
+            string projectNameSanitized = ProjectConfig.Name.Replace(' ', '_');
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
 
-            workspace = new Workspace
+            Workspace = new Workspace
             {
                 WorkingDirectory = $"{projectDirectory}/Workspace",
                 BuildOutputDirectory = $"{projectDirectory}/BuildOutput",
                 ArchivesDirectory = $"{projectDirectory}/Archives",
             };
 
-            TextReplacements.RegisterReplacement("working_directory", workspace.WorkingDirectory);
-            TextReplacements.RegisterReplacement("build_output_directory", workspace.BuildOutputDirectory);
-            TextReplacements.RegisterReplacement("archives_directory", workspace.ArchivesDirectory);
+            TextReplacements.RegisterReplacement("working_directory", Workspace.WorkingDirectory);
+            TextReplacements.RegisterReplacement("build_output_directory", Workspace.BuildOutputDirectory);
+            TextReplacements.RegisterReplacement("archives_directory", Workspace.ArchivesDirectory);
 
-            workspace.InitializeDirectories();
+            Workspace.InitializeDirectories();
 
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 
@@ -72,7 +72,7 @@ namespace UnityBuildServer
             if (TargetConfig.VCSConfiguration is GitVCSConfig)
             {
                 var gitConfig = (GitVCSConfig)TargetConfig.VCSConfiguration;
-                var vcs = new GitVCS(workspace.WorkingDirectory, gitConfig);
+                var vcs = new GitVCS(Workspace.WorkingDirectory, gitConfig);
                 return vcs;
             }
             throw new Exception("Could not identify VCS type from target configuration");
@@ -85,11 +85,11 @@ namespace UnityBuildServer
             {
                 if (stepConfig is UnityBuildConfig)
                 {
-                    steps.Add(new UnityBuildStep((UnityBuildConfig)stepConfig, workspace));
+                    steps.Add(new UnityBuildStep((UnityBuildConfig)stepConfig, Workspace));
                 }
                 else if (stepConfig is ShellBuildStepConfig)
                 {
-                    steps.Add(new ShellBuildStep((ShellBuildStepConfig)stepConfig, workspace));
+                    steps.Add(new ShellBuildStep((ShellBuildStepConfig)stepConfig, Workspace));
                 }
             }
             return steps;

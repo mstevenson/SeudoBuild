@@ -4,6 +4,6 @@ namespace UnityBuildServer
     public abstract class BuildStep
     {
         public abstract string TypeName { get; }
-        public abstract BuildInfo Execute();
+        public abstract void Execute();
     }
 }
