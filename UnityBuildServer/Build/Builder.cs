@@ -125,8 +125,8 @@ namespace UnityBuildServer
             {
                 BuildConsole.WriteLine("+ " + step.TypeName);
                 BuildConsole.IndentLevel = 2;
-                // TODO pass BuildInfos
-                step.CreateArchive(buildInfo, pipeline.Workspace);
+                var info = step.CreateArchive(buildInfo, pipeline.Workspace);
+                archiveInfos.Add(info);
             }
 
             return archiveInfos;

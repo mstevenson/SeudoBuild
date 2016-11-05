@@ -111,6 +111,10 @@ namespace UnityBuildServer
                 {
                     steps.Add(new FTPDistributeStep((FTPDistributeConfig)stepConfig));
                 }
+                if (stepConfig is SFTPDistributeConfig)
+                {
+                    steps.Add(new SFTPDistributeStep((SFTPDistributeConfig)stepConfig));
+                }
                 else if (stepConfig is SteamDistributeConfig)
                 {
                     steps.Add(new SteamDistributeStep((SteamDistributeConfig)stepConfig));
