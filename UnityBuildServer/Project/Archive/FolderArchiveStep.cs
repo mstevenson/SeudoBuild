@@ -23,13 +23,19 @@ namespace UnityBuildServer
         public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
             string folderName = workspace.Replacements.ReplaceVariablesInText(config.FolderName);
-            string source = workspace.WorkingDirectory;
+            string source = workspace.BuildOutputDirectory;
             string dest = $"{workspace.ArchivesDirectory}/{folderName}";
+
+            // Remove old directory
+            if (Directory.Exists(dest))
+            {
+                Directory.Delete(dest, true);
+            }
 
             CopyDirectory(source, dest);
 
-            // TODO
-            return new ArchiveInfo();
+            var archiveInfo = new ArchiveInfo { ArchiveFileName = folderName };
+            return archiveInfo;
         }
 
         //public enum Element
