@@ -51,11 +51,23 @@ namespace UnityBuildServer
             }
         }
 
+        void StoreCredentials()
+        {
+            string credentialsPath = $"{workingDirectory}/../git-credentials";
+
+            var uri = new Uri(config.RepositoryURL);
+            // Should use UriBuilder, but it doesn't include the password in the resulting uri string
+            string urlWithCredentials = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}{uri.AbsolutePath}";
+
+            File.WriteAllText(credentialsPath, urlWithCredentials);
+            credentialsPath = Path.GetFullPath(credentialsPath);
+            // FIXME escape spaces in path
+            //repo.Config.Set("credential.helper", $"store --file={credentialsPath}", ConfigurationLevel.Local);
+        }
+
         // Clone
         public override void Download()
         {
-            // TODO shallow clone?
-
             BuildConsole.WriteLine($"Cloning repository:  {config.RepositoryURL}");
             var cloneOptions = new CloneOptions
             {
@@ -66,10 +78,10 @@ namespace UnityBuildServer
             };
             Repository.Clone(config.RepositoryURL, workingDirectory, cloneOptions);
 
-            if (config.UseLFS)
-            {
-                PullLFS();
-            }
+            //if (config.UseLFS)
+            //{
+            //    PullLFS();
+            //}
 
             // TODO Handle sub-module credentials
         }
@@ -84,17 +96,15 @@ namespace UnityBuildServer
             {
                 repo.Reset(ResetMode.Hard);
                 repo.RemoveUntrackedFiles();
-            }
 
-            // Download LFS files
-            if (config.UseLFS)
-            {
-                PullLFS();
-            }
+                //// Download LFS files
+                //if (config.UseLFS)
+                //{
+                //    PullLFS();
+                //}
 
-            // Pull changes
-            using (var repo = new Repository(workingDirectory))
-            {
+                // Pull changes
+            
                 string remoteName = "origin";
 
                 BuildConsole.WriteLine($"Fetching from {remoteName}:  ({config.RepositoryURL})");
