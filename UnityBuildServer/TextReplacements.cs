@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace UnityBuildServer
 {
@@ -11,10 +12,13 @@ namespace UnityBuildServer
     {
         public string ReplaceVariablesInText(string source)
         {
+            // Replace all variables that are known by TextReplacements
             foreach (var kvp in this)
             {
                 source = source.Replace($"%{kvp.Key}%", kvp.Value);
             }
+            // Remove any variables that were not matched
+            source = Regex.Replace(source, "%.*?%", string.Empty, RegexOptions.Multiline);
             return source;
         }
     }
