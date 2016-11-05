@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using RunProcessAsTask;
 using System.Text;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class UnityProcess
     {

@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{64E2D8F1-B08C-4B87-A283-252C31693DC6}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>UnityBuildServerConsole</RootNamespace>
+    <RootNamespace>UnityBuild.Agent</RootNamespace>
     <AssemblyName>UnityBuildServerConsole</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -34,9 +34,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UnityBuildServer\UnityBuildServer.csproj">
+    <ProjectReference Include="..\UnityBuildServer\UnityBuildCore.csproj">
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
-      <Name>UnityBuildServer</Name>
+      <Name>UnityBuildCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

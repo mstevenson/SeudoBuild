@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{4A9529A8-F773-4827-BCF4-60B524E6CA52}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>UnityBuildServer.Tests</RootNamespace>
+    <RootNamespace>UnityBuild.Core.Tests</RootNamespace>
     <AssemblyName>UnityBuildServer.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -39,7 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\UnityBuildServer\UnityBuildServer.csproj">
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
-      <Name>UnityBuildServer</Name>
+      <Name>UnityBuildCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using UnityBuild.VCS;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     /// <summary>
     /// 
@@ -76,7 +76,7 @@ namespace UnityBuildServer
 
         void UpdateWorkingCopy(ProjectPipeline pipeline)
         {
-            VCS vcs = pipeline.VersionControlSystem;
+            VersionControlSystem vcs = pipeline.VersionControlSystem;
 
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine($"+ Update working copy ({vcs.TypeName})");

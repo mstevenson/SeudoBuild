@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     /// <summary>
     /// Executes an arbitrary shell script as part of a build process.

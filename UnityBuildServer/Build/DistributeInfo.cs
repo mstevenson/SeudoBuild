@@ -1,4 +1,4 @@
-﻿namespace UnityBuildServer
+﻿namespace UnityBuild
 {
     public class DistributeInfo
     {

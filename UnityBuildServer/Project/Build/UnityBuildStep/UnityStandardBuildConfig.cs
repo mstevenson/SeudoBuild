@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     /// <summary>
     /// Performs a standard Unity build, or executes an arbitrary static method in a Unity editor script.

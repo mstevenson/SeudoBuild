@@ -1,12 +1,12 @@
 ﻿using System;
-namespace UnityBuildServer
+namespace UnityBuild
 {
-    public class UnityExecuteMethodStep : BuildStep
+    public class UnityExecuteMethodBuildStep : BuildStep
     {
-        UnityExecuteMethodConfig config;
+        UnityExecuteMethodBuildConfig config;
         Workspace workspace;
 
-        public UnityExecuteMethodStep(UnityExecuteMethodConfig config, Workspace workspace)
+        public UnityExecuteMethodBuildStep(UnityExecuteMethodBuildConfig config, Workspace workspace)
         {
             this.config = config;
             this.workspace = workspace;

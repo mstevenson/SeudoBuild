@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
-namespace UnityBuildServer.Tests
+namespace UnityBuild.Tests
 {
     [TestFixture()]
     public class Test

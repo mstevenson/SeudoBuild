@@ -1,11 +1,11 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildServer", "UnityBuildServer\UnityBuildServer.csproj", "{96AEC5D7-D646-4A04-8624-383CC86C047C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildCore", "UnityBuildServer\UnityBuildCore.csproj", "{96AEC5D7-D646-4A04-8624-383CC86C047C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildServerConsole", "UnityBuildServerConsole\UnityBuildServerConsole.csproj", "{64E2D8F1-B08C-4B87-A283-252C31693DC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildAgent", "UnityBuildServerConsole\UnityBuildAgent.csproj", "{64E2D8F1-B08C-4B87-A283-252C31693DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildServer.Tests", "UnityBuildServer.Tests\UnityBuildServer.Tests.csproj", "{4A9529A8-F773-4827-BCF4-60B524E6CA52}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityBuildCore.Tests", "UnityBuildServer.Tests\UnityBuildCore.Tests.csproj", "{4A9529A8-F773-4827-BCF4-60B524E6CA52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

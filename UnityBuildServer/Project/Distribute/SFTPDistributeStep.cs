@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class SFTPDistributeStep : DistributeStep
     {

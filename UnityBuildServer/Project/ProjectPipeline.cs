@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityBuild.VCS;
+using UnityBuild.VCS.Git;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class ProjectPipeline
     {
-        public VCS VersionControlSystem { get; private set; }
+        public VersionControlSystem VersionControlSystem { get; private set; }
         public List<BuildStep> BuildSteps { get; private set; }
         public List<ArchiveStep> ArchiveSteps { get; private set; }
         public List<DistributeStep> DistributeSteps { get; private set; }
@@ -57,7 +59,7 @@ namespace UnityBuildServer
             return null;
         }
 
-        VCS InitializeVersionControlSystem()
+        VersionControlSystem InitializeVersionControlSystem()
         {
             if (TargetConfig.VCSConfiguration is GitVCSConfig)
             {
@@ -77,9 +79,9 @@ namespace UnityBuildServer
                 {
                     steps.Add(new UnityStandardBuildStep((UnityStandardBuildConfig)stepConfig, Workspace));
                 }
-                if (stepConfig is UnityExecuteMethodConfig)
+                if (stepConfig is UnityExecuteMethodBuildConfig)
                 {
-                    steps.Add(new UnityExecuteMethodStep((UnityExecuteMethodConfig)stepConfig, Workspace));
+                    steps.Add(new UnityExecuteMethodBuildStep((UnityExecuteMethodBuildConfig)stepConfig, Workspace));
                 }
                 if (stepConfig is UnityAdvancedBuildConfig)
                 {

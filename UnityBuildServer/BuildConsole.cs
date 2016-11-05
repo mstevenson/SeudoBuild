@@ -1,5 +1,6 @@
 ﻿using System;
-namespace UnityBuildServer
+
+namespace UnityBuild
 {
     public static class BuildConsole
     {

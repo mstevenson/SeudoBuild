@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class BuildInfo
     {

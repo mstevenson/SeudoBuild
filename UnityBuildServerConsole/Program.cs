@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityBuildServer;
+using UnityBuild;
+using UnityBuild.VCS.Git;
 
 namespace UnityBuildServerConsole
 {

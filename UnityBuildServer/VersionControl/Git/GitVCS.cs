@@ -5,9 +5,9 @@ using RunProcessAsTask;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
-namespace UnityBuildServer
+namespace UnityBuild.VCS.Git
 {
-    public class GitVCS : VCS
+    public class GitVCS : VersionControlSystem
     {
         string workingDirectory;
         GitVCSConfig config;

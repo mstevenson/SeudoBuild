@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     /// <summary>
     /// Register in-line variables to replace in strings and their replacement values.

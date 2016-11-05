@@ -1,10 +1,10 @@
 ﻿using System;
-namespace UnityBuildServer
+namespace UnityBuild
 {
     /// <summary>
     /// Executes an arbitrary static method in a Unity editor script.
     /// </summary>
-    public class UnityExecuteMethodConfig : BuildStepConfig
+    public class UnityExecuteMethodBuildConfig : BuildStepConfig
     {
         public override string Type
         {

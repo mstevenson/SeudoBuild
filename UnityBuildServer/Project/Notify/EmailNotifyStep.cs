@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class EmailNotifyStep : NotifyStep
     {

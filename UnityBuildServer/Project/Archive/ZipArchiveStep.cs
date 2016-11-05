@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Ionic.Zip;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class ZipArchiveStep : ArchiveStep
     {

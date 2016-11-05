@@ -1,8 +1,6 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
-using RunProcessAsTask;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class Workspace
     {

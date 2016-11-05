@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
-    public class ConfigSerializer
+    public class Serializer
     {
         public T Deserialize<T>(string path)
         {

@@ -1,5 +1,4 @@
-﻿using System;
-namespace UnityBuildServer
+﻿namespace UnityBuild.VCS
 {
     public abstract class VCSConfig
     {

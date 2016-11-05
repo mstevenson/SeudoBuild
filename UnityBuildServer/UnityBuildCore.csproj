@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{96AEC5D7-D646-4A04-8624-383CC86C047C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>UnityBuildServer</RootNamespace>
+    <RootNamespace>UnityBuild</RootNamespace>
     <AssemblyName>UnityBuildServer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -50,7 +50,7 @@
     <Compile Include="VersionControl\Git\GitVCS.cs" />
     <Compile Include="VersionControl\Git\LFSFilter.cs" />
     <Compile Include="Project\ProjectConfig.cs" />
-    <Compile Include="VersionControl\VCS.cs" />
+    <Compile Include="VersionControl\VersionControlSystem.cs" />
     <Compile Include="Project\BuildStepConfig.cs" />
     <Compile Include="VersionControl\VCSConfig.cs" />
     <Compile Include="VersionControl\Git\GitVCSConfig.cs" />
@@ -87,14 +87,14 @@
     <Compile Include="Build\DistributeInfo.cs" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="TextReplacements.cs" />
-    <Compile Include="ConfigSerializer.cs" />
+    <Compile Include="Serializer.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeConfig.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityAdvancedBuildConfig.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityAdvancedBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityPlatform.cs" />
-    <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodStep.cs" />
-    <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodConfig.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildStep.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

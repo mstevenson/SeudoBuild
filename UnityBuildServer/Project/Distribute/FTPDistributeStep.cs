@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using System.Collections.Generic;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class FTPDistributeStep : DistributeStep
     {

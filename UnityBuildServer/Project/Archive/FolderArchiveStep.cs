@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class FolderArchiveStep : ArchiveStep
     {

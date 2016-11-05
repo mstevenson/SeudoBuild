@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public abstract class DistributeStep
     {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using UnityBuild.VCS;
 
-namespace UnityBuildServer
+namespace UnityBuild
 {
     public class BuildTargetConfig
     {
