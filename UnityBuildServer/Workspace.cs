@@ -22,6 +22,8 @@ namespace UnityBuildServer
         /// </summary>
         public string ArchivesDirectory { get; set; }
 
+        public TextReplacements Replacements { get; set; } = new TextReplacements();
+
         public void InitializeDirectories()
         {
             if (!Directory.Exists(WorkingDirectory))

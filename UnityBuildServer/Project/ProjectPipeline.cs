@@ -38,11 +38,13 @@ namespace UnityBuildServer
                 WorkingDirectory = $"{projectDirectory}/Workspace",
                 BuildOutputDirectory = $"{projectDirectory}/BuildOutput",
                 ArchivesDirectory = $"{projectDirectory}/Archives",
+                Replacements = new TextReplacements
+                {
+                    { "working_directory", Workspace.WorkingDirectory },
+                    { "build_output_directory", Workspace.BuildOutputDirectory },
+                    { "archives_directory", Workspace.ArchivesDirectory }
+                }
             };
-
-            TextReplacements.RegisterReplacement("working_directory", Workspace.WorkingDirectory);
-            TextReplacements.RegisterReplacement("build_output_directory", Workspace.BuildOutputDirectory);
-            TextReplacements.RegisterReplacement("archives_directory", Workspace.ArchivesDirectory);
 
             Workspace.InitializeDirectories();
 

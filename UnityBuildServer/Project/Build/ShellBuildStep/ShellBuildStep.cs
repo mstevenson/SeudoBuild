@@ -23,7 +23,9 @@ namespace UnityBuildServer
 
         public override void Execute()
         {
-            string command = TextReplacements.FillPlaceholders(config.Command);
+            // Replace variables in string that begin and end with the % character
+            var command = workspace.Replacements.ReplaceVariablesInText(config.Command);
+            // Escape quotes
             command = command.Replace(@"""", @"\""");
 
             var startInfo = new ProcessStartInfo

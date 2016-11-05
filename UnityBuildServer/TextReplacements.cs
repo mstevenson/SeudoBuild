@@ -2,24 +2,15 @@
 
 namespace UnityBuildServer
 {
-    // FIXME A TextReplacements instance should be owned by the active Workspace
-
-    public static class TextReplacements
+    public class TextReplacements : Dictionary<string, string>
     {
-        static Dictionary<string, string> replacements = new Dictionary<string, string>();
-
-        public static void RegisterReplacement (string placeholder, string replacement)
+        public string ReplaceVariablesInText(string source)
         {
-            replacements.Add(placeholder, replacement);
-        }
-
-        public static string FillPlaceholders(string text)
-        {
-            foreach (var kvp in replacements)
+            foreach (var kvp in this)
             {
-                text = text.Replace($"%{kvp.Key}%", kvp.Value);
+                source = source.Replace($"%{kvp.Key}%", kvp.Value);
             }
-            return text;
+            return source;
         }
     }
 }
