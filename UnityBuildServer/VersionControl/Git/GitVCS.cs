@@ -47,7 +47,7 @@ namespace UnityBuildServer
         {
             get
             {
-                return Directory.Exists($"{workingDirectory}/.git");
+                return Repository.IsValid(workingDirectory);
             }
         }
 
