@@ -22,15 +22,20 @@ namespace UnityBuildServer
 
         public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {
+            // Replace in-line variables
+            string outputName = workspace.Replacements.ReplaceVariablesInText(config.Filename);
+            // Sanitize
+            outputName = outputName.Replace(' ', '_');
+
+            // Save zip file
             using (var zipFile = new ZipFile())
             {
-                string outputName = buildInfo.GenerateFileName();
                 zipFile.AddDirectory(workspace.WorkingDirectory);
                 zipFile.Save($"{workspace.ArchivesDirectory}/{outputName}.zip");
             }
 
-            // TODO
-            return new ArchiveInfo();
+            var archiveInfo = new ArchiveInfo { ArchiveFileName = outputName };
+            return archiveInfo;
         }
     }
 }

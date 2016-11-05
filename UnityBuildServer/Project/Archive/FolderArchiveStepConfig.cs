@@ -3,5 +3,6 @@ namespace UnityBuildServer
 {
     public class FolderArchiveStepConfig : ArchiveStepConfig
     {
+        public string FolderName { get; set; }
     }
 }

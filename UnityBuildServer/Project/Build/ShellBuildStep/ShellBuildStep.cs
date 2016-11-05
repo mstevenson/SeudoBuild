@@ -5,7 +5,7 @@ namespace UnityBuildServer
     /// <summary>
     /// Executes an arbitrary shell script as part of a build process.
     /// 
-    /// Available variables:
+    /// Variables:
     /// %working_directory% -- the full path of the working directory in which the un-built project files are stored
     /// %build_output_directory% -- the directory containing build products
     /// %archives_directory% -- the directory in which build products will be archived during a later step
@@ -19,10 +19,6 @@ namespace UnityBuildServer
         {
             this.config = config;
             this.workspace = workspace;
-
-            workspace.Replacements.Add("working_directory", workspace.WorkingDirectory);
-            workspace.Replacements.Add("build_output_directory", workspace.BuildOutputDirectory);
-            workspace.Replacements.Add("archives_directory", workspace.ArchivesDirectory);
         }
 
         public override string TypeName

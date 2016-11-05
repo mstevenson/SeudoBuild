@@ -4,6 +4,15 @@ using System.IO;
 
 namespace UnityBuildServer
 {
+    /// <summary>
+    /// 
+    /// Variables:
+    /// %project_name% -- the name for the entire project
+    /// %build_target_name% -- the specific target that was built
+    /// %app_version% -- version number as major.minor.patch
+    /// %build_date% -- the date that the build was completed
+    /// %commit_identifier% -- the current commit number or hash
+    /// </summary>
     public class Builder
     {
         BuilderConfig config;
@@ -15,6 +24,7 @@ namespace UnityBuildServer
 
         public void ExecuteBuild(ProjectConfig projectConfig, string buildTargetName)
         {
+            // Establish build target
             BuildTargetConfig targetConfig = null;
             foreach (var target in projectConfig.BuildTargets)
             {
@@ -28,14 +38,31 @@ namespace UnityBuildServer
                 throw new Exception("Could not find target named " + buildTargetName);
             }
 
+            // Setup
             var pipeline = ProjectPipeline.Create(config.ProjectsPath, projectConfig, buildTargetName);
+            var replacements = pipeline.Workspace.Replacements;
 
+            // Grab changes from version control system
             UpdateWorkingCopy(pipeline);
+
+            // Build
             var buildInfo = Build(pipeline);
+            replacements["project_name"] = buildInfo.ProjectName;
+            replacements["build_target_name"] = buildInfo.BuildTargetName;
+            replacements["app_version"] = buildInfo.AppVersion.ToString ();
+            replacements["build_date"] = buildInfo.BuildDate.ToString("yyyy-dd-M--HH-mm-ss");
+            replacements["commit_identifier"] = buildInfo.CommitIdentifier;
+
+            // Archive
             var archiveInfos = Archive(buildInfo, pipeline);
+
+            // Distribute
             var distributeInfos = Distribute(archiveInfos, pipeline);
+
+            // Notify
             Notify(distributeInfos, pipeline);
 
+            // Done
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("Build completed.");
         }

@@ -24,14 +24,22 @@ namespace UnityBuildServer
 
         public override void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace)
         {
+            foreach (var archiveInfo in archiveInfos)
+            {
+                Upload(archiveInfo, workspace);
+            }
+        }
+
+        public void Upload (ArchiveInfo archiveInfo, Workspace workspace)
+        {
             // Get the object used to communicate with the server.
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{config.URL}:{config.Port}/{config.BasePath}/{config.ArchiveFileName}");
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{config.URL}:{config.Port}/{config.BasePath}/{archiveInfo.ArchiveFileName}");
             request.Credentials = new NetworkCredential(config.Username, config.Password);
             request.Method = WebRequestMethods.Ftp.UploadFile;
             request.UseBinary = true;
             request.KeepAlive = true;
 
-            var file = new FileInfo($"{workspace.ArchivesDirectory}/{config.ArchiveFileName}");
+            var file = new FileInfo($"{workspace.ArchivesDirectory}/{archiveInfo.ArchiveFileName}");
             request.ContentLength = file.Length;
 
             int bufferLength = 16 * 1024;

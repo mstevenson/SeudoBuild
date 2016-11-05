@@ -9,22 +9,65 @@ namespace UnityBuildServer
         /// <summary>
         /// Contains project files downloaded from a version control system.
         /// </summary>
-        public string WorkingDirectory { get; set; }
+        public string WorkingDirectory
+        {
+            get
+            {
+                return workingDirectory;
+            }
+            set
+            {
+                workingDirectory = value;
+                Replacements["working_directory"] = workingDirectory;
+            }
+        }
+        string workingDirectory;
 
         /// <summary>
         /// Contains intermediate build files
         /// </summary>
         /// <value>The output directory.</value>
-        public string BuildOutputDirectory { get; set; }
+        public string BuildOutputDirectory
+        {
+            get
+            {
+                return buildOutputDirectory;
+            }
+            set
+            {
+                buildOutputDirectory = value;
+                Replacements["build_output_directory"] = buildOutputDirectory;
+            }
+        }
+        string buildOutputDirectory;
 
         /// <summary>
         /// Contains products resulting from a build.
         /// </summary>
-        public string ArchivesDirectory { get; set; }
+        public string ArchivesDirectory
+        {
+            get
+            {
+                return archivesDirectory;
+            }
+            set
+            {
+                archivesDirectory = value;
+                Replacements["archives_directory"] = archivesDirectory;
+            }
+        }
+        string archivesDirectory;
 
-        public TextReplacements Replacements { get; set; } = new TextReplacements();
+        public TextReplacements Replacements { get; } = new TextReplacements();
 
-        public void InitializeDirectories()
+        public Workspace(string projectDirectory)
+        {
+            WorkingDirectory = $"{projectDirectory}/Workspace";
+            BuildOutputDirectory = $"{projectDirectory}/BuildOutput";
+            ArchivesDirectory = $"{projectDirectory}/Archives";
+        }
+
+        public void CreateSubDirectories()
         {
             if (!Directory.Exists(WorkingDirectory))
             {

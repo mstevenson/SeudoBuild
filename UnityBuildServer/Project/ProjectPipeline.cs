@@ -33,14 +33,8 @@ namespace UnityBuildServer
             string projectNameSanitized = ProjectConfig.Name.Replace(' ', '_');
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
 
-            Workspace = new Workspace
-            {
-                WorkingDirectory = $"{projectDirectory}/Workspace",
-                BuildOutputDirectory = $"{projectDirectory}/BuildOutput",
-                ArchivesDirectory = $"{projectDirectory}/Archives"
-            };
-
-            Workspace.InitializeDirectories();
+            Workspace = new Workspace(projectDirectory);
+            Workspace.CreateSubDirectories();
 
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 

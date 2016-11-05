@@ -2,6 +2,6 @@
 {
     public class ArchiveInfo
     {
-        // names and paths of archives that were created
+        public string ArchiveFileName { get; set; }
     }
 }
