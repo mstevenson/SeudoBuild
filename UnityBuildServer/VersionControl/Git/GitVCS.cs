@@ -79,20 +79,20 @@ namespace UnityBuildServer
         {
             BuildConsole.WriteLine("Cleaning working copy");
 
-            // TODO Emulate git clean -d -x -f
+            // Clean the repo
+            using (var repo = new Repository(workingDirectory))
+            {
+                repo.Reset(ResetMode.Hard);
+                repo.RemoveUntrackedFiles();
+            }
 
-            //using (var repo = new Repository(workingDirectory)) {
-            //    Commit currentCommit = repo.Head.Tip.Tree;
-            //    currentCommit.cl
-            //}
-
-
+            // Download LFS files
             if (config.IsLFS)
             {
                 PullLFS();
             }
 
-            // Equivalent of 'git pull'
+            // Pull changes
             using (var repo = new Repository(workingDirectory))
             {
                 string remoteName = "origin";
@@ -118,7 +118,7 @@ namespace UnityBuildServer
 
         void PullLFS()
         {
-            BuildConsole.WriteLine($"Pulling LFS files: {config.IsLFS}");
+            //BuildConsole.WriteLine($"Pulling LFS files: {config.IsLFS}");
 
             // TODO
         }
