@@ -83,9 +83,9 @@ namespace UnityBuild
                 {
                     steps.Add(new UnityExecuteMethodBuildStep((UnityExecuteMethodBuildConfig)stepConfig, Workspace));
                 }
-                if (stepConfig is UnityAdvancedBuildConfig)
+                if (stepConfig is UnityParameterizedBuildConfig)
                 {
-                    steps.Add(new UnityAdvancedBuildStep((UnityAdvancedBuildConfig)stepConfig, Workspace));
+                    steps.Add(new UnityParameterizedBuildStep((UnityParameterizedBuildConfig)stepConfig, Workspace));
                 }
                 else if (stepConfig is ShellBuildStepConfig)
                 {

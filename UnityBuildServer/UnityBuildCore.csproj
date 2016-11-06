@@ -90,8 +90,8 @@
     <Compile Include="Serializer.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeConfig.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
-    <Compile Include="Project\Build\UnityBuildStep\UnityAdvancedBuildConfig.cs" />
-    <Compile Include="Project\Build\UnityBuildStep\UnityAdvancedBuildStep.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityParameterizedBuildConfig.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityParameterizedBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityPlatform.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildConfig.cs" />

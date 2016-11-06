@@ -2,7 +2,7 @@
 
 namespace UnityBuild
 {
-    public class UnityAdvancedBuildConfig : BuildStepConfig
+    public class UnityParameterizedBuildConfig : BuildStepConfig
     {
         public override string Type
         {
