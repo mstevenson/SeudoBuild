@@ -32,8 +32,9 @@ namespace UnityBuild.VCS.Git
             signature = new Signature(new Identity("UnityBuildServer", "info@basenjigames.com"), DateTimeOffset.UtcNow);
 
             // Set up LFS filter
-            var filter = new LFSFilter("lfs", workspace.WorkingDirectory, new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
-            lfsFilter = GlobalSettings.RegisterFilter(filter);
+            // DISABLED - we'll run LFS commands manually
+            //var filter = new LFSFilter("lfs", workspace.WorkingDirectory, new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
+            //lfsFilter = GlobalSettings.RegisterFilter(filter);
         }
 
         public override string TypeName
@@ -72,27 +73,9 @@ namespace UnityBuild.VCS.Git
             if (config.UseLFS)
             {
                 BuildConsole.WriteLine($"Cloning LFS repository:  {config.RepositoryURL}");
-
-                Console.ForegroundColor = ConsoleColor.Red;
-
                 workspace.CleanWorkingDirectory();
                 string repoUrl = GetUrlWithPassword(config.RepositoryURL);
-
-                var startInfo = new ProcessStartInfo
-                {
-                    FileName = "git-lfs",
-                    Arguments = $"clone {repoUrl} {workspace.WorkingDirectory}",
-                    WorkingDirectory = workspace.WorkingDirectory,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                var process = new Process { StartInfo = startInfo };
-                process.Start();
-                process.WaitForExit();
-
-                Console.ResetColor();
+                ExecuteLFSCommand($"clone {repoUrl} {workspace.WorkingDirectory}");
             }
             else
             {
@@ -130,30 +113,73 @@ namespace UnityBuild.VCS.Git
             // Clean the repo
             using (var repo = new Repository(workspace.WorkingDirectory))
             {
+                // Skip the LFS smudge filter when resetting the repo.
+                // LFS files will be integrated manually.
+                repo.Config.Set("filter.lfs.smudge", "git-lfs smudge --skip %f", ConfigurationLevel.Local);
+                repo.Config.Set("filter.lfs.required", false);
+
                 repo.Reset(ResetMode.Hard);
                 repo.RemoveUntrackedFiles();
 
                 // Pull changes
-            
+
                 string remoteName = "origin";
+                BuildConsole.WriteLine($"Pulling changes from {remoteName}:  {config.RepositoryURL}");
 
-                BuildConsole.WriteLine($"Fetching from {remoteName}:  ({config.RepositoryURL})");
-                var fetchOptions = new FetchOptions
+                var pullOptions = new PullOptions
                 {
-                    CredentialsProvider = credentialsHandler
+                    FetchOptions = new FetchOptions
+                    {
+                        CredentialsProvider = credentialsHandler
+                    },
+                    MergeOptions = new MergeOptions
+                    {
+                        FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
+                        FileConflictStrategy = CheckoutFileConflictStrategy.Theirs,
+                        MergeFileFavor = MergeFileFavor.Theirs,
+                        FailOnConflict = false
+                    }
                 };
-                repo.Fetch(remoteName, fetchOptions);
+                var mergeResult = repo.Network.Pull(signature, pullOptions);
 
-                BuildConsole.WriteLine($"Merging changes into {config.RepositoryBranchName}");
-                var mergeOptions = new MergeOptions
+                if (config.UseLFS)
                 {
-                    FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
-                    FileConflictStrategy = CheckoutFileConflictStrategy.Theirs,
-                    MergeFileFavor = MergeFileFavor.Theirs,
-                    FailOnConflict = false
-                };
-                repo.Merge(config.RepositoryBranchName, signature, mergeOptions);
+                    BuildConsole.WriteLine("Fetching LFS files");
+                    ExecuteLFSCommand("fetch");
+                    BuildConsole.WriteLine("Checking out LFS files into working copy");
+                    ExecuteLFSCommand("checkout");
+                }
+
+                if (mergeResult.Status == MergeStatus.UpToDate)
+                {
+                    BuildConsole.WriteLine($"Repository is already up-to-date");
+                }
+                else
+                {
+                    BuildConsole.WriteLine($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}");
+                }
             }
+        }
+
+        void ExecuteLFSCommand(string arguments)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "git-lfs",
+                Arguments = arguments,
+                WorkingDirectory = workspace.WorkingDirectory,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            var process = new Process { StartInfo = startInfo };
+            process.Start();
+            process.WaitForExit();
+
+            Console.ResetColor();
         }
     }
 }
