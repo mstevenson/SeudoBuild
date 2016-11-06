@@ -37,11 +37,14 @@ namespace UnityBuild
                 throw new System.Exception("Unity executable does not exist at path " + unity.Path);
             }
 
+            // FIXME
+            string methodName = "";
+
             // Use System.Environment.GetCommandLineArgs in Unity to get custom arguments
             var args = new List<string>();
             args.Add("-quit");
             args.Add("-batchmode");
-            args.Add($"-executeMethod {config.MethodName}");
+            args.Add($"-executeMethod {methodName}");
 
             if (config.BuildAssetBundles)
             {
