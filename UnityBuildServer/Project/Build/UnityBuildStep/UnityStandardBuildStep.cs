@@ -7,7 +7,7 @@ using System.IO;
 
 namespace UnityBuild
 {
-    public class UnityStandardBuildStep : BuildStep
+    public class UnityStandardBuildStep : UnityBuildStep
     {
         UnityStandardBuildConfig config;
         Workspace workspace;

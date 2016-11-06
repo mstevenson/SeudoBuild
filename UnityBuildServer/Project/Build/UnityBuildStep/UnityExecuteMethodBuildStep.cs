@@ -5,7 +5,7 @@ using System.IO;
 
 namespace UnityBuild
 {
-    public class UnityExecuteMethodBuildStep : BuildStep
+    public class UnityExecuteMethodBuildStep : UnityBuildStep
     {
         UnityExecuteMethodBuildConfig config;
         Workspace workspace;

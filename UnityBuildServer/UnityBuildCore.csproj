@@ -77,7 +77,7 @@
     <Compile Include="Project\Distribute\DistributeStep.cs" />
     <Compile Include="Project\Distribute\SteamDistributeStep.cs" />
     <Compile Include="Project\Notify\NotifyStep.cs" />
-    <Compile Include="Project\Build\BuildStep.cs" />
+    <Compile Include="Project\Build\IBuildStep.cs" />
     <Compile Include="Project\Build\ShellBuildStep\ShellBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityStandardBuildStep.cs" />
     <Compile Include="Build\BuilderConfig.cs" />
@@ -95,6 +95,8 @@
     <Compile Include="Project\Build\UnityBuildStep\UnityPlatform.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildConfig.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityBuildStep.cs" />
+    <Compile Include="Project\Build\UnityBuildStep\UnityBuildResults.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -74,8 +74,13 @@ namespace UnityBuild.VCS.Git
             {
                 BuildConsole.WriteLine($"Cloning LFS repository:  {config.RepositoryURL}");
                 workspace.CleanWorkingDirectory();
-                string repoUrl = GetUrlWithPassword(config.RepositoryURL);
-                ExecuteLFSCommand($"clone {repoUrl} {workspace.WorkingDirectory}");
+
+                // FIXME extremely insecure to include password in the URL, but it's the only way I've
+                // found to circumvent the manual password prompt when running git-lfs
+                var uri = new Uri(config.RepositoryURL);
+                string repoUrlWithPassword = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
+
+                ExecuteLFSCommand($"clone {repoUrlWithPassword} {workspace.WorkingDirectory}");
             }
             else
             {
@@ -94,16 +99,6 @@ namespace UnityBuild.VCS.Git
 
             // TODO Handle sub-module credentials
         }
-
-        string GetUrlWithPassword(string url)
-        {
-            // FIXME insecure to include password in the URL, but it's the only way I've
-            // found to circumvent the manual password prompt when running git-lfs
-            var uri = new Uri(config.RepositoryURL);
-            string urlWithCredentials = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
-            return urlWithCredentials;
-        }
-
 
         // Pull
         public override void Update()

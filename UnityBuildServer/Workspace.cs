@@ -1,9 +1,35 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace UnityBuild
 {
     public class Workspace
     {
+        public enum PlatformType
+        {
+            Mac,
+            Windows,
+            Linux
+        }
+
+        public PlatformType Platform
+        {
+            get
+            {
+                switch (Environment.OSVersion.Platform)
+                {
+                    case PlatformID.MacOSX:
+                        return PlatformType.Mac;
+                    case PlatformID.Win32NT:
+                        return PlatformType.Windows;
+                    case PlatformID.Unix:
+                        return PlatformType.Linux;
+                    default:
+                        throw new PlatformNotSupportedException("The current platform is not supported.");
+                }
+            }
+        }
+
         /// <summary>
         /// Contains project files downloaded from a version control system.
         /// </summary>
@@ -56,6 +82,23 @@ namespace UnityBuild
         }
         string archivesDirectory;
 
+        /// <summary>
+        /// Contains products resulting from a build.
+        /// </summary>
+        public string LogsDirectory
+        {
+            get
+            {
+                return logsDirectory;
+            }
+            set
+            {
+                logsDirectory = value;
+                Replacements["logs_directory"] = logsDirectory;
+            }
+        }
+        string logsDirectory;
+
         public TextReplacements Replacements { get; } = new TextReplacements();
 
         public Workspace(string projectDirectory)
@@ -63,6 +106,7 @@ namespace UnityBuild
             WorkingDirectory = $"{projectDirectory}/Workspace";
             BuildOutputDirectory = $"{projectDirectory}/BuildOutput";
             ArchivesDirectory = $"{projectDirectory}/Archives";
+            LogsDirectory = $"{projectDirectory}/Logs";
         }
 
         public void CreateSubDirectories()
@@ -79,6 +123,10 @@ namespace UnityBuild
             {
                 Directory.CreateDirectory(ArchivesDirectory);
             }
+            if (!Directory.Exists(LogsDirectory))
+            {
+                Directory.CreateDirectory(LogsDirectory);
+            }
         }
 
         public void CleanWorkingDirectory()
@@ -94,6 +142,11 @@ namespace UnityBuild
         public void CleanArchivesDirectory()
         {
             CleanDirectory(ArchivesDirectory);
+        }
+
+        public void CleanLogsDirectory()
+        {
+            CleanDirectory(LogsDirectory);
         }
 
         void CleanDirectory (string directory)

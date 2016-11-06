@@ -10,7 +10,7 @@ namespace UnityBuild
     /// %build_output_directory% -- the directory containing build products
     /// %archives_directory% -- the directory in which build products will be archived during a later step
     /// </summary>
-    public class ShellBuildStep : BuildStep
+    public class ShellBuildStep : IBuildStep
     {
         ShellBuildStepConfig config;
         Workspace workspace;
@@ -21,7 +21,7 @@ namespace UnityBuild
             this.workspace = workspace;
         }
 
-        public override string TypeName
+        public string TypeName
         {
             get
             {
@@ -29,7 +29,7 @@ namespace UnityBuild
             }
         }
 
-        public override void Execute()
+        public void Execute()
         {
             // Replace variables in string that begin and end with the % character
             var command = workspace.Replacements.ReplaceVariablesInText(config.Command);

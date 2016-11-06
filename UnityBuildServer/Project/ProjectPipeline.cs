@@ -8,7 +8,7 @@ namespace UnityBuild
     public class ProjectPipeline
     {
         public VersionControlSystem VersionControlSystem { get; private set; }
-        public List<BuildStep> BuildSteps { get; private set; }
+        public List<IBuildStep> BuildSteps { get; private set; }
         public List<ArchiveStep> ArchiveSteps { get; private set; }
         public List<DistributeStep> DistributeSteps { get; private set; }
         public List<NotifyStep> NotifySteps { get; private set; }
@@ -70,9 +70,9 @@ namespace UnityBuild
             throw new Exception("Could not identify VCS type from target configuration");
         }
 
-        List<BuildStep> GenerateBuildSteps()
+        List<IBuildStep> GenerateBuildSteps()
         {
-            var steps = new List<BuildStep>();
+            var steps = new List<IBuildStep>();
             foreach (var stepConfig in TargetConfig.BuildSteps)
             {
                 if (stepConfig is UnityStandardBuildConfig)
