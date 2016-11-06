@@ -37,8 +37,8 @@ namespace UnityBuild
                 throw new System.Exception("Unity executable does not exist at path " + unity.Path);
             }
 
-            // FIXME
-            string methodName = "";
+            // FIXME match this to the Unity build script method name
+            string methodName = "Builder.RemoteBuild";
 
             // Use System.Environment.GetCommandLineArgs in Unity to get custom arguments
             var args = new List<string>();

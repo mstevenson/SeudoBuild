@@ -64,7 +64,7 @@ namespace UnityBuild
             if (TargetConfig.VCSConfiguration is GitVCSConfig)
             {
                 var gitConfig = (GitVCSConfig)TargetConfig.VCSConfiguration;
-                var vcs = new GitVCS(Workspace.WorkingDirectory, gitConfig);
+                var vcs = new GitVCS(Workspace, gitConfig);
                 return vcs;
             }
             throw new Exception("Could not identify VCS type from target configuration");

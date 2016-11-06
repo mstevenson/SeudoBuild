@@ -4,22 +4,23 @@ using System.Collections.Generic;
 using RunProcessAsTask;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
+using System.Diagnostics;
 
 namespace UnityBuild.VCS.Git
 {
     public class GitVCS : VersionControlSystem
     {
-        string workingDirectory;
+        Workspace workspace;
         GitVCSConfig config;
 
-        public static UsernamePasswordCredentials credentials;
+        UsernamePasswordCredentials credentials;
         FilterRegistration lfsFilter;
         Signature signature;
         CredentialsHandler credentialsHandler;
 
-        public GitVCS(string workingDirectory, GitVCSConfig config)
+        public GitVCS(Workspace workspace, GitVCSConfig config)
         {
-            this.workingDirectory = workingDirectory;
+            this.workspace = workspace;
             this.config = config;
 
             credentials = new UsernamePasswordCredentials
@@ -31,7 +32,7 @@ namespace UnityBuild.VCS.Git
             signature = new Signature(new Identity("UnityBuildServer", "info@basenjigames.com"), DateTimeOffset.UtcNow);
 
             // Set up LFS filter
-            var filter = new LFSFilter("lfs", workingDirectory, new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
+            var filter = new LFSFilter("lfs", workspace.WorkingDirectory, new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
             lfsFilter = GlobalSettings.RegisterFilter(filter);
         }
 
@@ -47,13 +48,13 @@ namespace UnityBuild.VCS.Git
         {
             get
             {
-                return Repository.IsValid(workingDirectory);
+                return Repository.IsValid(workspace.WorkingDirectory);
             }
         }
 
         void StoreCredentials()
         {
-            string credentialsPath = $"{workingDirectory}/../git-credentials";
+            string credentialsPath = $"{workspace.WorkingDirectory}/../git-credentials";
 
             var uri = new Uri(config.RepositoryURL);
             // Should use UriBuilder, but it doesn't include the password in the resulting uri string
@@ -68,23 +69,58 @@ namespace UnityBuild.VCS.Git
         // Clone
         public override void Download()
         {
-            BuildConsole.WriteLine($"Cloning repository:  {config.RepositoryURL}");
-            var cloneOptions = new CloneOptions
+            if (config.UseLFS)
             {
-                CredentialsProvider = credentialsHandler,
-                BranchName = config.RepositoryBranchName,
-                Checkout = true,
-                RecurseSubmodules = true
-            };
-            Repository.Clone(config.RepositoryURL, workingDirectory, cloneOptions);
+                BuildConsole.WriteLine($"Cloning LFS repository:  {config.RepositoryURL}");
 
-            //if (config.UseLFS)
-            //{
-            //    PullLFS();
-            //}
+                Console.ForegroundColor = ConsoleColor.Red;
+
+                workspace.CleanWorkingDirectory();
+                string repoUrl = GetUrlWithPassword(config.RepositoryURL);
+
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = "git-lfs",
+                    Arguments = $"clone {repoUrl} {workspace.WorkingDirectory}",
+                    WorkingDirectory = workspace.WorkingDirectory,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                var process = new Process { StartInfo = startInfo };
+                process.Start();
+                process.WaitForExit();
+
+                Console.ResetColor();
+            }
+            else
+            {
+                BuildConsole.WriteLine($"Cloning repository:  {config.RepositoryURL}");
+
+                var cloneOptions = new CloneOptions
+                {
+                    CredentialsProvider = credentialsHandler,
+                    BranchName = config.RepositoryBranchName,
+                    Checkout = true,
+                    RecurseSubmodules = true
+                };
+
+                Repository.Clone(config.RepositoryURL, workspace.WorkingDirectory, cloneOptions);
+            }
 
             // TODO Handle sub-module credentials
         }
+
+        string GetUrlWithPassword(string url)
+        {
+            // FIXME insecure to include password in the URL, but it's the only way I've
+            // found to circumvent the manual password prompt when running git-lfs
+            var uri = new Uri(config.RepositoryURL);
+            string urlWithCredentials = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
+            return urlWithCredentials;
+        }
+
 
         // Pull
         public override void Update()
@@ -92,16 +128,10 @@ namespace UnityBuild.VCS.Git
             BuildConsole.WriteLine("Cleaning working copy");
 
             // Clean the repo
-            using (var repo = new Repository(workingDirectory))
+            using (var repo = new Repository(workspace.WorkingDirectory))
             {
                 repo.Reset(ResetMode.Hard);
                 repo.RemoveUntrackedFiles();
-
-                //// Download LFS files
-                //if (config.UseLFS)
-                //{
-                //    PullLFS();
-                //}
 
                 // Pull changes
             
@@ -124,13 +154,6 @@ namespace UnityBuild.VCS.Git
                 };
                 repo.Merge(config.RepositoryBranchName, signature, mergeOptions);
             }
-        }
-
-        void PullLFS()
-        {
-            //BuildConsole.WriteLine($"Pulling LFS files: {config.IsLFS}");
-
-            // TODO
         }
     }
 }
