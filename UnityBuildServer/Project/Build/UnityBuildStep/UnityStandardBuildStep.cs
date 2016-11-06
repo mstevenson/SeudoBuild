@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using RunProcessAsTask;
@@ -27,22 +28,38 @@ namespace UnityBuild
 
         public override void Execute()
         {
-            
+            // FIXME don't hard-code
+
+
+            Run(new UnityInstallation {
+                Version = new VersionNumber { Major = 5, Minor = 4, Patch = 2, Build = "f2" },
+                Path = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
+            }, config, workspace);
         }
 
 
-        Task<ProcessResults> Run(UnityInstallation unity, UnityStandardBuildConfig unityBuildSettings, Workspace workspace)
+        void Run(UnityInstallation unityInstallation, UnityStandardBuildConfig unityBuildSettings, Workspace workspace)
         {
-            if (!File.Exists(unity.Path))
-            {
-                throw new System.Exception("Unity executable does not exist at path " + unity.Path);
-            }
-
+            
             var args = GetBuildArgs(unityBuildSettings, workspace);
-            var startInfo = new ProcessStartInfo(unity.Path, args);
 
-            var task = ProcessEx.RunAsync(startInfo);
-            return task;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = unityInstallation.Path,
+                Arguments = args,
+                WorkingDirectory = workspace.WorkingDirectory,
+                //RedirectStandardInput = true,
+                //RedirectStandardOutput = true,
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            var process = new Process { StartInfo = startInfo };
+            process.Start();
+            process.WaitForExit();
+
+            Console.ResetColor();
         }
 
         string GetBuildArgs(UnityStandardBuildConfig settings, Workspace workspace)
