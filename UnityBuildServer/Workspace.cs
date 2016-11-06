@@ -5,27 +5,35 @@ namespace UnityBuild
 {
     public class Workspace
     {
-        public enum PlatformType
+        public enum Platform
         {
             Mac,
             Windows,
             Linux
         }
 
-        public PlatformType Platform
+        public Platform RunningPlatform
         {
             get
             {
+                // macOS is incorrectly detected as Unix. The solution is to check
+                // for the presence of macOS root folders.
+                // http://stackoverflow.com/questions/10138040/how-to-detect-properly-windows-linux-mac-operating-systems
                 switch (Environment.OSVersion.Platform)
                 {
-                    case PlatformID.MacOSX:
-                        return PlatformType.Mac;
-                    case PlatformID.Win32NT:
-                        return PlatformType.Windows;
                     case PlatformID.Unix:
-                        return PlatformType.Linux;
+                        if (Directory.Exists("/Applications")
+                            & Directory.Exists("/System")
+                            & Directory.Exists("/Users")
+                            & Directory.Exists("/Volumes"))
+                            return Platform.Mac;
+                        else
+                            return Platform.Linux;
+                    case PlatformID.MacOSX:
+                        return Platform.Mac;
+
                     default:
-                        throw new PlatformNotSupportedException("The current platform is not supported.");
+                        return Platform.Windows;
                 }
             }
         }

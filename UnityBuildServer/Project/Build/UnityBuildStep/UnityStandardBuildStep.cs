@@ -29,39 +29,19 @@ namespace UnityBuild
         public override void Execute()
         {
             // FIXME don't hard-code
+
             var version = new VersionNumber { Major = 5, Minor = 4, Patch = 2, Build = "f2" };
 
             BuildConsole.WriteLine($"Building with Unity {version}");
 
-            Run(new UnityInstallation {
+            var unityInstallation = new UnityInstallation
+            {
                 Version = version,
                 Path = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
-            }, config, workspace);
-        }
-
-
-        void Run(UnityInstallation unityInstallation, UnityStandardBuildConfig unityBuildSettings, Workspace workspace)
-        {
-            
-            var args = GetBuildArgs(unityBuildSettings, workspace);
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = unityInstallation.Path,
-                Arguments = args,
-                WorkingDirectory = workspace.WorkingDirectory,
-                //RedirectStandardInput = true,
-                //RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                UseShellExecute = false
             };
-            var process = new Process { StartInfo = startInfo };
-            process.Start();
-            process.WaitForExit();
 
-            Console.ResetColor();
+            var args = GetBuildArgs(config, workspace);
+            ExecuteUnity(unityInstallation, args, workspace);
         }
 
         string GetBuildArgs(UnityStandardBuildConfig settings, Workspace workspace)
