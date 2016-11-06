@@ -41,7 +41,7 @@ namespace UnityBuild
             // Save zip file
             using (var zipFile = new ZipFile())
             {
-                zipFile.AddDirectory(workspace.WorkingDirectory);
+                zipFile.AddDirectory(workspace.BuildOutputDirectory);
                 zipFile.Save(filepath);
             }
 
