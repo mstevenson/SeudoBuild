@@ -29,10 +29,12 @@ namespace UnityBuild
         public override void Execute()
         {
             // FIXME don't hard-code
+            var version = new VersionNumber { Major = 5, Minor = 4, Patch = 2, Build = "f2" };
 
+            BuildConsole.WriteLine($"Building with Unity {version}");
 
             Run(new UnityInstallation {
-                Version = new VersionNumber { Major = 5, Minor = 4, Patch = 2, Build = "f2" },
+                Version = version,
                 Path = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
             }, config, workspace);
         }
