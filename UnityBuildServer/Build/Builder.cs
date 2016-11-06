@@ -35,7 +35,7 @@ namespace UnityBuild
             BuildTargetConfig targetConfig = null;
             foreach (var target in projectConfig.BuildTargets)
             {
-                if (target.Name == buildTargetName)
+                if (target.TargetName == buildTargetName)
                 {
                     targetConfig = target;
                 }
@@ -114,7 +114,7 @@ namespace UnityBuild
             {
                 BuildDate = DateTime.Now,
                 ProjectName = pipeline.ProjectConfig.ProjectName,
-                BuildTargetName = pipeline.TargetConfig.Name,
+                BuildTargetName = pipeline.TargetConfig.TargetName,
                 Status = BuildCompletionStatus.Running
             };
 
@@ -142,13 +142,17 @@ namespace UnityBuild
             stopwatch.Stop();
             buildInfo.BuildDuration = stopwatch.Elapsed;
 
-            if (buildInfo.Status == BuildCompletionStatus.Completed)
+            if (buildInfo.Status != BuildCompletionStatus.Faulted)
             {
-                BuildConsole.WriteLine("All build steps completed in " + buildInfo);
+                buildInfo.Status = BuildCompletionStatus.Completed;
+                BuildConsole.WriteLine("Build steps completed in " + buildInfo.BuildDuration.ToString(@"hh\:mm\:ss"));
             }
             else
             {
-                BuildConsole.WriteLine($"Build failed on step {stepIndex} ({currentStep.TypeName})");
+                BuildConsole.IndentLevel -= 2;
+                Console.ForegroundColor = ConsoleColor.Red;
+                BuildConsole.WriteLine($"# Build failed on step {stepIndex} ({currentStep.TypeName})");
+                Console.ResetColor();
             }
 
             return buildInfo;
@@ -159,6 +163,16 @@ namespace UnityBuild
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("+ Archive");
             BuildConsole.IndentLevel = 1;
+
+            if (buildInfo.Status == BuildCompletionStatus.Faulted)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                BuildConsole.WriteLine("# Skipping, previous build step failed");
+                Console.ResetColor();
+
+                // TODO return faulted status
+                return null;
+            }
 
             List<ArchiveInfo> archiveInfos = new List<ArchiveInfo>();
 
@@ -185,6 +199,8 @@ namespace UnityBuild
             BuildConsole.WriteLine("+ Distribute");
             BuildConsole.IndentLevel = 1;
 
+            // TODO handle faulted state from the previous step, bail out, forward the error
+
             List<DistributeInfo> distributeInfos = new List<DistributeInfo>();
 
             foreach (var step in pipeline.DistributeSteps)
@@ -208,6 +224,8 @@ namespace UnityBuild
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("+ Notify");
             BuildConsole.IndentLevel = 1;
+
+            // TODO handle faulted state from the previous step, bail out, forward the error
 
             foreach (var step in pipeline.NotifySteps)
             {

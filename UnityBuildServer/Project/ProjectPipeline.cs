@@ -51,7 +51,7 @@ namespace UnityBuild
         {
             foreach (var t in ProjectConfig.BuildTargets)
             {
-                if (t.Name == targetName)
+                if (t.TargetName == targetName)
                 {
                     return t;
                 }

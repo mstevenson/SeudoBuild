@@ -118,8 +118,7 @@ namespace UnityBuild.VCS.Git
 
                 // Pull changes
 
-                string remoteName = "origin";
-                BuildConsole.WriteLine($"Pulling changes from {remoteName}:  {config.RepositoryURL}");
+                BuildConsole.WriteLine($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {config.RepositoryURL}");
 
                 var pullOptions = new PullOptions
                 {
@@ -158,7 +157,7 @@ namespace UnityBuild.VCS.Git
 
         void ExecuteLFSCommand(string arguments)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Cyan;
 
             var startInfo = new ProcessStartInfo
             {
