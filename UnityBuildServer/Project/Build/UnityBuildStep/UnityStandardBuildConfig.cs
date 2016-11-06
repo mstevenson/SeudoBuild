@@ -15,15 +15,17 @@ namespace UnityBuild
             }
         }
 
-        /// <summary>
-        /// The installed Unity executable to build with.
-        /// </summary>
-        public VersionNumber UnityVersionNumber { get; set; }
+        public string ExecutableName { get; set; }
 
         /// <summary>
         /// If ExecuteStaticMethod is false, a standard build will be performed
         /// for this TargetPlatform.
         /// </summary>
         public UnityPlatform TargetPlatform { get; set; }
+
+        /// <summary>
+        /// The installed Unity executable to build with.
+        /// </summary>
+        public VersionNumber UnityVersionNumber { get; set; }
     }
 }
