@@ -4,6 +4,6 @@ namespace UnityBuild
     public interface IBuildStep
     {
         string TypeName { get; }
-        void Execute();
+        BuildResult Execute();
     }
 }

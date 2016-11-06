@@ -26,7 +26,7 @@ namespace UnityBuild
             }
         }
 
-        public override void Execute()
+        public override BuildResult Execute()
         {
             // FIXME don't hard-code
 
@@ -41,7 +41,9 @@ namespace UnityBuild
             };
 
             var args = GetBuildArgs(config, workspace);
-            ExecuteUnity(unityInstallation, args, workspace);
+            var buildResult = ExecuteUnity(unityInstallation, args, workspace);
+
+            return buildResult;
         }
 
         string GetBuildArgs(UnityStandardBuildConfig settings, Workspace workspace)

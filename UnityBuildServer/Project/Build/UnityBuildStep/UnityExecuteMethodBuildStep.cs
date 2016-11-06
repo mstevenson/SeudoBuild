@@ -24,9 +24,10 @@ namespace UnityBuild
             }
         }
 
-        public override void Execute()
+        public override BuildResult Execute()
         {
             // TODO
+            return new BuildResult { Status = BuildCompletionStatus.Faulted };
         }
 
         Task<ProcessResults> Run(UnityInstallation unity, UnityExecuteMethodBuildConfig config, Workspace workspace)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityBuild.VCS;
+using System.Diagnostics;
 
 namespace UnityBuild
 {
@@ -71,7 +72,7 @@ namespace UnityBuild
             // Done
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("");
-            BuildConsole.WriteLine("Build completed.");
+            BuildConsole.WriteLine("Build process completed.");
         }
 
         void UpdateWorkingCopy(ProjectPipeline pipeline)
@@ -98,23 +99,56 @@ namespace UnityBuild
             BuildConsole.WriteLine("+ Build");
             BuildConsole.IndentLevel = 1;
 
+            // Bail if nothing to build
+            if (pipeline.BuildSteps.Count == 0)
+            {
+                BuildConsole.WriteLine("No build steps");
+                return new BuildInfo { Status = BuildCompletionStatus.Faulted };
+            }
+
             // Delete all files in the build output directory
             pipeline.Workspace.CleanBuildOutputDirectory();
 
+            // TODO add commit identifier and app version to BuildInfo
             BuildInfo buildInfo = new BuildInfo
             {
                 BuildDate = DateTime.Now,
                 ProjectName = pipeline.ProjectConfig.ProjectName,
-                BuildTargetName = pipeline.TargetConfig.Name
+                BuildTargetName = pipeline.TargetConfig.Name,
+                Status = BuildCompletionStatus.Running
             };
 
-            // TODO add commit identifier, app version, and build duration to BuildInfo
 
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            IBuildStep currentStep = null;
+            int stepIndex = 0;
+
+            // Build
             foreach (var step in pipeline.BuildSteps)
             {
+                stepIndex++;
+                currentStep = step;
                 BuildConsole.WriteLine("+ " + step.TypeName);
                 BuildConsole.IndentLevel = 3;
-                step.Execute();
+                var stepResult = step.Execute();
+                if (stepResult.Status == BuildCompletionStatus.Faulted)
+                {
+                    buildInfo.Status = BuildCompletionStatus.Faulted;
+                    break;
+                }
+            }
+
+            stopwatch.Stop();
+            buildInfo.BuildDuration = stopwatch.Elapsed;
+
+            if (buildInfo.Status == BuildCompletionStatus.Completed)
+            {
+                BuildConsole.WriteLine("All build steps completed in " + buildInfo);
+            }
+            else
+            {
+                BuildConsole.WriteLine($"Build failed on step {stepIndex} ({currentStep.TypeName})");
             }
 
             return buildInfo;

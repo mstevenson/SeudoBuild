@@ -5,10 +5,12 @@ namespace UnityBuild
 {
     public class BuildInfo
     {
-        public string ProjectName { get; set; }
-        public string BuildTargetName { get; set; }
+        public string ProjectName { get; set; } = string.Empty;
+        public string BuildTargetName { get; set; } = string.Empty;
+        public BuildCompletionStatus Status { get; set; }
         public DateTime BuildDate { get; set; } = DateTime.Now;
-        public string CommitIdentifier { get; set; }
+        public TimeSpan BuildDuration { get; set; } = new TimeSpan();
+        public string CommitIdentifier { get; set; } = string.Empty;
         public VersionNumber AppVersion { get; set; } = new VersionNumber();
     }
 }

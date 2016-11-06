@@ -10,13 +10,11 @@ namespace UnityBuild
     {
         public abstract string TypeName { get; }
 
-        public abstract void Execute();
+        public abstract BuildResult Execute();
 
-        protected UnityBuildResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace)
+        protected BuildResult ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-
-            var results = new UnityBuildResults();
 
             var startInfo = new ProcessStartInfo
             {
@@ -116,7 +114,17 @@ namespace UnityBuild
             tokenSource.Dispose();
             Console.ResetColor();
 
-            return results;
+            var buildResult = new BuildResult();
+            if (unityProcess.ExitCode == 0)
+            {
+                buildResult.Status = BuildCompletionStatus.Completed;
+            }
+            else
+            {
+                buildResult.Status = BuildCompletionStatus.Faulted;
+            }
+
+            return buildResult;
         }
 
         string GetEditorLogPath(Workspace workspace)

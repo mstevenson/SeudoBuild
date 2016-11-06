@@ -29,7 +29,7 @@ namespace UnityBuild
             }
         }
 
-        public void Execute()
+        public BuildResult Execute()
         {
             // Replace variables in string that begin and end with the % character
             var command = workspace.Replacements.ReplaceVariablesInText(config.Command);
@@ -57,7 +57,21 @@ namespace UnityBuild
                 BuildConsole.WriteLine(line);
             }
 
+            process.WaitForExit();
             System.Console.ResetColor();
+
+            var buildResult = new BuildResult();
+            int exitCode = process.ExitCode;
+            if (exitCode == 0)
+            {
+                buildResult.Status = BuildCompletionStatus.Completed;
+            }
+            else
+            {
+                buildResult.Status = BuildCompletionStatus.Faulted;
+            }
+
+            return buildResult;
         }
     }
 }
