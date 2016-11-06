@@ -89,7 +89,7 @@ namespace UnityBuild.VCS.Git
                 var cloneOptions = new CloneOptions
                 {
                     CredentialsProvider = credentialsHandler,
-                    BranchName = config.RepositoryBranchName,
+                    BranchName = string.IsNullOrEmpty (config.RepositoryBranchName) ? "master" : config.RepositoryBranchName,
                     Checkout = true,
                     RecurseSubmodules = true
                 };
