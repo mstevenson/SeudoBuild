@@ -99,6 +99,7 @@
     <Compile Include="Project\Build\UnityBuildStep\UnityBuildResults.cs" />
     <Compile Include="Build\BuildResult.cs" />
     <Compile Include="Build\BuildCompletionStatus.cs" />
+    <Compile Include="Build\VCSResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

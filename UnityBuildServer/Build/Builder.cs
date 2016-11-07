@@ -50,7 +50,9 @@ namespace UnityBuild
             var replacements = pipeline.Workspace.Replacements;
 
             // Grab changes from version control system
-            UpdateWorkingCopy(pipeline);
+            VCSResult updateResult = UpdateWorkingCopy(pipeline);
+
+            // TODO handle VCS failure, pass the result through to the Build step
 
             // Build
             var buildInfo = Build(pipeline);
@@ -75,7 +77,7 @@ namespace UnityBuild
             Console.WriteLine("Build process completed.");
         }
 
-        void UpdateWorkingCopy(ProjectPipeline pipeline)
+        VCSResult UpdateWorkingCopy(ProjectPipeline pipeline)
         {
             VersionControlSystem vcs = pipeline.VersionControlSystem;
 
@@ -90,6 +92,9 @@ namespace UnityBuild
             {
                 vcs.Download();
             }
+
+            // FIXME return a result object that indicates success or failure
+            return new VCSResult { Success = true };
         }
 
         BuildInfo Build(ProjectPipeline pipeline)
