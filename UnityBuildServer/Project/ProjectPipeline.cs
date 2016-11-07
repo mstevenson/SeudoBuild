@@ -104,9 +104,9 @@ namespace UnityBuild
                 {
                     steps.Add(new ZipArchiveStep((ZipArchiveConfig)stepConfig));
                 }
-                else if (stepConfig is FolderArchiveStepConfig)
+                else if (stepConfig is FolderArchiveConfig)
                 {
-                    steps.Add(new FolderArchiveStep((FolderArchiveStepConfig)stepConfig));
+                    steps.Add(new FolderArchiveStep((FolderArchiveConfig)stepConfig));
                 }
             }
             return steps;

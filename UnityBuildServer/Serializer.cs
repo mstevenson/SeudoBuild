@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
+using UnityBuild.VCS;
 
 namespace UnityBuild
 {
@@ -8,7 +9,19 @@ namespace UnityBuild
         public T Deserialize<T>(string path)
         {
             string json = File.ReadAllText(path);
-            T obj = JsonConvert.DeserializeObject<T>(json);
+
+            JsonConverter[] converters = 
+            {
+                new VCSConfigConverter(),
+                new BuildStepConfigConverter(),
+                new ArchiveStepConfigConverter(),
+                new DistributeStepConfigConverter(),
+                new NotifyStepConfigConverter()
+            };
+
+            var settings = new JsonSerializerSettings { Converters = converters };
+
+            T obj = JsonConvert.DeserializeObject<T>(json, settings);
             return obj;
         }
 

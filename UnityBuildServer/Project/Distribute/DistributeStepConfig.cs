@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuild
 {
-    public abstract class DistributeConfig
+    public abstract class DistributeStepConfig
     {
         public abstract string Type { get; }
 

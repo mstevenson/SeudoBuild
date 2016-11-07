@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuild
 {
-    public class SteamDistributeConfig : DistributeConfig
+    public class SteamDistributeConfig : DistributeStepConfig
     {
         public override string Type { get; } = "Steam Upload";
         public string PublishToBranch { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace UnityBuild
 {
-    public class SFTPDistributeConfig : DistributeConfig
+    public class SFTPDistributeConfig : DistributeStepConfig
     {
         public override string Type { get; } = "SFTP Upload";
         public string Host { get; set; }

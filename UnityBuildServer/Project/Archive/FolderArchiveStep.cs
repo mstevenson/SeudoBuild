@@ -5,9 +5,9 @@ namespace UnityBuild
 {
     public class FolderArchiveStep : ArchiveStep
     {
-        FolderArchiveStepConfig config;
+        FolderArchiveConfig config;
 
-        public FolderArchiveStep(FolderArchiveStepConfig config)
+        public FolderArchiveStep(FolderArchiveConfig config)
         {
             this.config = config;
         }

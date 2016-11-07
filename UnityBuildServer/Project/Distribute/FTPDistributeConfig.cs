@@ -1,7 +1,7 @@
 ﻿using System;
 namespace UnityBuild
 {
-    public class FTPDistributeConfig : DistributeConfig
+    public class FTPDistributeConfig : DistributeStepConfig
     {
         public override string Type { get; } = "FTP Upload";
         public string URL { get; set; }

@@ -56,19 +56,19 @@
     <Compile Include="VersionControl\Git\GitVCSConfig.cs" />
     <Compile Include="Project\BuildTargetConfig.cs" />
     <Compile Include="VersionNumber.cs" />
-    <Compile Include="Project\Distribute\DistributeConfig.cs" />
+    <Compile Include="Project\Distribute\DistributeStepConfig.cs" />
     <Compile Include="Project\Distribute\FTPDistributeConfig.cs" />
     <Compile Include="Project\Distribute\SteamDistributeConfig.cs" />
     <Compile Include="Project\Archive\ArchiveStepConfig.cs" />
     <Compile Include="Project\Archive\FolderArchiveStep.cs" />
-    <Compile Include="Project\Archive\FolderArchiveStepConfig.cs" />
+    <Compile Include="Project\Archive\FolderArchiveConfig.cs" />
     <Compile Include="Project\Archive\ZipArchiveStep.cs" />
     <Compile Include="Project\Build\ShellBuildStep\ShellBuildStepConfig.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityStandardBuildConfig.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityInstallation.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityProcess.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
-    <Compile Include="Project\Notify\NotifyConfig.cs" />
+    <Compile Include="Project\Notify\NotifyStepConfig.cs" />
     <Compile Include="Project\Notify\EmailNotifyConfig.cs" />
     <Compile Include="Project\Archive\ArchiveStep.cs" />
     <Compile Include="Project\Archive\ZipArchiveConfig.cs" />
@@ -99,6 +99,11 @@
     <Compile Include="Build\BuildResult.cs" />
     <Compile Include="Build\BuildCompletionStatus.cs" />
     <Compile Include="Build\VCSResult.cs" />
+    <Compile Include="Project\Build\BuildStepConfigConverter.cs" />
+    <Compile Include="Project\Distribute\DistributeStepConfigConverter.cs" />
+    <Compile Include="Project\Notify\NotifyStepConfigConverter.cs" />
+    <Compile Include="Project\Archive\ArchiveStepConfigConverter.cs" />
+    <Compile Include="VersionControl\VCSConfigConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,6 +1,6 @@
 ﻿namespace UnityBuild
 {
-    public class EmailNotifyConfig : NotifyConfig
+    public class EmailNotifyConfig : NotifyStepConfig
     {
         public override string Type { get; } = "Email Notification";
         public string SMTPUser { get; set; }
