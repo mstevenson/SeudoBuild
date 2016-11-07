@@ -25,8 +25,8 @@ namespace UnityBuild
 
         public void ExecuteBuild(ProjectConfig projectConfig, string buildTargetName)
         {
-            BuildConsole.WriteLine("Starting build process:");
-            BuildConsole.IndentLevel = 1;
+            Console.WriteLine("Starting build process:");
+
             BuildConsole.WriteLine($"Project: {projectConfig.ProjectName}");
             BuildConsole.WriteLine($"Target:  {buildTargetName}");
             BuildConsole.WriteLine("");
@@ -72,16 +72,15 @@ namespace UnityBuild
             // Done
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("");
-            BuildConsole.WriteLine("Build process completed.");
+            Console.WriteLine("Build process completed.");
         }
 
         void UpdateWorkingCopy(ProjectPipeline pipeline)
         {
             VersionControlSystem vcs = pipeline.VersionControlSystem;
 
-            BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteLine($"+ Update working copy ({vcs.TypeName})");
-            BuildConsole.IndentLevel = 2;
+            BuildConsole.WriteBullet($"Update working copy ({vcs.TypeName})");
+            BuildConsole.IndentLevel++;
 
             if (vcs.IsWorkingCopyInitialized)
             {
@@ -96,13 +95,13 @@ namespace UnityBuild
         BuildInfo Build(ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteLine("+ Build");
+            BuildConsole.WriteBullet("Build");
             BuildConsole.IndentLevel = 1;
 
             // Bail if nothing to build
             if (pipeline.BuildSteps.Count == 0)
             {
-                BuildConsole.WriteLine("No build steps");
+                BuildConsole.WriteAlert("No build steps");
                 return new BuildInfo { Status = BuildCompletionStatus.Faulted };
             }
 
@@ -129,9 +128,12 @@ namespace UnityBuild
             {
                 stepIndex++;
                 currentStep = step;
-                BuildConsole.WriteLine("+ " + step.TypeName);
-                BuildConsole.IndentLevel = 3;
+                BuildConsole.WriteBullet($"{step.TypeName} (step {stepIndex}/{pipeline.BuildSteps.Count})");
+                BuildConsole.IndentLevel++;
+
                 var stepResult = step.Execute();
+
+                BuildConsole.IndentLevel--;
                 if (stepResult.Status == BuildCompletionStatus.Faulted)
                 {
                     buildInfo.Status = BuildCompletionStatus.Faulted;
@@ -145,14 +147,11 @@ namespace UnityBuild
             if (buildInfo.Status != BuildCompletionStatus.Faulted)
             {
                 buildInfo.Status = BuildCompletionStatus.Completed;
-                BuildConsole.WriteLine("Build steps completed in " + buildInfo.BuildDuration.ToString(@"hh\:mm\:ss"));
+                BuildConsole.WriteSuccess("Build steps completed in " + buildInfo.BuildDuration.ToString(@"hh\:mm\:ss"));
             }
             else
             {
-                BuildConsole.IndentLevel -= 2;
-                Console.ForegroundColor = ConsoleColor.Red;
-                BuildConsole.WriteLine($"# Build failed on step {stepIndex} ({currentStep.TypeName})");
-                Console.ResetColor();
+                BuildConsole.WriteFailure($"Build failed on step {stepIndex} ({currentStep.TypeName})");
             }
 
             return buildInfo;
@@ -161,14 +160,18 @@ namespace UnityBuild
         List<ArchiveInfo> Archive(BuildInfo buildInfo, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteLine("+ Archive");
-            BuildConsole.IndentLevel = 1;
+            BuildConsole.WriteBullet("Archive");
+            BuildConsole.IndentLevel++;
+
+            if (pipeline.ArchiveSteps.Count == 0)
+            {
+                BuildConsole.WriteAlert("No archive steps");
+                return null;
+            }
 
             if (buildInfo.Status == BuildCompletionStatus.Faulted)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                BuildConsole.WriteLine("# Skipping, previous build step failed");
-                Console.ResetColor();
+                BuildConsole.WriteFailure("Skipping, previous build step failed");
 
                 // TODO return faulted status
                 return null;
@@ -178,16 +181,9 @@ namespace UnityBuild
 
             foreach (var step in pipeline.ArchiveSteps)
             {
-                BuildConsole.WriteLine("+ " + step.TypeName);
-                BuildConsole.IndentLevel = 3;
+                BuildConsole.WriteBullet(step.TypeName);
                 var info = step.CreateArchive(buildInfo, pipeline.Workspace);
                 archiveInfos.Add(info);
-            }
-
-            if (pipeline.ArchiveSteps.Count == 0)
-            {
-                BuildConsole.IndentLevel = 2;
-                BuildConsole.WriteLine("No archive steps");
             }
 
             return archiveInfos;
@@ -196,8 +192,14 @@ namespace UnityBuild
         List<DistributeInfo> Distribute(List<ArchiveInfo> archiveInfos, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteLine("+ Distribute");
-            BuildConsole.IndentLevel = 1;
+            BuildConsole.WriteBullet("Distribute");
+            BuildConsole.IndentLevel++;
+
+            if (pipeline.DistributeSteps.Count == 0)
+            {
+                BuildConsole.WriteAlert("No distribute steps");
+                return null;
+            }
 
             // TODO handle faulted state from the previous step, bail out, forward the error
 
@@ -205,15 +207,8 @@ namespace UnityBuild
 
             foreach (var step in pipeline.DistributeSteps)
             {
-                BuildConsole.WriteLine($"+ {step.TypeName}");
-                BuildConsole.IndentLevel = 3;
+                BuildConsole.WriteBullet(step.TypeName);
                 step.Distribute(archiveInfos, pipeline.Workspace);
-            }
-
-            if (pipeline.DistributeSteps.Count == 0)
-            {
-                BuildConsole.IndentLevel = 2;
-                BuildConsole.WriteLine("No distribute steps");
             }
 
             return distributeInfos;
@@ -222,23 +217,25 @@ namespace UnityBuild
         void Notify(List<DistributeInfo> distributeInfos, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteLine("+ Notify");
-            BuildConsole.IndentLevel = 1;
-
-            // TODO handle faulted state from the previous step, bail out, forward the error
-
-            foreach (var step in pipeline.NotifySteps)
-            {
-                BuildConsole.WriteLine("+ " + step.TypeName);
-                BuildConsole.IndentLevel = 3;
-                step.Notify();
-            }
+            BuildConsole.WriteBullet("Notify");
+            BuildConsole.IndentLevel++;
 
             if (pipeline.NotifySteps.Count == 0)
             {
-                BuildConsole.IndentLevel = 2;
-                BuildConsole.WriteLine("No notify steps");
+                BuildConsole.WriteAlert("No notify steps");
             }
+
+            // TODO handle faulted state from the previous step, bail out, forward the error
+
+            BuildConsole.IndentLevel++;
+
+            foreach (var step in pipeline.NotifySteps)
+            {
+                BuildConsole.WriteBullet(step.TypeName);
+                step.Notify();
+            }
+
+            BuildConsole.IndentLevel--;
         }
     }
 }

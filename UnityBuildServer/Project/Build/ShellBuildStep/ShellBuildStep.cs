@@ -49,7 +49,7 @@ namespace UnityBuild
             var process = new Process { StartInfo = startInfo };
             process.Start();
 
-            System.Console.ForegroundColor = System.ConsoleColor.DarkGreen;
+            System.Console.ForegroundColor = System.ConsoleColor.Cyan;
 
             while (!process.StandardOutput.EndOfStream)
             {
