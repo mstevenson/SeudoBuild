@@ -15,7 +15,7 @@ namespace UnityBuild
             }
         }
 
-        public string ExecutableName { get; set; }
+        public string OutputName { get; set; }
 
         /// <summary>
         /// If ExecuteStaticMethod is false, a standard build will be performed

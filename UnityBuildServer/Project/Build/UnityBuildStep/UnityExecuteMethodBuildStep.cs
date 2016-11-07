@@ -32,7 +32,7 @@ namespace UnityBuild
                 Path = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
             };
 
-            var args = "-quit -batchmode -executeMethod " + config.MethodName;
+            var args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {workspace.WorkingDirectory}";
             var buildResult = ExecuteUnity(unityInstallation, args, workspace);
 
             return buildResult;

@@ -49,6 +49,8 @@ namespace UnityBuild
             var args = new List<string>();
             args.Add("-quit");
             args.Add("-batchmode");
+            args.Add("-projectPath");
+            args.Add(workspace.WorkingDirectory);
 
             string executableExtension = "";
 
@@ -70,7 +72,7 @@ namespace UnityBuild
                     break;
             }
 
-            string exePath = $"{workspace.BuildOutputDirectory}/{settings.ExecutableName}{executableExtension}";
+            string exePath = $"{workspace.BuildOutputDirectory}/{settings.OutputName}{executableExtension}";
             args.Add(exePath);
 
             return string.Join(" ", args.ToArray());

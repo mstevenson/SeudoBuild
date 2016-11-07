@@ -45,7 +45,10 @@ namespace UnityBuild
             var args = new List<string>();
             args.Add("-quit");
             args.Add("-batchmode");
-            args.Add($"-executeMethod {methodName}");
+            args.Add("-executeMethod");
+            args.Add(methodName);
+            args.Add("-projectPath");
+            args.Add(workspace.WorkingDirectory);
 
             // Custom args
 
