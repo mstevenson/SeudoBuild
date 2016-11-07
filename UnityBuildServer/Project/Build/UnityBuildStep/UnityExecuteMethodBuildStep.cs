@@ -1,8 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using RunProcessAsTask;
-using System.IO;
-
+﻿
 namespace UnityBuild
 {
     public class UnityExecuteMethodBuildStep : UnityBuildStep
@@ -26,22 +22,20 @@ namespace UnityBuild
 
         public override BuildResult Execute()
         {
-            // TODO
-            return new BuildResult { Status = BuildCompletionStatus.Faulted };
-        }
+            // FIXME don't hard-code
 
-        Task<ProcessResults> Run(UnityInstallation unity, UnityExecuteMethodBuildConfig config, Workspace workspace)
-        {
-            if (!File.Exists(unity.Path))
+            var version = new VersionNumber { Major = 5, Minor = 4, Patch = 2, Build = "f2" };
+
+            var unityInstallation = new UnityInstallation
             {
-                throw new System.Exception("Unity executable does not exist at path " + unity.Path);
-            }
+                Version = version,
+                Path = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
+            };
 
             var args = "-quit -batchmode -executeMethod " + config.MethodName;
-            var startInfo = new ProcessStartInfo(unity.Path, args);
+            var buildResult = ExecuteUnity(unityInstallation, args, workspace);
 
-            var task = ProcessEx.RunAsync(startInfo);
-            return task;
+            return buildResult;
         }
     }
 }

@@ -14,6 +14,8 @@ namespace UnityBuild
 
         protected BuildResult ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace)
         {
+            BuildConsole.WriteLine($"Building with Unity {unityInstallation.Version}");
+
             Console.ForegroundColor = ConsoleColor.Cyan;
 
             var startInfo = new ProcessStartInfo

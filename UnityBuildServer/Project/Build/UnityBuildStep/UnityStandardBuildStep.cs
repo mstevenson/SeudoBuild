@@ -32,8 +32,6 @@ namespace UnityBuild
 
             var version = new VersionNumber { Major = 5, Minor = 4, Patch = 2, Build = "f2" };
 
-            BuildConsole.WriteLine($"Building with Unity {version}");
-
             var unityInstallation = new UnityInstallation
             {
                 Version = version,
