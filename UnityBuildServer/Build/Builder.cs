@@ -133,7 +133,7 @@ namespace UnityBuild
             {
                 stepIndex++;
                 currentStep = step;
-                BuildConsole.WriteBullet($"{step.TypeName} (step {stepIndex}/{pipeline.BuildSteps.Count})");
+                BuildConsole.WriteBullet($"{step.Type} (step {stepIndex}/{pipeline.BuildSteps.Count})");
                 BuildConsole.IndentLevel++;
 
                 var stepResult = step.Execute();
@@ -156,7 +156,7 @@ namespace UnityBuild
             }
             else
             {
-                BuildConsole.WriteFailure($"Build failed on step {stepIndex} ({currentStep.TypeName})");
+                BuildConsole.WriteFailure($"Build failed on step {stepIndex} ({currentStep.Type})");
             }
 
             return buildInfo;
@@ -186,7 +186,7 @@ namespace UnityBuild
 
             foreach (var step in pipeline.ArchiveSteps)
             {
-                BuildConsole.WriteBullet(step.TypeName);
+                BuildConsole.WriteBullet(step.Type);
                 var info = step.CreateArchive(buildInfo, pipeline.Workspace);
                 archiveInfos.Add(info);
             }
@@ -212,7 +212,7 @@ namespace UnityBuild
 
             foreach (var step in pipeline.DistributeSteps)
             {
-                BuildConsole.WriteBullet(step.TypeName);
+                BuildConsole.WriteBullet(step.Type);
                 step.Distribute(archiveInfos, pipeline.Workspace);
             }
 
@@ -236,7 +236,7 @@ namespace UnityBuild
 
             foreach (var step in pipeline.NotifySteps)
             {
-                BuildConsole.WriteBullet(step.TypeName);
+                BuildConsole.WriteBullet(step.Type);
                 step.Notify();
             }
 

@@ -2,6 +2,7 @@
 {
     public class EmailNotifyConfig : NotifyConfig
     {
+        public override string Type { get; } = "Email Notification";
         public string SMTPUser { get; set; }
         public string SMTPPassword { get; set; }
         public string FromAddress { get; set; }

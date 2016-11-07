@@ -6,13 +6,7 @@ namespace UnityBuild
     /// </summary>
     public class UnityExecuteMethodBuildConfig : BuildStepConfig
     {
-        public override string Type
-        {
-            get
-            {
-                return "Unity Execute Method";
-            }
-        }
+        public override string Type { get; } = "Unity Execute Method";
 
         /// <summary>
         /// The installed Unity executable to build with.

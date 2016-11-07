@@ -3,7 +3,7 @@ namespace UnityBuild
 {
     public abstract class DistributeConfig
     {
-        public string Id { get; set; }
+        public abstract string Type { get; }
 
         /// <summary>
         /// The name of the archive to distribute.

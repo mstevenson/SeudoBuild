@@ -12,13 +12,7 @@ namespace UnityBuild
             this.config = config;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "Zip File";
-            }
-        }
+        public override string Type { get; } = "Zip File";
 
         public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {

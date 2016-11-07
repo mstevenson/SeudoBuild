@@ -12,13 +12,7 @@ namespace UnityBuild
             this.workspace = workspace;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "Unity Execute Method";
-            }
-        }
+        public override string Type { get; } = "Unity Execute Method";
 
         public override BuildResult Execute()
         {

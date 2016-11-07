@@ -11,13 +11,7 @@ namespace UnityBuild
             this.config = config;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "Steam Upload";
-            }
-        }
+        public override string Type { get; } = "Steam Upload";
 
         public override void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace)
         {

@@ -4,7 +4,7 @@ namespace UnityBuild
 {
     public abstract class DistributeStep
     {
-        public abstract string TypeName { get; }
+        public abstract string Type { get; }
         public abstract void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace);
     }
 }

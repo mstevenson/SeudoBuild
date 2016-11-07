@@ -12,13 +12,7 @@ namespace UnityBuild
             this.config = config;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "Folder";
-            }
-        }
+        public override string Type { get; } = "Folder";
 
         public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
         {

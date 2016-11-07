@@ -3,7 +3,7 @@ namespace UnityBuild
 {
     public abstract class NotifyStep
     {
-        public abstract string TypeName { get; }
+        public abstract string Type { get; }
         public abstract void Notify();
     }
 }

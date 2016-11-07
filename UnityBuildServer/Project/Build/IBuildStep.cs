@@ -3,7 +3,7 @@ namespace UnityBuild
 {
     public interface IBuildStep
     {
-        string TypeName { get; }
+        string Type { get; }
         BuildResult Execute();
     }
 }

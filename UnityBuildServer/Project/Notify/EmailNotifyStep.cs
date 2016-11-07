@@ -12,13 +12,7 @@ namespace UnityBuild
             this.config = config;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "Email Notification";
-            }
-        }
+        public override string Type { get; } = "Email Notification";
 
         public override void Notify()
         {

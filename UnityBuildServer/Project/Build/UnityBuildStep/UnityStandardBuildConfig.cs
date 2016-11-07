@@ -7,13 +7,7 @@ namespace UnityBuild
     /// </summary>
     public class UnityStandardBuildConfig : BuildStepConfig
     {
-        public override string Type
-        {
-            get
-            {
-                return "Unity Simple";
-            }
-        }
+        public override string Type { get; } = "Unity Simple Build";
 
         public string OutputName { get; set; }
 

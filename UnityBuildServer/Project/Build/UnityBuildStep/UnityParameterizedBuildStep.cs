@@ -17,13 +17,7 @@ namespace UnityBuild
             this.workspace = workspace;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "Unity Advanced Build";
-            }
-        }
+        public override string Type { get; } = "Unity Parameterized Build";
 
         public override BuildResult Execute()
         {

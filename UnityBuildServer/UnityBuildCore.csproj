@@ -96,7 +96,6 @@
     <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityExecuteMethodBuildConfig.cs" />
     <Compile Include="Project\Build\UnityBuildStep\UnityBuildStep.cs" />
-    <Compile Include="Project\Build\UnityBuildStep\UnityBuildResults.cs" />
     <Compile Include="Build\BuildResult.cs" />
     <Compile Include="Build\BuildCompletionStatus.cs" />
     <Compile Include="Build\VCSResult.cs" />

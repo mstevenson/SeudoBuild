@@ -18,13 +18,7 @@ namespace UnityBuild
             this.workspace = workspace;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "Unity Standard Build";
-            }
-        }
+        public override string Type { get; } = "Unity Standard Build";
 
         public override BuildResult Execute()
         {

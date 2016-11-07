@@ -15,13 +15,7 @@ namespace UnityBuild
             this.config = config;
         }
 
-        public override string TypeName
-        {
-            get
-            {
-                return "SFTP Upload";
-            }
-        }
+        public override string Type { get; } = "SFTP Upload";
 
         public override void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace)
         {

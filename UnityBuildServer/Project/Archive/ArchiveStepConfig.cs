@@ -2,6 +2,6 @@
 {
     public abstract class ArchiveStepConfig
     {
-        public string Id { get; set; }
+        public abstract string Type { get; }
     }
 }

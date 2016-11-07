@@ -21,13 +21,7 @@ namespace UnityBuild
             this.workspace = workspace;
         }
 
-        public string TypeName
-        {
-            get
-            {
-                return "Shell Script";
-            }
-        }
+        public string Type { get; } = "Shell Script";
 
         public BuildResult Execute()
         {

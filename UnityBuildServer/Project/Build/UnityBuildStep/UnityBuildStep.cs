@@ -8,7 +8,7 @@ namespace UnityBuild
 {
     public abstract class UnityBuildStep : IBuildStep
     {
-        public abstract string TypeName { get; }
+        public abstract string Type { get; }
 
         public abstract BuildResult Execute();
 

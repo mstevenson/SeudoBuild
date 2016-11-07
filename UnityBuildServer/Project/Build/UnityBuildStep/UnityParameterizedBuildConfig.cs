@@ -4,13 +4,7 @@ namespace UnityBuild
 {
     public class UnityParameterizedBuildConfig : BuildStepConfig
     {
-        public override string Type
-        {
-            get
-            {
-                return "Unity Advanced";
-            }
-        }
+        public override string Type { get; } = "Unity Parameterized Build";
 
         public UnityPlatform TargetPlatform { get; set; }
         public VersionNumber UnityVersionNumber { get; set; }
