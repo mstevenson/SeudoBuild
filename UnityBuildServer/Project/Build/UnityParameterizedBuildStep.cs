@@ -27,9 +27,9 @@ namespace UnityBuild
 
         Task<ProcessResults> Run(UnityInstallation unity, UnityParameterizedBuildConfig config, Workspace workspace)
         {
-            if (!File.Exists(unity.Path))
+            if (!File.Exists(unity.ExePath))
             {
-                throw new System.Exception("Unity executable does not exist at path " + unity.Path);
+                throw new System.Exception("Unity executable does not exist at path " + unity.ExePath);
             }
 
             // FIXME match this to the Unity build script method name
@@ -96,7 +96,7 @@ namespace UnityBuild
 
             var argString = string.Join(" ", args.ToArray());
 
-            var startInfo = new ProcessStartInfo(unity.Path, argString);
+            var startInfo = new ProcessStartInfo(unity.ExePath, argString);
 
             var task = ProcessEx.RunAsync(startInfo);
             return task;

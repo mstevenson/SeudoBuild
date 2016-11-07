@@ -20,7 +20,7 @@ namespace UnityBuild
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = unityInstallation.Path,
+                FileName = unityInstallation.ExePath,
                 Arguments = arguments,
                 WorkingDirectory = workspace.WorkingDirectory,
                 //RedirectStandardInput = true,
@@ -131,7 +131,9 @@ namespace UnityBuild
 
         string GetEditorLogPath(Workspace workspace)
         {
-            switch (workspace.RunningPlatform)
+            var platform = Workspace.RunningPlatform;
+
+            switch (platform)
             {
                 case Workspace.Platform.Mac:
                     string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -140,7 +142,7 @@ namespace UnityBuild
                     string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                     return appData + @"\Local\Unity\Editor\Editor.log";
                 default:
-                    throw new PlatformNotSupportedException($"{workspace.RunningPlatform} platform is not supported");
+                    throw new PlatformNotSupportedException($"{platform} platform is not supported");
             }
         }
     }

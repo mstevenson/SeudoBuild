@@ -95,7 +95,6 @@
     <Compile Include="Project\Build\UnityExecuteMethodBuildStep.cs" />
     <Compile Include="Project\Build\UnityParameterizedBuildStep.cs" />
     <Compile Include="Project\Build\UnityStandardBuildStep.cs" />
-    <Compile Include="Project\Build\Configuration\UnityInstallation.cs" />
     <Compile Include="Project\Distribute\Configuration\DistributeStepConfig.cs" />
     <Compile Include="Project\Distribute\Configuration\DistributeStepConfigConverter.cs" />
     <Compile Include="Project\Distribute\Configuration\FTPDistributeConfig.cs" />
@@ -103,6 +102,7 @@
     <Compile Include="Project\Distribute\Configuration\SteamDistributeConfig.cs" />
     <Compile Include="Project\Notify\Configuration\EmailNotifyConfig.cs" />
     <Compile Include="Project\Notify\Configuration\NotifyStepConfig.cs" />
+    <Compile Include="Project\Build\UnityInstallation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

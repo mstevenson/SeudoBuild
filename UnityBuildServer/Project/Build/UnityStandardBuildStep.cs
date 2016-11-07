@@ -29,7 +29,7 @@ namespace UnityBuild
             var unityInstallation = new UnityInstallation
             {
                 Version = version,
-                Path = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
+                ExePath = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
             };
 
             var args = GetBuildArgs(config, workspace);

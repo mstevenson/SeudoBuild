@@ -12,7 +12,7 @@ namespace UnityBuild
             Linux
         }
 
-        public Platform RunningPlatform
+        public static Platform RunningPlatform
         {
             get
             {
