@@ -70,10 +70,11 @@ namespace SeudoBuild.VCS.Git
         // Clone
         public override void Download()
         {
+            workspace.CleanWorkingDirectory();
+
             if (config.UseLFS)
             {
                 BuildConsole.WriteLine($"Cloning LFS repository:  {config.RepositoryURL}");
-                workspace.CleanWorkingDirectory();
 
                 // FIXME extremely insecure to include password in the URL, but it's the only way I've
                 // found to circumvent the manual password prompt when running git-lfs
@@ -116,10 +117,19 @@ namespace SeudoBuild.VCS.Git
                 repo.Reset(ResetMode.Hard);
                 repo.RemoveUntrackedFiles();
 
+                // Clone a new copy if necessary
+
+                if (!IsWorkingCopyInitialized || repo.Head.Remote.Url != config.RepositoryURL)
+                {
+                    BuildConsole.WriteLine($"Repository URL has changed, cloning a new copy:  {config.RepositoryURL}");
+                    Download();
+                    return;
+                }
+
                 // Pull changes
 
                 BuildConsole.WriteLine($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {config.RepositoryURL}");
-
+                
                 var pullOptions = new PullOptions
                 {
                     FetchOptions = new FetchOptions
@@ -135,7 +145,7 @@ namespace SeudoBuild.VCS.Git
                     }
                 };
                 var mergeResult = repo.Network.Pull(signature, pullOptions);
-
+                
                 if (config.UseLFS)
                 {
                     BuildConsole.WriteLine("Fetching LFS files");
@@ -143,7 +153,7 @@ namespace SeudoBuild.VCS.Git
                     BuildConsole.WriteLine("Checking out LFS files into working copy");
                     ExecuteLFSCommand("checkout");
                 }
-
+                
                 if (mergeResult.Status == MergeStatus.UpToDate)
                 {
                     BuildConsole.WriteLine($"Repository is already up-to-date");
