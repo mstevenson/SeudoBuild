@@ -83,10 +83,10 @@ namespace SeudoBuild.Agent
                 invokedVerbInstance = subOptions;
             });
 
-            if (!parseSuccess)
-            {
-                Environment.Exit(Parser.DefaultExitCodeFail);
-            }
+            //if (!parseSuccess)
+            //{
+            //    Environment.Exit(Parser.DefaultExitCodeFail);
+            //}
 
             // Build locally
             if (invokedVerb == "build")
@@ -114,15 +114,15 @@ namespace SeudoBuild.Agent
             }
 
             // Submit job to the network
-            if (invokedVerb == "submit")
+            else if (invokedVerb == "submit")
             {
                 var submitSubOptions = (SubmitSubOptions)invokedVerbInstance;
-
-                // TODO
+                var submit = new BuildSubmit();
+                submit.Submit();
             }
 
             // Listen for jobs on the network
-            if (invokedVerb == "listen")
+            else if (invokedVerb == "listen")
             {
                 var listenSubOptions = (ListenSubOptions)invokedVerbInstance;
                 var server = new BuildQueue();
