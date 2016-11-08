@@ -145,5 +145,11 @@ namespace SeudoBuild
                     throw new PlatformNotSupportedException($"{platform} platform is not supported");
             }
         }
+
+        protected string GetBuildLogPath(Workspace workspace)
+        {
+            string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+            return $"{workspace.LogsDirectory}/Unity_Build_{now}";
+        }
     }
 }

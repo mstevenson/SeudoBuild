@@ -45,6 +45,8 @@ namespace SeudoBuild
             args.Add("-batchmode");
             args.Add("-projectPath");
             args.Add(workspace.WorkingDirectory);
+            args.Add("-logfile");
+            args.Add(GetBuildLogPath(workspace));
 
             string executableExtension = "";
 
