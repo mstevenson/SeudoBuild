@@ -33,9 +33,10 @@ namespace SeudoBuild
         void Initialize(string projectsBaseDirectory, string buildTargetName)
         {
             string projectNameSanitized = ProjectConfig.ProjectName.Replace(' ', '_');
-            string projectDirectory = projectNameSanitized;
+            string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
 
             Workspace = new Workspace(projectDirectory);
+            BuildConsole.WriteLine("Building to " + projectDirectory);
             Workspace.CreateSubDirectories();
 
             TargetConfig = GetBuildTargetConfig(buildTargetName);
