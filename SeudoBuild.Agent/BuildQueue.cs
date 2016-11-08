@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System.Text;
+using NetMQ;
+using NetMQ.Sockets;
 
 namespace SeudoBuild.Agent
 {
@@ -19,30 +18,21 @@ namespace SeudoBuild.Agent
             cancelToken = cancelTokenSource.Token;
 
 
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
+            using (var server = new ResponseSocket())
             {
-                using (var channel = connection.CreateModel())
+                server.Bind("tcp://*:5555");
+
+                while (true)
                 {
-                    channel.QueueDeclare(queue: "hello",
-                                         durable: false,
-                                         exclusive: false,
-                                         autoDelete: false,
-                                         arguments: null);
+                    var message = server.ReceiveFrameString();
 
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (model, ea) =>
-                    {
-                        var body = ea.Body;
-                        var message = Encoding.UTF8.GetString(body);
-                        Console.WriteLine("  Received {0}", message);
-                    };
-                    channel.BasicConsume(queue: "hello",
-                                         noAck: true,
-                                         consumer: consumer);
+                    Console.WriteLine("Received {0}", message);
 
-                    Console.WriteLine(" Press [enter] to exit.");
-                    Console.ReadLine();
+                    // processing the request
+                    Thread.Sleep(100);
+
+                    Console.WriteLine("Sending World");
+                    server.SendFrame("World");
                 }
             }
 

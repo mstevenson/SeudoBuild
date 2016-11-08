@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System.Text;
+using NetMQ;
+using NetMQ.Sockets;
 
 namespace SeudoBuild.Agent
 {
@@ -12,28 +11,21 @@ namespace SeudoBuild.Agent
         public void Submit()
         {
             Console.WriteLine("Submitting build job");
-            var factory = new ConnectionFactory() { HostName = "127.0.0.1" };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+
+
+            using (var client = new RequestSocket())
             {
-                channel.QueueDeclare(queue: "hello",
-                                     durable: false,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
+                client.Connect("tcp://localhost:5555");
 
-                string message = "Hello World!";
-                var body = Encoding.UTF8.GetBytes(message);
+                for (int i = 0; i < 10; i++)
+                {
+                    Console.WriteLine("Sending Hello");
+                    client.SendFrame("Hello");
 
-                channel.BasicPublish(exchange: "",
-                                     routingKey: "hello",
-                                     basicProperties: null,
-                                     body: body);
-                Console.WriteLine(" [x] Sent {0}", message);
+                    var message = client.ReceiveFrameString();
+                    Console.WriteLine("Received {0}", message);
+                }
             }
-
-            Console.WriteLine(" Press [enter] to exit.");
-            Console.ReadLine();
         }
     }
 }
