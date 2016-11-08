@@ -15,13 +15,13 @@ namespace SeudoBuild
         {
             JObject jobj = JObject.Load(reader);
             if (jobj["Type"].Value<string>() == "FTP Upload")
-                return jobj.ToObject<FTPDistributeStep>(serializer);
+                return jobj.ToObject<FTPDistributeConfig>(serializer);
 
             if (jobj["Type"].Value<string>() == "SFTP Upload")
-                return jobj.ToObject<SFTPDistributeStep>(serializer);
+                return jobj.ToObject<SFTPDistributeConfig>(serializer);
 
             if (jobj["Type"].Value<string>() == "Steam Upload")
-                return jobj.ToObject<SteamDistributeStep>(serializer);
+                return jobj.ToObject<SteamDistributeConfig>(serializer);
             
             return null;
         }
