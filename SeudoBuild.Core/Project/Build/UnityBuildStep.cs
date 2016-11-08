@@ -48,7 +48,7 @@ namespace SeudoBuild
             // Watch for the Unity editor log file to change,
             // and examine its output to determine when the build has completed
 
-            string editorLogPath = GetEditorLogPath(workspace);
+            string editorLogPath = GetBuildLogPath(workspace);
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
 
@@ -127,23 +127,6 @@ namespace SeudoBuild
             }
 
             return buildResult;
-        }
-
-        string GetEditorLogPath(Workspace workspace)
-        {
-            var platform = Workspace.RunningPlatform;
-
-            switch (platform)
-            {
-                case Workspace.Platform.Mac:
-                    string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                    return userDir + "/Library/Logs/Unity/Editor.log";
-                case Workspace.Platform.Windows:
-                    string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                    return appData + @"\Local\Unity\Editor\Editor.log";
-                default:
-                    throw new PlatformNotSupportedException($"{platform} platform is not supported");
-            }
         }
 
         protected string GetBuildLogPath(Workspace workspace)
