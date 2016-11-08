@@ -27,7 +27,7 @@ namespace SeudoBuild
         /// the folder name ending with the given version number.
         /// Example:  /Applications/Unity 5.3.4f2/Unity.app
         /// </summary>
-        public static UnityInstallation FindUnityInstallation (VersionNumber version)
+        public static UnityInstallation FindUnityInstallation (VersionNumber version, IFileSystem fileSystem)
         {
             Workspace.Platform platform = Workspace.RunningPlatform;
 

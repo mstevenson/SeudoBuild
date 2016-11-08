@@ -1,5 +1,4 @@
-﻿using System;
-namespace SeudoBuild
+﻿namespace SeudoBuild
 {
     public class FolderArchiveConfig : ArchiveStepConfig
     {
