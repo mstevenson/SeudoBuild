@@ -112,7 +112,7 @@ namespace SeudoBuild
         public Workspace(string projectDirectory)
         {
             WorkingDirectory = $"{projectDirectory}/Workspace";
-            BuildOutputDirectory = $"{projectDirectory}/BuildOutput";
+            BuildOutputDirectory = $"{projectDirectory}/Output";
             ArchivesDirectory = $"{projectDirectory}/Archives";
             LogsDirectory = $"{projectDirectory}/Logs";
         }

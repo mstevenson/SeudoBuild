@@ -92,12 +92,12 @@ namespace SeudoBuild.Agent
             if (invokedVerb == "build")
             {
                 var buildSubOptions = (BuildSubOptions)invokedVerbInstance;
-                ProjectConfig config = null;
+                ProjectConfig projectConfig = null;
 
                 try
                 {
                     var s = new Serializer();
-                    config = s.Deserialize<ProjectConfig>(buildSubOptions.ProjectConfigPath);
+                    projectConfig = s.Deserialize<ProjectConfig>(buildSubOptions.ProjectConfigPath);
                 }
                 catch (Exception e)
                 {
@@ -105,11 +105,11 @@ namespace SeudoBuild.Agent
                     Console.WriteLine(e.Message);
                 }
 
-                if (config != null)
+                if (projectConfig != null)
                 {
-                    //BuilderConfig builderConfig = new BuilderConfig { ProjectsPath = outputPath };
-                    //Builder builder = new Builder(builderConfig);
-                    //builder.ExecuteBuild(projectConfig, buildTarget);
+                    BuilderConfig builderConfig = new BuilderConfig { ProjectsPath = options.BuildVerb.OutputPath };
+                    Builder builder = new Builder(builderConfig);
+                    builder.ExecuteBuild(projectConfig, options.BuildVerb.BuildTarget);
                 }
             }
 
