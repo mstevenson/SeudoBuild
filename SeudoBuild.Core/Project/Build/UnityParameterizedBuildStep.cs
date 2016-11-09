@@ -44,7 +44,7 @@ namespace SeudoBuild
             args.Add("-projectPath");
             args.Add(workspace.WorkingDirectory);
             args.Add("-logfile");
-            args.Add(GetBuildLogPath(workspace));
+            args.Add(Workspace.StandardOutputPath);
 
             // Custom args
 

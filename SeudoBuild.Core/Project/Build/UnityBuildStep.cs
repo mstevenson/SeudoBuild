@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SeudoBuild
 {
@@ -24,96 +25,40 @@ namespace SeudoBuild
                 Arguments = arguments,
                 WorkingDirectory = workspace.WorkingDirectory,
                 //RedirectStandardInput = true,
-                //RedirectStandardOutput = true,
+                RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
             var unityProcess = new Process { StartInfo = startInfo };
 
-            //string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-            //string logPath = $"{workspace.LogsDirectory}/Unity_Build_Log_{now}";
+            // FIXME is this all being disposed correctly?
 
-            //using (var writer = File.AppendText(logPath))
-            //{
-            //unityProcess.OutputDataReceived += (sender, e) =>
-            //{
-            //    // TODO examine log for errors and other pertinent info
-            //};
-            
-            //unityProcess.ErrorDataReceived += (sender, e) =>
-            //{
-            //    // TODO return error
-            //};
-
-            // Watch for the Unity editor log file to change,
-            // and examine its output to determine when the build has completed
-
-            string editorLogPath = GetBuildLogPath(workspace);
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
-
-            Task unityEditorLogWatcherTask = Task.Run(() =>
+            string logPath = GetBuildLogPath(workspace);
+            var writer = new StreamWriter(logPath);
+            try
             {
-                // Bail if the task was already cancelled
-                token.ThrowIfCancellationRequested();
-
-                FileInfo logFile = new FileInfo(editorLogPath);
-                bool lastExisted = false;
-                DateTime lastModified = DateTime.Now;
-                long lastLength = 0;
-
-                while (true)
+                unityProcess.OutputDataReceived += (sender, e) =>
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        token.ThrowIfCancellationRequested();
-                    }
+                    //Console.WriteLine(e.Data);
+                    writer.WriteLine(e.Data);
+                    writer.Flush();
+                    // TODO examine log for errors and other pertinent info
+                };
 
-                    bool changed = false;
-                    int lengthDiff = 0;
+                //unityProcess.ErrorDataReceived += (sender, e) =>
+                //{
+                //    // TODO return error
+                //};
 
-                    bool exists = logFile.Exists;
-                    if (exists)
-                    {
-                        if (!lastExisted)
-                        {
-                            lastExisted = true;
-                            lastModified = logFile.LastWriteTimeUtc;
-                            lastLength = logFile.Length;
-                            changed = true;
-                        }
-                        else
-                        {
-                            DateTime modified = logFile.LastWriteTimeUtc;
-                            long length = logFile.Length;
-                            changed = modified != lastModified || length != lastLength;
+                unityProcess.Start();
+                unityProcess.BeginOutputReadLine();
+                unityProcess.WaitForExit();
+            }
+            finally
+            {
+                writer.Close();
+            }
 
-                            lastModified = modified;
-                            lastLength = length;
-                        }
-                    }
-
-                    if (changed)
-                    {
-                        BuildConsole.WriteLine("Unity log changed");
-
-                        // TODO Copy the new log lines (lengthDiff) to our own log file
-
-                        // TODO examine Unity log
-                    }
-
-                    // FIXME we may miss the final few lines of the log file
-
-                    Thread.Sleep(100);
-                }
-            }, token);
-
-
-            unityProcess.Start();
-            unityProcess.WaitForExit();
-            tokenSource.Cancel();
-
-            tokenSource.Dispose();
             Console.ResetColor();
 
             var buildResult = new BuildResult();
@@ -132,7 +77,7 @@ namespace SeudoBuild
         protected string GetBuildLogPath(Workspace workspace)
         {
             string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-            return $"{workspace.LogsDirectory}/Unity_Build_{now}";
+            return $"{workspace.LogsDirectory}/Unity_Build_Log_{now}.txt";
         }
     }
 }

@@ -38,6 +38,14 @@ namespace SeudoBuild
             }
         }
 
+        public static string StandardOutputPath
+        {
+            get
+            {
+                return RunningPlatform == Platform.Windows ? "CON" : "/dev/stdout";
+            }
+        }
+
         /// <summary>
         /// Contains project files downloaded from a version control system.
         /// </summary>

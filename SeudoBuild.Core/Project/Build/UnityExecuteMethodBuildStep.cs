@@ -26,7 +26,7 @@ namespace SeudoBuild
                 ExePath = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
             };
 
-            var args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {workspace.WorkingDirectory} -logfile {GetBuildLogPath(workspace)}";
+            var args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {workspace.WorkingDirectory} -logfile {Workspace.StandardOutputPath}";
             var buildResult = ExecuteUnity(unityInstallation, args, workspace);
 
             return buildResult;
