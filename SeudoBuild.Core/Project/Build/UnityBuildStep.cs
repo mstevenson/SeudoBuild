@@ -42,6 +42,7 @@ namespace SeudoBuild
                     //Console.WriteLine(e.Data);
                     writer.WriteLine(e.Data);
                     writer.Flush();
+                    HandleLogLine(e.Data);
                     // TODO examine log for errors and other pertinent info
                 };
 
@@ -78,6 +79,65 @@ namespace SeudoBuild
         {
             string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
             return $"{workspace.LogsDirectory}/Unity_Build_Log_{now}.txt";
+        }
+
+        // Examine and respond to a line in the Unity log file
+        void HandleLogLine(string line)
+        {
+            if (line == null)
+            {
+                return;
+            }
+
+            if (line.Contains("WARNING: "))
+            {
+                BuildConsole.WriteLine(line);
+            }
+            if (line.Contains("ERROR: "))
+            {
+                BuildConsole.WriteLine(line);
+            }
+
+            if (line.Contains("Initialize mono"))
+            {
+                BuildConsole.WriteLine("Loading Unity project");
+            }
+            if (line.Contains("- starting compile"))
+            {
+                BuildConsole.WriteLine(line);
+            }
+            //if (line.Contains("Compilation succeeded"))
+            //{
+            //    BuildConsole.WriteLine(line);
+            //}
+            if (line.Contains("Compilation failed"))
+            {
+                BuildConsole.WriteLine(line);
+            }
+            if (line.Contains("Finished compile"))
+            {
+                BuildConsole.WriteLine(line);
+            }
+            //if (line.Contains("Launched and connected shader compiler"))
+            //{
+            //    BuildConsole.WriteLine("Running shader compiler");
+            //}
+            //if (line.Contains("Total AssetImport time"))
+            //{
+            //    BuildConsole.WriteLine(line);
+            //}
+            if (line.Contains("building "))
+            {
+                BuildConsole.WriteLine(line);
+            }
+            if (line.Contains("Opening scene "))
+            {
+                BuildConsole.WriteLine(line);
+            }
+            if (line.Contains("*** Completed"))
+            {
+                BuildConsole.WriteLine(line);
+            }
         }
     }
 }
