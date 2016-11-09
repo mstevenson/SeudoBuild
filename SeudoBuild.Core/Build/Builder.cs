@@ -2,51 +2,47 @@
 using System.Collections.Generic;
 using SeudoBuild.VCS;
 using System.Diagnostics;
+using System.Linq;
 
 namespace SeudoBuild
 {
     /// <summary>
     /// 
-    /// Text replacement variables:
-    /// %project_name% -- the name for the entire project
-    /// %build_target_name% -- the specific target that was built
-    /// %app_version% -- version number as major.minor.patch
-    /// %build_date% -- the date that the build was completed
-    /// %commit_identifier% -- the current commit number or hash
     /// </summary>
     public class Builder
     {
-        BuilderConfig config;
+        BuilderConfig builderConfig;
 
         public Builder(BuilderConfig config)
         {
-            this.config = config;
+            this.builderConfig = config;
         }
 
-        public void ExecuteBuild(ProjectConfig projectConfig, string buildTargetName)
+        public void ExecuteBuildPipeline(ProjectConfig projectConfig, string buildTargetName)
         {
+            if (projectConfig == null)
+            {
+                throw new ArgumentNullException("projectConfig", "A project configuration definition must be specified.");
+            }
+            if (string.IsNullOrEmpty (buildTargetName))
+            {
+                throw new ArgumentNullException("buildTargetName", "A project configuration definition must be specified.");
+            }
+
+            BuildTargetConfig targetConfig = projectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
+            if (targetConfig == null)
+            {
+                throw new ArgumentException("The specified build target could not be found in the project.", "buildTargetName");
+            }
+
             Console.WriteLine("Starting build process:");
 
             BuildConsole.WriteLine($"Project: {projectConfig.ProjectName}");
             BuildConsole.WriteLine($"Target:  {buildTargetName}");
             BuildConsole.WriteLine("");
 
-            // Establish build target
-            BuildTargetConfig targetConfig = null;
-            foreach (var target in projectConfig.BuildTargets)
-            {
-                if (target.TargetName == buildTargetName)
-                {
-                    targetConfig = target;
-                }
-            }
-            if (targetConfig == null)
-            {
-                throw new Exception("Could not find target named " + buildTargetName);
-            }
-
             // Setup
-            var pipeline = ProjectPipeline.Create(config.ProjectsPath, projectConfig, buildTargetName);
+            var pipeline = ProjectPipeline.Create(builderConfig.ProjectsPath, projectConfig, buildTargetName);
             var replacements = pipeline.Workspace.Replacements;
 
             // Grab changes from version control system
