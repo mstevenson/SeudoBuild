@@ -43,6 +43,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildQueue.cs" />
     <Compile Include="BuildSubmit.cs" />
+    <Compile Include="BuildAgentConfig.cs" />
+    <Compile Include="DeploymentTarget.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">
