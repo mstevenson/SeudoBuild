@@ -8,7 +8,7 @@ namespace SeudoBuild
     //}
 
     public abstract class PipelineSequenceResults<TStep>
-        where TStep : IPipelineStepResults, new()
+        where TStep : PipelineStepResults, new()
     {
         public bool IsSuccess { get; set; }
         public Exception Exception { get; set; }

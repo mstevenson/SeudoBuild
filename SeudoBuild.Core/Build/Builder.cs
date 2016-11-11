@@ -188,9 +188,9 @@ namespace SeudoBuild
 
         OutSeq ExecuteSequence<InSeq, InStep, OutSeq, OutStep>(string sequenceName, IEnumerable<IPipelineStep<InSeq,InStep,OutStep>> sequenceSteps, InSeq previousSequence, Workspace workspace)
             where InSeq : PipelineSequenceResults<InStep> // previous sequence results
-            where InStep : IPipelineStepResults, new() // previous step results
+            where InStep : PipelineStepResults, new() // previous step results
             where OutSeq : PipelineSequenceResults<OutStep>, new() // current sequence results
-            where OutStep : IPipelineStepResults, new() // current step results
+            where OutStep : PipelineStepResults, new() // current step results
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet(sequenceName);
@@ -207,16 +207,28 @@ namespace SeudoBuild
                 return results;
             }
 
-            int stepCount = -1;
+            int stepIndex = -1;
+            IPipelineStep<InSeq, InStep, OutStep> currentStep = null;
             foreach (var step in sequenceSteps)
             {
-                stepCount++;
                 BuildConsole.WriteBullet(step.Type);
+
+                stepIndex++;
+                currentStep = step;
+
                 var stepResult = step.ExecuteStep(previousSequence, workspace);
                 results.StepResults.Add(stepResult);
+                if (!stepResult.IsSuccess)
+                {
+                    results.IsSuccess = false;
+                    results.Exception = stepResult.Exception;
+                    string error = $"{sequenceName} sequence failed on step {stepIndex} ({currentStep.Type})";
+                    BuildConsole.WriteFailure(error);
+                    break;
+                }
             }
 
-            if (stepCount == 0)
+            if (stepIndex == 0)
             {
                 BuildConsole.WriteAlert($"No {sequenceName} steps");
                 results.IsSuccess = false;

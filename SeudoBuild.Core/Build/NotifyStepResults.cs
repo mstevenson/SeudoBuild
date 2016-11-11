@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public class NotifyStepResults : IPipelineStepResults
+    public class NotifyStepResults : PipelineStepResults
     {
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace SeudoBuild
 {
-    public class DistributeStepResults : IPipelineStepResults
+    public class DistributeStepResults : PipelineStepResults
     {
         // Information about files that were distributed during build process
     }

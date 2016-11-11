@@ -1,6 +1,6 @@
 ﻿namespace SeudoBuild
 {
-    public class ArchiveStepResults : IPipelineStepResults
+    public class ArchiveStepResults : PipelineStepResults
     {
         public string ArchiveFileName { get; set; }
     }

@@ -91,7 +91,7 @@
     <Compile Include="Build\NotifySequenceResults.cs" />
     <Compile Include="Build\NotifyStepResults.cs" />
     <Compile Include="Build\IPipelineStep.cs" />
-    <Compile Include="Build\IPipelineStepResults.cs" />
+    <Compile Include="Build\PipelineStepResults.cs" />
     <Compile Include="Build\BuildStepResults.cs" />
   </ItemGroup>
   <ItemGroup>
