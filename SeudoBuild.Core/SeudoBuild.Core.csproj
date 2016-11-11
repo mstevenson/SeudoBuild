@@ -66,9 +66,9 @@
     <Compile Include="Project\Build\IBuildStep.cs" />
     <Compile Include="Build\BuilderConfig.cs" />
     <Compile Include="Build\Builder.cs" />
-    <Compile Include="Build\ArchiveInfo.cs" />
-    <Compile Include="Build\BuildStepResults.cs" />
-    <Compile Include="Build\DistributeInfo.cs" />
+    <Compile Include="Build\ArchiveStepResults.cs" />
+    <Compile Include="Build\BuildSequenceResults.cs" />
+    <Compile Include="Build\DistributeStepResults.cs" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="TextReplacements.cs" />
     <Compile Include="Serializer.cs" />
@@ -85,11 +85,14 @@
     <Compile Include="Project\Build\UnityInstallation.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\IFileSystem.cs" />
-    <Compile Include="Build\ArchiveStepResults.cs" />
-    <Compile Include="Build\DistributeStepResults.cs" />
-    <Compile Include="Build\PipelineStepResults.cs" />
+    <Compile Include="Build\ArchiveSequenceResults.cs" />
+    <Compile Include="Build\DistributeSequenceResults.cs" />
+    <Compile Include="Build\PipelineSequenceResults.cs" />
+    <Compile Include="Build\NotifySequenceResults.cs" />
     <Compile Include="Build\NotifyStepResults.cs" />
-    <Compile Include="Build\NotifyInfo.cs" />
+    <Compile Include="Build\PipelineStep.cs" />
+    <Compile Include="Build\PipelineStepResults.cs" />
+    <Compile Include="Build\BuildStepResults.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

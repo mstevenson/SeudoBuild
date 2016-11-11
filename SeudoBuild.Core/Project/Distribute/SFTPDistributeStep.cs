@@ -17,18 +17,18 @@ namespace SeudoBuild
 
         public override string Type { get; } = "SFTP Upload";
 
-        public override DistributeInfo Distribute(ArchiveStepResults archiveResults, Workspace workspace)
+        public override DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {
-            foreach (var archiveInfo in archiveResults.Infos)
+            foreach (var archiveInfo in archiveResults.StepResults)
             {
                 Upload(archiveInfo, workspace);
             }
 
             // FIXME
-            return new DistributeInfo();
+            return new DistributeStepResults();
         }
 
-        public void Upload(ArchiveInfo archiveInfo, Workspace workspace)
+        public void Upload(ArchiveStepResults archiveInfo, Workspace workspace)
         {
             // Supply the password via fake keyboard input
             var keyboardAuthMethod = new KeyboardInteractiveAuthenticationMethod(config.Username);

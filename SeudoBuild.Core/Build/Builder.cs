@@ -52,11 +52,12 @@ namespace SeudoBuild
 
             // Build
             var buildResults = Build(vcsResults, pipeline);
-            replacements["project_name"] = buildResults.ProjectName;
-            replacements["build_target_name"] = buildResults.BuildTargetName;
-            replacements["app_version"] = buildResults.AppVersion.ToString ();
-            replacements["build_date"] = buildResults.BuildDate.ToString("yyyy-dd-M--HH-mm-ss");
-            replacements["commit_identifier"] = buildResults.CommitIdentifier;
+            var step = buildResults.StepResults[0];
+            replacements["project_name"] = step.ProjectName;
+            replacements["build_target_name"] = step.BuildTargetName;
+            replacements["app_version"] = step.AppVersion.ToString ();
+            replacements["build_date"] = step.BuildDate.ToString("yyyy-dd-M--HH-mm-ss");
+            replacements["commit_identifier"] = step.CommitIdentifier;
 
             // Archive
             var archiveResults = Archive(buildResults, pipeline);
@@ -65,7 +66,7 @@ namespace SeudoBuild
             var distributeResults = Distribute(archiveResults, pipeline);
 
             // Notify
-            var notifyresults = Notify(archiveResults, distributeResults, pipeline);
+            var notifyresults = Notify(distributeResults, pipeline);
 
             // Done
             BuildConsole.IndentLevel = 0;
@@ -104,7 +105,7 @@ namespace SeudoBuild
             return results;
         }
 
-        BuildStepResults Build(VCSResults vcsResults, ProjectPipeline pipeline)
+        BuildSequenceResults Build(VCSResults vcsResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Build");
@@ -115,7 +116,7 @@ namespace SeudoBuild
             {
                 BuildConsole.WriteAlert("No build steps");
                 //return new BuildStepResults { Status = BuildCompletionStatus.Faulted };
-                return new BuildStepResults { IsSuccess = false, Exception = new Exception("No build steps.") };
+                return new BuildSequenceResults { IsSuccess = false, Exception = new Exception("No build steps.") };
             }
 
             bool isFaulted = false;
@@ -123,8 +124,10 @@ namespace SeudoBuild
             // Delete all files in the build output directory
             pipeline.Workspace.CleanBuildOutputDirectory();
 
-            // TODO add app version to BuildInfo
-            BuildStepResults buildInfo = new BuildStepResults
+            var sequenceResults = new BuildSequenceResults();
+
+            // TODO add app version
+            var stepResults = new BuildStepResults
             {
                 BuildDate = DateTime.Now,
                 ProjectName = pipeline.ProjectConfig.ProjectName,
@@ -132,6 +135,8 @@ namespace SeudoBuild
                 CommitIdentifier = vcsResults.CurrentCommitIdentifier,
                 //Status = BuildCompletionStatus.Running
             };
+
+            sequenceResults.StepResults.Add(stepResults);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -158,32 +163,32 @@ namespace SeudoBuild
             }
 
             stopwatch.Stop();
-            buildInfo.BuildDuration = stopwatch.Elapsed;
+            stepResults.BuildDuration = stopwatch.Elapsed;
 
             if (!isFaulted)
             {
                 //buildInfo.Status = BuildCompletionStatus.Completed;
-                buildInfo.IsSuccess = true;
-                BuildConsole.WriteSuccess("Build steps completed in " + buildInfo.BuildDuration.ToString(@"hh\:mm\:ss"));
+                sequenceResults.IsSuccess = true;
+                BuildConsole.WriteSuccess("Build steps completed in " + stepResults.BuildDuration.ToString(@"hh\:mm\:ss"));
             }
             else
             {
-                buildInfo.IsSuccess = false;
+                sequenceResults.IsSuccess = false;
                 string error = $"Build failed on step {stepIndex} ({currentStep.Type})";
-                buildInfo.Exception = new Exception(error);
+                sequenceResults.Exception = new Exception(error);
                 BuildConsole.WriteFailure(error);
             }
 
-            return buildInfo;
+            return sequenceResults;
         }
 
-        ArchiveStepResults Archive(BuildStepResults buildResults, ProjectPipeline pipeline)
+        ArchiveSequenceResults Archive(BuildSequenceResults buildResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Archive");
             BuildConsole.IndentLevel++;
 
-            var results = new ArchiveStepResults();
+            var results = new ArchiveSequenceResults();
 
             if (pipeline.ArchiveSteps.Count == 0)
             {
@@ -204,20 +209,20 @@ namespace SeudoBuild
             foreach (var step in pipeline.ArchiveSteps)
             {
                 BuildConsole.WriteBullet(step.Type);
-                var info = step.CreateArchive(buildResults, pipeline.Workspace);
-                results.Infos.Add(info);
+                var info = step.ExecuteStep(buildResults, pipeline.Workspace);
+                results.StepResults.Add(info);
             }
 
             return results;
         }
 
-        DistributeStepResults Distribute(ArchiveStepResults archiveResults, ProjectPipeline pipeline)
+        DistributeSequenceResults Distribute(ArchiveSequenceResults archiveResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Distribute");
             BuildConsole.IndentLevel++;
 
-            var results = new DistributeStepResults();
+            var results = new DistributeSequenceResults();
 
             if (pipeline.DistributeSteps.Count == 0)
             {
@@ -238,14 +243,14 @@ namespace SeudoBuild
             foreach (var step in pipeline.DistributeSteps)
             {
                 BuildConsole.WriteBullet(step.Type);
-                var info = step.Distribute(archiveResults, pipeline.Workspace);
-                results.Infos.Add(info);
+                var info = step.ExecuteStep(archiveResults, pipeline.Workspace);
+                results.StepResults.Add(info);
             }
 
             return results;
         }
 
-        NotifyStepResults Notify(ArchiveStepResults archiveResults, DistributeStepResults distributeResults, ProjectPipeline pipeline)
+        NotifySequenceResults Notify(DistributeSequenceResults distributeResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Notify");
@@ -260,9 +265,9 @@ namespace SeudoBuild
 
             BuildConsole.IndentLevel++;
 
-            var results = new NotifyStepResults();
+            var results = new NotifySequenceResults();
 
-            if (!archiveResults.IsSuccess || !distributeResults.IsSuccess)
+            if (!distributeResults.IsSuccess)
             {
                 BuildConsole.WriteFailure("Skipping, previous step failed");
                 results.IsSuccess = false;
@@ -273,13 +278,51 @@ namespace SeudoBuild
             foreach (var step in pipeline.NotifySteps)
             {
                 BuildConsole.WriteBullet(step.Type);
-                var info = step.Notify();
-                results.Infos.Add(info);
+                var info = step.ExecuteStep(distributeResults, pipeline.Workspace);
+                results.StepResults.Add(info);
             }
 
             BuildConsole.IndentLevel--;
 
             return results;
         }
+
+        //T ExecuteSequence<T, U, V>(string sequenceName, List<PipelineStep<U,V>> sequenceSteps, U previousSequenceResults, Workspace workspace)
+        //    where T : PipelineSequenceResults, new() // current sequence return value
+        //    where U : PipelineSequenceResults, new() // previous sequence results
+        //    where V : PipelineStepResults, new() // step info result type
+        //{
+        //    BuildConsole.IndentLevel = 0;
+        //    BuildConsole.WriteBullet(sequenceName);
+        //    BuildConsole.IndentLevel++;
+
+
+        //    var results = new T();
+
+        //    if (sequenceSteps.Count == 0)
+        //    {
+        //        BuildConsole.WriteAlert($"No {sequenceName} steps");
+        //        results.IsSuccess = false;
+        //        results.Exception = new Exception($"No {sequenceName} steps.");
+        //        return results;
+        //    }
+
+        //    if (!previousSequenceResults.IsSuccess)
+        //    {
+        //        BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
+        //        results.IsSuccess = false;
+        //        results.Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.");
+        //        return results;
+        //    }
+
+        //    foreach (var step in sequenceSteps)
+        //    {
+        //        BuildConsole.WriteBullet(step.Type);
+        //        var info = step.ExecuteStep(previousSequenceResults, workspace);
+        //        results.Infos.Add(info);
+        //    }
+
+        //    return results;
+        //}
     }
 }

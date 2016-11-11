@@ -1,9 +1,7 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public abstract class NotifyStep
+    public abstract class NotifyStep : PipelineStep<DistributeSequenceResults, DistributeStepResults, NotifyStepResults>
     {
-        public abstract string Type { get; }
-        public abstract NotifyInfo Notify();
     }
 }

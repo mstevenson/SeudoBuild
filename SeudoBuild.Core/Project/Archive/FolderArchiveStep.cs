@@ -14,7 +14,7 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Folder";
 
-        public override ArchiveInfo CreateArchive(BuildStepResults buildInfo, Workspace workspace)
+        public override ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
         {
             string folderName = workspace.Replacements.ReplaceVariablesInText(config.FolderName);
             string source = workspace.BuildOutputDirectory;
@@ -28,7 +28,7 @@ namespace SeudoBuild
 
             CopyDirectory(source, dest);
 
-            var archiveInfo = new ArchiveInfo { ArchiveFileName = folderName };
+            var archiveInfo = new ArchiveStepResults { ArchiveFileName = folderName };
             return archiveInfo;
         }
 

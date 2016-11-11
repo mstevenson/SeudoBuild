@@ -2,9 +2,7 @@
 
 namespace SeudoBuild
 {
-    public abstract class DistributeStep
+    public abstract class DistributeStep : PipelineStep<ArchiveSequenceResults, ArchiveStepResults, DistributeStepResults>
     {
-        public abstract string Type { get; }
-        public abstract DistributeInfo Distribute(ArchiveStepResults archiveResults, Workspace workspace);
     }
 }

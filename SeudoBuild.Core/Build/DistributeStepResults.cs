@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace SeudoBuild
+﻿namespace SeudoBuild
 {
-    public class DistributeStepResults : PipelineStepResults<DistributeInfo>
+    public class DistributeStepResults : PipelineStepResults
     {
+        // Information about files that were distributed during build process
     }
 }

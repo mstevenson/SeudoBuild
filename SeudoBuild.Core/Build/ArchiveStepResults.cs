@@ -1,7 +1,7 @@
-﻿using System;
-namespace SeudoBuild
+﻿namespace SeudoBuild
 {
-    public class ArchiveStepResults : PipelineStepResults<ArchiveInfo>
+    public class ArchiveStepResults : PipelineStepResults
     {
+        public string ArchiveFileName { get; set; }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-
 namespace SeudoBuild
 {
     public class BuildStepResults : PipelineStepResults

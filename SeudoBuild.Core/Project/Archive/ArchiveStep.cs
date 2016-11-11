@@ -1,8 +1,6 @@
 ﻿namespace SeudoBuild
 {
-    public abstract class ArchiveStep
+    public abstract class ArchiveStep : PipelineStep<BuildSequenceResults, BuildStepResults, ArchiveStepResults>
     {
-        public abstract string Type { get; }
-        public abstract ArchiveInfo CreateArchive(BuildStepResults buildInfo, Workspace workspace);
     }
 }

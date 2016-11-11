@@ -14,12 +14,12 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Email Notification";
 
-        public override NotifyInfo Notify()
+        public override NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, Workspace workspace)
         {
             SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");
 
             // FIXME
-            return new NotifyInfo();
+            return new NotifyStepResults();
         }
 
         void SendMessage(string from, string to, string subject, string body)

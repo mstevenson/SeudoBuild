@@ -14,7 +14,7 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Zip File";
 
-        public override ArchiveInfo CreateArchive(BuildStepResults buildInfo, Workspace workspace)
+        public override ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
         {
             // Remove file extension in case it was accidentally included in the config data
             string filename = Path.GetFileNameWithoutExtension(config.Filename);
@@ -41,7 +41,7 @@ namespace SeudoBuild
 
             BuildConsole.WriteLine("Zip file saved");
 
-            var archiveInfo = new ArchiveInfo { ArchiveFileName = filename };
+            var archiveInfo = new ArchiveStepResults { ArchiveFileName = filename };
             return archiveInfo;
         }
     }
