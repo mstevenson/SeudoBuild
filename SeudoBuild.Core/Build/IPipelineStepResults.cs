@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public abstract class PipelineStepResults
+    public interface IPipelineStepResults
     {
     }
 }

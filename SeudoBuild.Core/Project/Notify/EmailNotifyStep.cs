@@ -3,7 +3,7 @@ using System.Net.Mail;
 
 namespace SeudoBuild
 {
-    public class EmailNotifyStep : NotifyStep
+    public class EmailNotifyStep : INotifyStep
     {
         EmailNotifyConfig config;
 
@@ -12,9 +12,9 @@ namespace SeudoBuild
             this.config = config;
         }
 
-        public override string Type { get; } = "Email Notification";
+        public string Type { get; } = "Email Notification";
 
-        public override NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, Workspace workspace)
+        public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, Workspace workspace)
         {
             SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");
 

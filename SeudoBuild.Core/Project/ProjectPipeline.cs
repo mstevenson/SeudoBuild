@@ -9,9 +9,9 @@ namespace SeudoBuild
     {
         public VersionControlSystem VersionControlSystem { get; private set; }
         public List<IBuildStep> BuildSteps { get; private set; }
-        public List<ArchiveStep> ArchiveSteps { get; private set; }
-        public List<DistributeStep> DistributeSteps { get; private set; }
-        public List<NotifyStep> NotifySteps { get; private set; }
+        public List<IArchiveStep> ArchiveSteps { get; private set; }
+        public List<IDistributeStep> DistributeSteps { get; private set; }
+        public List<INotifyStep> NotifySteps { get; private set; }
 
         public ProjectConfig ProjectConfig { get; private set; }
         public BuildTargetConfig TargetConfig { get; private set; }
@@ -96,9 +96,9 @@ namespace SeudoBuild
             return steps;
         }
 
-        List<ArchiveStep> GenerateArchiveSteps()
+        List<IArchiveStep> GenerateArchiveSteps()
         {
-            var steps = new List<ArchiveStep>();
+            var steps = new List<IArchiveStep>();
             foreach (var stepConfig in TargetConfig.ArchiveSteps)
             {
                 if (stepConfig is ZipArchiveConfig)
@@ -113,9 +113,9 @@ namespace SeudoBuild
             return steps;
         }
 
-        List<DistributeStep> GenerateDistributeSteps()
+        List<IDistributeStep> GenerateDistributeSteps()
         {
-            var steps = new List<DistributeStep>();
+            var steps = new List<IDistributeStep>();
             foreach (var stepConfig in TargetConfig.DistributeSteps)
             {
                 if (stepConfig is FTPDistributeConfig)
@@ -134,9 +134,9 @@ namespace SeudoBuild
             return steps;
         }
 
-        List<NotifyStep> GenerateNotifySteps()
+        List<INotifyStep> GenerateNotifySteps()
         {
-            var steps = new List<NotifyStep>();
+            var steps = new List<INotifyStep>();
             foreach (var stepConfig in TargetConfig.NotifySteps)
             {
                 if (stepConfig is EmailNotifyConfig)

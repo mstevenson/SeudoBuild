@@ -7,11 +7,11 @@ namespace SeudoBuild
     //{
     //}
 
-    public abstract class PipelineSequenceResults<T>
-        where T : PipelineStepResults
+    public abstract class PipelineSequenceResults<TStep>
+        where TStep : IPipelineStepResults, new()
     {
         public bool IsSuccess { get; set; }
         public Exception Exception { get; set; }
-        public List<T> StepResults { get; } = new List<T>();
+        public List<TStep> StepResults { get; } = new List<TStep>();
     }
 }

@@ -60,13 +60,17 @@ namespace SeudoBuild
             replacements["commit_identifier"] = step.CommitIdentifier;
 
             // Archive
-            var archiveResults = Archive(buildResults, pipeline);
+            //var archiveResults = Archive(buildResults, pipeline);
+            var archiveResults = ExecuteSequence<BuildSequenceResults, BuildStepResults, ArchiveSequenceResults, ArchiveStepResults>
+                ("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
 
             // Distribute
-            var distributeResults = Distribute(archiveResults, pipeline);
+            var distributeResults = ExecuteSequence<ArchiveSequenceResults, ArchiveStepResults, DistributeSequenceResults, DistributeStepResults>
+                ("Distribute", pipeline.DistributeSteps, archiveResults, pipeline.Workspace);
 
             // Notify
-            var notifyresults = Notify(distributeResults, pipeline);
+            var notifyResults = ExecuteSequence<DistributeSequenceResults, DistributeStepResults, NotifySequenceResults, NotifyStepResults>
+                ("Notify", pipeline.NotifySteps, distributeResults, pipeline.Workspace);
 
             // Done
             BuildConsole.IndentLevel = 0;
@@ -182,147 +186,45 @@ namespace SeudoBuild
             return sequenceResults;
         }
 
-        ArchiveSequenceResults Archive(BuildSequenceResults buildResults, ProjectPipeline pipeline)
+        OutSeq ExecuteSequence<InSeq, InStep, OutSeq, OutStep>(string sequenceName, IEnumerable<IPipelineStep<InSeq,InStep,OutStep>> sequenceSteps, InSeq previousSequence, Workspace workspace)
+            where InSeq : PipelineSequenceResults<InStep> // previous sequence results
+            where InStep : IPipelineStepResults, new() // previous step results
+            where OutSeq : PipelineSequenceResults<OutStep>, new() // current sequence results
+            where OutStep : IPipelineStepResults, new() // current step results
         {
             BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteBullet("Archive");
+            BuildConsole.WriteBullet(sequenceName);
             BuildConsole.IndentLevel++;
 
-            var results = new ArchiveSequenceResults();
+            // Pipeline sequence result
+            var results = new OutSeq();
 
-            if (pipeline.ArchiveSteps.Count == 0)
+            if (!previousSequence.IsSuccess)
             {
-                BuildConsole.WriteAlert("No archive steps");
+                BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
                 results.IsSuccess = false;
-                results.Exception = new Exception("No archive steps.");
+                results.Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.");
                 return results;
             }
 
-            if (!buildResults.IsSuccess)
+            int stepCount = -1;
+            foreach (var step in sequenceSteps)
             {
-                BuildConsole.WriteFailure("Skipping, previous build step failed");
-                results.IsSuccess = false;
-                results.Exception = new Exception("Skipped archival, previous step failed.");
-                return results;
-            }
-
-            foreach (var step in pipeline.ArchiveSteps)
-            {
+                stepCount++;
                 BuildConsole.WriteBullet(step.Type);
-                var info = step.ExecuteStep(buildResults, pipeline.Workspace);
-                results.StepResults.Add(info);
+                var stepResult = step.ExecuteStep(previousSequence, workspace);
+                results.StepResults.Add(stepResult);
+            }
+
+            if (stepCount == 0)
+            {
+                BuildConsole.WriteAlert($"No {sequenceName} steps");
+                results.IsSuccess = false;
+                results.Exception = new Exception($"No {sequenceName} steps.");
+                return results;
             }
 
             return results;
         }
-
-        DistributeSequenceResults Distribute(ArchiveSequenceResults archiveResults, ProjectPipeline pipeline)
-        {
-            BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteBullet("Distribute");
-            BuildConsole.IndentLevel++;
-
-            var results = new DistributeSequenceResults();
-
-            if (pipeline.DistributeSteps.Count == 0)
-            {
-                BuildConsole.WriteAlert("No distribute steps");
-                results.IsSuccess = false;
-                results.Exception = new Exception("No distribute steps.");
-                return results;
-            }
-
-            if (!archiveResults.IsSuccess)
-            {
-                BuildConsole.WriteFailure("Skipping, previous build step failed");
-                results.IsSuccess = false;
-                results.Exception = new Exception("Skipped distribute, previous step failed.");
-                return results;
-            }
-
-            foreach (var step in pipeline.DistributeSteps)
-            {
-                BuildConsole.WriteBullet(step.Type);
-                var info = step.ExecuteStep(archiveResults, pipeline.Workspace);
-                results.StepResults.Add(info);
-            }
-
-            return results;
-        }
-
-        NotifySequenceResults Notify(DistributeSequenceResults distributeResults, ProjectPipeline pipeline)
-        {
-            BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteBullet("Notify");
-            BuildConsole.IndentLevel++;
-
-            if (pipeline.NotifySteps.Count == 0)
-            {
-                BuildConsole.WriteAlert("No notify steps");
-            }
-
-            // TODO handle faulted state from the previous step, bail out, forward the error
-
-            BuildConsole.IndentLevel++;
-
-            var results = new NotifySequenceResults();
-
-            if (!distributeResults.IsSuccess)
-            {
-                BuildConsole.WriteFailure("Skipping, previous step failed");
-                results.IsSuccess = false;
-                results.Exception = new Exception("Skipped distribute, previous step failed.");
-                return results;
-            }
-
-            foreach (var step in pipeline.NotifySteps)
-            {
-                BuildConsole.WriteBullet(step.Type);
-                var info = step.ExecuteStep(distributeResults, pipeline.Workspace);
-                results.StepResults.Add(info);
-            }
-
-            BuildConsole.IndentLevel--;
-
-            return results;
-        }
-
-        //T ExecuteSequence<T, U, V>(string sequenceName, List<PipelineStep<U,V>> sequenceSteps, U previousSequenceResults, Workspace workspace)
-        //    where T : PipelineSequenceResults, new() // current sequence return value
-        //    where U : PipelineSequenceResults, new() // previous sequence results
-        //    where V : PipelineStepResults, new() // step info result type
-        //{
-        //    BuildConsole.IndentLevel = 0;
-        //    BuildConsole.WriteBullet(sequenceName);
-        //    BuildConsole.IndentLevel++;
-
-
-        //    var results = new T();
-
-        //    if (sequenceSteps.Count == 0)
-        //    {
-        //        BuildConsole.WriteAlert($"No {sequenceName} steps");
-        //        results.IsSuccess = false;
-        //        results.Exception = new Exception($"No {sequenceName} steps.");
-        //        return results;
-        //    }
-
-        //    if (!previousSequenceResults.IsSuccess)
-        //    {
-        //        BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
-        //        results.IsSuccess = false;
-        //        results.Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.");
-        //        return results;
-        //    }
-
-        //    foreach (var step in sequenceSteps)
-        //    {
-        //        BuildConsole.WriteBullet(step.Type);
-        //        var info = step.ExecuteStep(previousSequenceResults, workspace);
-        //        results.Infos.Add(info);
-        //    }
-
-        //    return results;
-        //}
     }
 }

@@ -57,12 +57,12 @@
     <Compile Include="Project\Archive\FolderArchiveStep.cs" />
     <Compile Include="Project\Archive\ZipArchiveStep.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
-    <Compile Include="Project\Archive\ArchiveStep.cs" />
+    <Compile Include="Project\Archive\IArchiveStep.cs" />
     <Compile Include="Project\Notify\EmailNotifyStep.cs" />
     <Compile Include="Project\Distribute\FTPDistributeStep.cs" />
-    <Compile Include="Project\Distribute\DistributeStep.cs" />
+    <Compile Include="Project\Distribute\IDistributeStep.cs" />
     <Compile Include="Project\Distribute\SteamDistributeStep.cs" />
-    <Compile Include="Project\Notify\NotifyStep.cs" />
+    <Compile Include="Project\Notify\INotifyStep.cs" />
     <Compile Include="Project\Build\IBuildStep.cs" />
     <Compile Include="Build\BuilderConfig.cs" />
     <Compile Include="Build\Builder.cs" />
@@ -90,8 +90,8 @@
     <Compile Include="Build\PipelineSequenceResults.cs" />
     <Compile Include="Build\NotifySequenceResults.cs" />
     <Compile Include="Build\NotifyStepResults.cs" />
-    <Compile Include="Build\PipelineStep.cs" />
-    <Compile Include="Build\PipelineStepResults.cs" />
+    <Compile Include="Build\IPipelineStep.cs" />
+    <Compile Include="Build\IPipelineStepResults.cs" />
     <Compile Include="Build\BuildStepResults.cs" />
   </ItemGroup>
   <ItemGroup>

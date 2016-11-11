@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SeudoBuild
 {
-    public class FolderArchiveStep : ArchiveStep
+    public class FolderArchiveStep : IArchiveStep
     {
         FolderArchiveConfig config;
 
@@ -12,9 +12,9 @@ namespace SeudoBuild
             this.config = config;
         }
 
-        public override string Type { get; } = "Folder";
+        public string Type { get; } = "Folder";
 
-        public override ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
+        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
         {
             string folderName = workspace.Replacements.ReplaceVariablesInText(config.FolderName);
             string source = workspace.BuildOutputDirectory;

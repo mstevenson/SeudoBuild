@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public class BuildStepResults : PipelineStepResults
+    public class BuildStepResults : IPipelineStepResults
     {
         public string ProjectName { get; set; } = string.Empty;
         public string BuildTargetName { get; set; } = string.Empty;

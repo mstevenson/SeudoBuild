@@ -6,7 +6,7 @@ using Renci.SshNet.Common;
 
 namespace SeudoBuild
 {
-    public class SFTPDistributeStep : DistributeStep
+    public class SFTPDistributeStep : IDistributeStep
     {
         SFTPDistributeConfig config;
 
@@ -15,9 +15,9 @@ namespace SeudoBuild
             this.config = config;
         }
 
-        public override string Type { get; } = "SFTP Upload";
+        public string Type { get; } = "SFTP Upload";
 
-        public override DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {
             foreach (var archiveInfo in archiveResults.StepResults)
             {

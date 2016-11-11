@@ -3,7 +3,7 @@ using Ionic.Zip;
 
 namespace SeudoBuild
 {
-    public class ZipArchiveStep : ArchiveStep
+    public class ZipArchiveStep : IArchiveStep
     {
         ZipArchiveConfig config;
 
@@ -12,9 +12,9 @@ namespace SeudoBuild
             this.config = config;
         }
 
-        public override string Type { get; } = "Zip File";
+        public string Type { get; } = "Zip File";
 
-        public override ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
+        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
         {
             // Remove file extension in case it was accidentally included in the config data
             string filename = Path.GetFileNameWithoutExtension(config.Filename);
