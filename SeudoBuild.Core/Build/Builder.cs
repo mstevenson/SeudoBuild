@@ -18,15 +18,15 @@ namespace SeudoBuild
             this.builderConfig = config;
         }
 
-        public void ExecuteBuildPipeline(ProjectConfig projectConfig, string buildTargetName)
+        public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName)
         {
             if (projectConfig == null)
             {
-                throw new ArgumentNullException("projectConfig", "A project configuration definition must be specified.");
+                throw new ArgumentNullException(nameof(projectConfig), "A project configuration definition must be specified.");
             }
             if (string.IsNullOrEmpty (buildTargetName))
             {
-                throw new ArgumentNullException("buildTargetName", "A project configuration definition must be specified.");
+                throw new ArgumentNullException(nameof(buildTargetName), "A project configuration definition must be specified.");
             }
 
             BuildTargetConfig targetConfig = projectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
@@ -41,31 +41,31 @@ namespace SeudoBuild
             BuildConsole.WriteLine($"Target:  {buildTargetName}");
             BuildConsole.WriteLine("");
 
-            // Setup
+            // Setup pipelin
             var pipeline = ProjectPipeline.Create(builderConfig.ProjectsPath, projectConfig, buildTargetName);
             var replacements = pipeline.Workspace.Replacements;
 
             // Grab changes from version control system
-            VCSResult updateResult = UpdateWorkingCopy(pipeline);
+            VCSResults vcsResults = UpdateWorkingCopy(pipeline);
 
             // TODO handle VCS failure, pass the result through to the Build step
 
             // Build
-            var buildInfo = Build(pipeline);
-            replacements["project_name"] = buildInfo.ProjectName;
-            replacements["build_target_name"] = buildInfo.BuildTargetName;
-            replacements["app_version"] = buildInfo.AppVersion.ToString ();
-            replacements["build_date"] = buildInfo.BuildDate.ToString("yyyy-dd-M--HH-mm-ss");
-            replacements["commit_identifier"] = buildInfo.CommitIdentifier;
+            var buildResults = Build(vcsResults, pipeline);
+            replacements["project_name"] = buildResults.ProjectName;
+            replacements["build_target_name"] = buildResults.BuildTargetName;
+            replacements["app_version"] = buildResults.AppVersion.ToString ();
+            replacements["build_date"] = buildResults.BuildDate.ToString("yyyy-dd-M--HH-mm-ss");
+            replacements["commit_identifier"] = buildResults.CommitIdentifier;
 
             // Archive
-            var archiveInfos = Archive(buildInfo, pipeline);
+            var archiveResults = Archive(buildResults, pipeline);
 
             // Distribute
-            var distributeInfos = Distribute(archiveInfos, pipeline);
+            var distributeResults = Distribute(archiveResults, pipeline);
 
             // Notify
-            Notify(distributeInfos, pipeline);
+            var notifyresults = Notify(archiveResults, distributeResults, pipeline);
 
             // Done
             BuildConsole.IndentLevel = 0;
@@ -73,27 +73,38 @@ namespace SeudoBuild
             Console.WriteLine("Build process completed.");
         }
 
-        VCSResult UpdateWorkingCopy(ProjectPipeline pipeline)
+        VCSResults UpdateWorkingCopy(ProjectPipeline pipeline)
         {
             VersionControlSystem vcs = pipeline.VersionControlSystem;
 
             BuildConsole.WriteBullet($"Update working copy ({vcs.TypeName})");
             BuildConsole.IndentLevel++;
 
-            if (vcs.IsWorkingCopyInitialized)
+            var results = new VCSResults();
+
+            try
             {
-                vcs.Update();
+                if (vcs.IsWorkingCopyInitialized)
+                {
+                    vcs.Update();
+                }
+                else
+                {
+                    vcs.Download();
+                }
             }
-            else
+            catch (Exception e)
             {
-                vcs.Download();
+                results.Success = false;
+                results.Exception = e;
             }
 
-            // FIXME return a result object that indicates success or failure
-            return new VCSResult { Success = true };
+            results.CurrentCommitIdentifier = vcs.CurrentCommit;
+            results.Success = true;
+            return results;
         }
 
-        BuildInfo Build(ProjectPipeline pipeline)
+        BuildStepResults Build(VCSResults vcsResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Build");
@@ -103,21 +114,24 @@ namespace SeudoBuild
             if (pipeline.BuildSteps.Count == 0)
             {
                 BuildConsole.WriteAlert("No build steps");
-                return new BuildInfo { Status = BuildCompletionStatus.Faulted };
+                //return new BuildStepResults { Status = BuildCompletionStatus.Faulted };
+                return new BuildStepResults { IsSuccess = false, Exception = new Exception("No build steps.") };
             }
+
+            bool isFaulted = false;
 
             // Delete all files in the build output directory
             pipeline.Workspace.CleanBuildOutputDirectory();
 
-            // TODO add commit identifier and app version to BuildInfo
-            BuildInfo buildInfo = new BuildInfo
+            // TODO add app version to BuildInfo
+            BuildStepResults buildInfo = new BuildStepResults
             {
                 BuildDate = DateTime.Now,
                 ProjectName = pipeline.ProjectConfig.ProjectName,
                 BuildTargetName = pipeline.TargetConfig.TargetName,
-                Status = BuildCompletionStatus.Running
+                CommitIdentifier = vcsResults.CurrentCommitIdentifier,
+                //Status = BuildCompletionStatus.Running
             };
-
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -137,7 +151,8 @@ namespace SeudoBuild
                 BuildConsole.IndentLevel--;
                 if (stepResult.Status == BuildCompletionStatus.Faulted)
                 {
-                    buildInfo.Status = BuildCompletionStatus.Faulted;
+                    isFaulted = true;
+                    //buildInfo.Status = BuildCompletionStatus.Faulted;
                     break;
                 }
             }
@@ -145,77 +160,92 @@ namespace SeudoBuild
             stopwatch.Stop();
             buildInfo.BuildDuration = stopwatch.Elapsed;
 
-            if (buildInfo.Status != BuildCompletionStatus.Faulted)
+            if (!isFaulted)
             {
-                buildInfo.Status = BuildCompletionStatus.Completed;
+                //buildInfo.Status = BuildCompletionStatus.Completed;
+                buildInfo.IsSuccess = true;
                 BuildConsole.WriteSuccess("Build steps completed in " + buildInfo.BuildDuration.ToString(@"hh\:mm\:ss"));
             }
             else
             {
-                BuildConsole.WriteFailure($"Build failed on step {stepIndex} ({currentStep.Type})");
+                buildInfo.IsSuccess = false;
+                string error = $"Build failed on step {stepIndex} ({currentStep.Type})";
+                buildInfo.Exception = new Exception(error);
+                BuildConsole.WriteFailure(error);
             }
 
             return buildInfo;
         }
 
-        List<ArchiveInfo> Archive(BuildInfo buildInfo, ProjectPipeline pipeline)
+        ArchiveStepResults Archive(BuildStepResults buildResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Archive");
             BuildConsole.IndentLevel++;
 
+            var results = new ArchiveStepResults();
+
             if (pipeline.ArchiveSteps.Count == 0)
             {
                 BuildConsole.WriteAlert("No archive steps");
-                return null;
+                results.IsSuccess = false;
+                results.Exception = new Exception("No archive steps.");
+                return results;
             }
 
-            if (buildInfo.Status == BuildCompletionStatus.Faulted)
+            if (!buildResults.IsSuccess)
             {
                 BuildConsole.WriteFailure("Skipping, previous build step failed");
-
-                // TODO return faulted status
-                return null;
+                results.IsSuccess = false;
+                results.Exception = new Exception("Skipped archival, previous step failed.");
+                return results;
             }
-
-            List<ArchiveInfo> archiveInfos = new List<ArchiveInfo>();
 
             foreach (var step in pipeline.ArchiveSteps)
             {
                 BuildConsole.WriteBullet(step.Type);
-                var info = step.CreateArchive(buildInfo, pipeline.Workspace);
-                archiveInfos.Add(info);
+                var info = step.CreateArchive(buildResults, pipeline.Workspace);
+                results.Infos.Add(info);
             }
 
-            return archiveInfos;
+            return results;
         }
 
-        List<DistributeInfo> Distribute(List<ArchiveInfo> archiveInfos, ProjectPipeline pipeline)
+        DistributeStepResults Distribute(ArchiveStepResults archiveResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Distribute");
             BuildConsole.IndentLevel++;
 
+            var results = new DistributeStepResults();
+
             if (pipeline.DistributeSteps.Count == 0)
             {
                 BuildConsole.WriteAlert("No distribute steps");
-                return null;
+                results.IsSuccess = false;
+                results.Exception = new Exception("No distribute steps.");
+                return results;
             }
 
-            // TODO handle faulted state from the previous step, bail out, forward the error
-
-            List<DistributeInfo> distributeInfos = new List<DistributeInfo>();
+            if (!archiveResults.IsSuccess)
+            {
+                BuildConsole.WriteFailure("Skipping, previous build step failed");
+                results.IsSuccess = false;
+                results.Exception = new Exception("Skipped distribute, previous step failed.");
+                return results;
+            }
 
             foreach (var step in pipeline.DistributeSteps)
             {
                 BuildConsole.WriteBullet(step.Type);
-                step.Distribute(archiveInfos, pipeline.Workspace);
+                var info = step.Distribute(archiveResults, pipeline.Workspace);
+                results.Infos.Add(info);
             }
 
-            return distributeInfos;
+            return results;
         }
 
-        void Notify(List<DistributeInfo> distributeInfos, ProjectPipeline pipeline)
+        NotifyStepResults Notify(ArchiveStepResults archiveResults, DistributeStepResults distributeResults, ProjectPipeline pipeline)
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet("Notify");
@@ -230,13 +260,26 @@ namespace SeudoBuild
 
             BuildConsole.IndentLevel++;
 
+            var results = new NotifyStepResults();
+
+            if (!archiveResults.IsSuccess || !distributeResults.IsSuccess)
+            {
+                BuildConsole.WriteFailure("Skipping, previous step failed");
+                results.IsSuccess = false;
+                results.Exception = new Exception("Skipped distribute, previous step failed.");
+                return results;
+            }
+
             foreach (var step in pipeline.NotifySteps)
             {
                 BuildConsole.WriteBullet(step.Type);
-                step.Notify();
+                var info = step.Notify();
+                results.Infos.Add(info);
             }
 
             BuildConsole.IndentLevel--;
+
+            return results;
         }
     }
 }

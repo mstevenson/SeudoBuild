@@ -109,7 +109,7 @@ namespace SeudoBuild.Agent
                 {
                     BuilderConfig builderConfig = new BuilderConfig { ProjectsPath = options.BuildVerb.OutputPath };
                     Builder builder = new Builder(builderConfig);
-                    builder.ExecuteBuildPipeline(projectConfig, options.BuildVerb.BuildTarget);
+                    builder.ExecutePipeline(projectConfig, options.BuildVerb.BuildTarget);
                 }
             }
 

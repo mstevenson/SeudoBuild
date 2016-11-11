@@ -16,12 +16,15 @@ namespace SeudoBuild
 
         public override string Type { get; } = "FTP Upload";
 
-        public override void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace)
+        public override DistributeInfo Distribute(ArchiveStepResults archiveResults, Workspace workspace)
         {
-            foreach (var archiveInfo in archiveInfos)
+            foreach (var archiveInfo in archiveResults.Infos)
             {
                 Upload(archiveInfo, workspace);
             }
+
+            // FIXME
+            return new DistributeInfo();
         }
 
         public void Upload (ArchiveInfo archiveInfo, Workspace workspace)

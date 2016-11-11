@@ -67,7 +67,7 @@
     <Compile Include="Build\BuilderConfig.cs" />
     <Compile Include="Build\Builder.cs" />
     <Compile Include="Build\ArchiveInfo.cs" />
-    <Compile Include="Build\BuildInfo.cs" />
+    <Compile Include="Build\BuildStepResults.cs" />
     <Compile Include="Build\DistributeInfo.cs" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="TextReplacements.cs" />
@@ -75,7 +75,7 @@
     <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
     <Compile Include="Build\BuildResult.cs" />
     <Compile Include="Build\BuildCompletionStatus.cs" />
-    <Compile Include="Build\VCSResult.cs" />
+    <Compile Include="Build\VCSResults.cs" />
     <Compile Include="VersionControl\VCSConfigConverter.cs" />
     <Compile Include="Project\Build\ShellBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep.cs" />
@@ -85,6 +85,11 @@
     <Compile Include="Project\Build\UnityInstallation.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\IFileSystem.cs" />
+    <Compile Include="Build\ArchiveStepResults.cs" />
+    <Compile Include="Build\DistributeStepResults.cs" />
+    <Compile Include="Build\PipelineStepResults.cs" />
+    <Compile Include="Build\NotifyStepResults.cs" />
+    <Compile Include="Build\NotifyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

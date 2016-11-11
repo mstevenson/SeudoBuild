@@ -53,6 +53,19 @@ namespace SeudoBuild.VCS.Git
             }
         }
 
+        public override string CurrentCommit
+        {
+            get
+            {
+                string result = null;
+                using (var repo = new Repository(workspace.WorkingDirectory))
+                {
+                    result = repo.Head.Tip.Sha;
+                }
+                return result;
+            }
+        }
+
         void StoreCredentials()
         {
             string credentialsPath = $"{workspace.WorkingDirectory}/../git-credentials";

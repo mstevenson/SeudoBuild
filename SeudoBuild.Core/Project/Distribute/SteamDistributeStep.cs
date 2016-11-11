@@ -13,9 +13,11 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Steam Upload";
 
-        public override void Distribute(List<ArchiveInfo> archiveInfos, Workspace workspace)
+        public override DistributeInfo Distribute(ArchiveStepResults archiveResults, Workspace workspace)
         {
             // TODO
+
+            return new DistributeInfo();
         }
     }
 }

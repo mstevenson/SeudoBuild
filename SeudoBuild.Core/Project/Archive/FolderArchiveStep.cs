@@ -14,7 +14,7 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Folder";
 
-        public override ArchiveInfo CreateArchive(BuildInfo buildInfo, Workspace workspace)
+        public override ArchiveInfo CreateArchive(BuildStepResults buildInfo, Workspace workspace)
         {
             string folderName = workspace.Replacements.ReplaceVariablesInText(config.FolderName);
             string source = workspace.BuildOutputDirectory;

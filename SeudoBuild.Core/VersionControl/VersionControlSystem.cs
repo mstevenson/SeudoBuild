@@ -7,6 +7,7 @@
     {
         public abstract string TypeName { get; }
         public abstract bool IsWorkingCopyInitialized { get; }
+        public abstract string CurrentCommit { get; }
         public abstract void Download();
         public abstract void Update();
     }

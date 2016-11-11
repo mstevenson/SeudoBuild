@@ -14,9 +14,12 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Email Notification";
 
-        public override void Notify()
+        public override NotifyInfo Notify()
         {
             SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");
+
+            // FIXME
+            return new NotifyInfo();
         }
 
         void SendMessage(string from, string to, string subject, string body)
