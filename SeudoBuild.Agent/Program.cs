@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SeudoBuild;
 using CommandLine;
 using CommandLine.Text;
+using System.IO;
 
 namespace SeudoBuild.Agent
 {
@@ -36,14 +37,14 @@ namespace SeudoBuild.Agent
 
         class BuildSubOptions
         {
-            [Option('o', "output-folder", HelpText = "Path to the build output folder.", Required = true)]
-            public string OutputPath { get; set; }
-
             [Option('p', "project-config", HelpText = "Path to a project configuration file.", Required = true)]
             public string ProjectConfigPath { get; set; }
 
             [Option('t', "build-target", HelpText = "Name of the target to build as specified in the project configuration file.", Required = true)]
             public string BuildTarget { get; set; }
+
+            [Option('o', "output-folder", HelpText = "Path to the build output folder.")]
+            public string OutputPath { get; set; }
         }
 
         class ListenSubOptions
@@ -107,7 +108,13 @@ namespace SeudoBuild.Agent
 
                 if (projectConfig != null)
                 {
-                    BuilderConfig builderConfig = new BuilderConfig { ProjectsPath = options.BuildVerb.OutputPath };
+                    string outputPath = options.BuildVerb.OutputPath;
+                    if (string.IsNullOrEmpty(outputPath))
+                    {
+                        // Config file's directory
+                        outputPath = new FileInfo(options.BuildVerb.ProjectConfigPath).Directory.FullName;
+                    }
+                    BuilderConfig builderConfig = new BuilderConfig { ProjectsPath = outputPath };
                     Builder builder = new Builder(builderConfig);
                     builder.ExecutePipeline(projectConfig, options.BuildVerb.BuildTarget);
                 }
