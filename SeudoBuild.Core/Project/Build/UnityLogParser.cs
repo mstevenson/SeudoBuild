@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-//using StringMatch = System.Collections.Generic.Dictionary<string, System.Func<string, string>>;
-
 namespace SeudoBuild
 {
     public class UnityLogParser
@@ -17,15 +15,8 @@ namespace SeudoBuild
         }
 
         State currentState = State.Start;
-
-        //delegate string MatchDelegate(string line);
-
-        //Dictionary<string, MatchDelegate> generalMatches = new Dictionary<string, MatchDelegate>();
-        //Dictionary<State, Dictionary<string, MatchDelegate>> stateMaches = new Dictionary<State, Dictionary<string, MatchDelegate>>();
-
-        Matches firstMatches = new Matches();
+        Matches universalMatches = new Matches();
         Dictionary<State, Matches> stateMatches = new Dictionary<State, Matches>();
-        Matches lastMatches = new Matches();
 
 
         public class Match
@@ -63,11 +54,17 @@ namespace SeudoBuild
 
         public UnityLogParser()
         {
-            firstMatches = new Matches
+            universalMatches = new Matches
             {
                 { "WARNING: ", (line) => line },
                 { "ERROR: ", (line) => line },
-                { "Aborting batchmode due to failure", (line) => line }
+                { "Aborting batchmode due to failure", (line) => line },
+                { "- starting compile", (line) => line },
+                { "Compilation failed", (line) => line },
+                { "Finished compile", (line) => line },
+                { "building ", (line) => line },
+                { "*** Cancelled", (line) => { currentState = State.Cancelled; return "Cancelled build"; } },
+                { "*** Completed", (line) => line }
             };
 
             stateMatches = new Dictionary<State, Matches>
@@ -83,21 +80,11 @@ namespace SeudoBuild
                     }
                 }
             };
-
-            lastMatches = new Matches
-            {
-                { "- starting compile", (line) => line },
-                { "Compilation failed", (line) => line },
-                { "Finished compile", (line) => line },
-                { "building ", (line) => line },
-                { "*** Cancelled", (line) => { currentState = State.Cancelled; return "Cancelled build"; } },
-                { "*** Completed", (line) => line }
-            };
         }
 
         public string ProcessLogLine(string line)
         {
-            foreach (var match in firstMatches)
+            foreach (var match in universalMatches)
             {
                 if (line.Contains(match.text))
                 {
@@ -116,15 +103,6 @@ namespace SeudoBuild
                         string result = match.output.Invoke(line);
                         return result;
                     }
-                }
-            }
-
-            foreach (var match in lastMatches)
-            {
-                if (line.Contains(match.text))
-                {
-                    string result = match.output.Invoke(line);
-                    return result;
                 }
             }
 
