@@ -19,7 +19,7 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Unity Parameterized Build";
 
-        public override BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace)
+        public override BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
         {
             // TODO
             return null;

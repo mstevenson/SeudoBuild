@@ -74,7 +74,6 @@
     <Compile Include="Serializer.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
     <Compile Include="Build\BuildCompletionStatus.cs" />
-    <Compile Include="Build\VCSResults.cs" />
     <Compile Include="VersionControl\VCSConfigConverter.cs" />
     <Compile Include="Project\Build\ShellBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep.cs" />
@@ -93,6 +92,10 @@
     <Compile Include="Build\PipelineStepResults.cs" />
     <Compile Include="Build\BuildStepResults.cs" />
     <Compile Include="Project\Build\UnityLogParser.cs" />
+    <Compile Include="Project\Source\ISourceStep.cs" />
+    <Compile Include="Build\SourceSequenceResults.cs" />
+    <Compile Include="Build\SourceStepResults.cs" />
+    <Compile Include="Project\Source\GitSourceStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -108,6 +111,7 @@
     <Folder Include="Project\Notify\" />
     <Folder Include="Build\" />
     <Folder Include="IO\" />
+    <Folder Include="Project\Source\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">

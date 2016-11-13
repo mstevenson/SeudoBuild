@@ -26,7 +26,7 @@ namespace SeudoBuild
 
         // FIXME change from BuildResult to BuildStepResults
 
-        public BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace)
+        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
         {
             // Replace variables in string that begin and end with the % character
             var command = workspace.Replacements.ReplaceVariablesInText(config.Command);

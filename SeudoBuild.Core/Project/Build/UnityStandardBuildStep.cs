@@ -20,7 +20,7 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Unity Standard Build";
 
-        public override BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace)
+        public override BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
         {
             // FIXME don't hard-code
 

@@ -2,7 +2,7 @@
 
 namespace SeudoBuild
 {
-    public class VCSResults : PipelineSequenceResults
+    public class SourceSequenceResults : PipelineSequenceResults<SourceStepResults>
     {
         public string CurrentCommitIdentifier { get; set; }
     }

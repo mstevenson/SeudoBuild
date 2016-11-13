@@ -8,6 +8,7 @@ namespace SeudoBuild
     public class ProjectPipeline
     {
         public VersionControlSystem VersionControlSystem { get; private set; }
+        public List<ISourceStep> SourceSteps { get; private set; }
         public List<IBuildStep> BuildSteps { get; private set; }
         public List<IArchiveStep> ArchiveSteps { get; private set; }
         public List<IDistributeStep> DistributeSteps { get; private set; }
@@ -42,6 +43,7 @@ namespace SeudoBuild
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 
             VersionControlSystem = InitializeVersionControlSystem();
+            SourceSteps = GenerateSourceSteps();
             BuildSteps = GenerateBuildSteps();
             ArchiveSteps = GenerateArchiveSteps();
             DistributeSteps = GenerateDistributeSteps();
@@ -69,6 +71,19 @@ namespace SeudoBuild
                 return vcs;
             }
             throw new Exception("Could not identify VCS type from target configuration");
+        }
+
+        List<ISourceStep> GenerateSourceSteps()
+        {
+            var steps = new List<ISourceStep>();
+            foreach (var stepConfig in TargetConfig.SourceSteps)
+            {
+                if (stepConfig is GitSourceConfig)
+                {
+                    steps.Add(new GitSourceStep((GitSourceConfig)stepConfig, Workspace));
+                }
+            }
+            return steps;
         }
 
         List<IBuildStep> GenerateBuildSteps()

@@ -11,7 +11,7 @@ namespace SeudoBuild
     {
         public abstract string Type { get; }
 
-        public abstract BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace);
+        public abstract BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace);
 
         protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace)
         {

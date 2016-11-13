@@ -18,4 +18,10 @@ namespace SeudoBuild
         where TOutStep : PipelineStepResults, new() // current step results
     {
     }
+
+    public interface IPipelineStep<TOutSeq, TOutStep>
+        where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
+        where TOutStep : PipelineStepResults, new() // current step results
+    {
+    }
 }

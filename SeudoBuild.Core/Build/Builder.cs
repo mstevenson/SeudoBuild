@@ -55,10 +55,13 @@ namespace SeudoBuild
             pipeline.Workspace.CleanBuildOutputDirectory();
 
             // Grab changes from version control system
-            VCSResults vcsResults = UpdateWorkingCopy(pipeline);
+            SourceSequenceResults vcsResults = UpdateWorkingCopy(pipeline);
             replacements["commit_identifier"] = vcsResults.CurrentCommitIdentifier;
 
+            // TODO move VCS interaction into an ExecuteSequence call
+
             // Run pipeline
+            //var sourceResults = ExecuteSequence("Source", pipeline.SourceSteps, pipeline.Workspace);
             var buildResults = ExecuteSequence("Build", pipeline.BuildSteps, vcsResults, pipeline.Workspace);
             var archiveResults = ExecuteSequence("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
             var distributeResults = ExecuteSequence("Distribute", pipeline.DistributeSteps, archiveResults, pipeline.Workspace);
@@ -70,14 +73,14 @@ namespace SeudoBuild
             Console.WriteLine("Build process completed.");
         }
 
-        VCSResults UpdateWorkingCopy(ProjectPipeline pipeline)
+        SourceSequenceResults UpdateWorkingCopy(ProjectPipeline pipeline)
         {
             VersionControlSystem vcs = pipeline.VersionControlSystem;
 
             BuildConsole.WriteBullet($"Update working copy ({vcs.TypeName})");
             BuildConsole.IndentLevel++;
 
-            var results = new VCSResults();
+            var results = new SourceSequenceResults();
 
             try
             {

@@ -54,12 +54,16 @@
     <Compile Include="Build\BuildStepConfigConverter.cs" />
     <Compile Include="Distribute\DistributeStepConfigConverter.cs" />
     <Compile Include="Notify\NotifyStepConfigConverter.cs" />
+    <Compile Include="Source\GitSourceConfig.cs" />
+    <Compile Include="Source\SourceStepConfig.cs" />
+    <Compile Include="Source\SourceStepConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Archive\" />
     <Folder Include="Build\" />
     <Folder Include="Distribute\" />
     <Folder Include="Notify\" />
+    <Folder Include="Source\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
