@@ -28,37 +28,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VersionNumber.cs" />
     <Compile Include="DistributeStepConfig.cs" />
-    <Compile Include="DistributeStepConfigConverter.cs" />
     <Compile Include="NotifyStepConfig.cs" />
-    <Compile Include="NotifyStepConfigConverter.cs" />
     <Compile Include="ArchiveStepConfig.cs" />
-    <Compile Include="ArchiveStepConfigConverter.cs" />
     <Compile Include="SourceStepConfig.cs" />
-    <Compile Include="SourceStepConfigConverter.cs" />
     <Compile Include="BuildStepConfig.cs" />
-    <Compile Include="BuildStepConfigConverter.cs" />
-    <Compile Include="Serializer.cs" />
-    <Compile Include="Modules\IArchiveModule.cs" />
-    <Compile Include="Modules\IBuildModule.cs" />
-    <Compile Include="Modules\IDistributeModule.cs" />
-    <Compile Include="Modules\INotifyModule.cs" />
-    <Compile Include="Modules\ISourceModule.cs" />
-    <Compile Include="Modules\IModule.cs" />
     <Compile Include="StepConfig.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

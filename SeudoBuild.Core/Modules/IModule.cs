@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace SeudoBuild.Data
+namespace SeudoBuild
 {
     public interface IModule
     {

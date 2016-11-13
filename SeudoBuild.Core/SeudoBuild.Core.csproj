@@ -27,6 +27,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -63,6 +66,13 @@
     <Compile Include="Pipeline\ProjectPipeline.cs" />
     <Compile Include="Pipeline\ProjectConfig.cs" />
     <Compile Include="Pipeline\BuildTargetConfig.cs" />
+    <Compile Include="Modules\IArchiveModule.cs" />
+    <Compile Include="Modules\IBuildModule.cs" />
+    <Compile Include="Modules\IDistributeModule.cs" />
+    <Compile Include="Modules\IModule.cs" />
+    <Compile Include="Modules\INotifyModule.cs" />
+    <Compile Include="Modules\ISourceModule.cs" />
+    <Compile Include="Serializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />
@@ -70,12 +80,16 @@
     <Folder Include="IO\" />
     <Folder Include="Pipeline\Results\" />
     <Folder Include="Pipeline\Steps\" />
+    <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
       <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
       <Name>SeudoBuild.Data</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

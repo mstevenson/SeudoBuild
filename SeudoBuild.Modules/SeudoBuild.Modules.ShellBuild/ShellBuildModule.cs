@@ -1,6 +1,5 @@
 ﻿using System;
 using Newtonsoft.Json;
-using SeudoBuild.Data;
 
 namespace SeudoBuild.Modules.ShellBuild
 {

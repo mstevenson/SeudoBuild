@@ -2,7 +2,6 @@
 using CommandLine;
 using CommandLine.Text;
 using System.IO;
-using SeudoBuild.Data;
 
 namespace SeudoBuild.Agent
 {
