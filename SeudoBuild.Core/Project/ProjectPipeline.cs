@@ -42,7 +42,8 @@ namespace SeudoBuild
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
 
             Workspace = new Workspace(projectDirectory);
-            BuildConsole.WriteLine("Building to " + projectDirectory);
+            BuildConsole.WriteLine("Saving to " + projectDirectory);
+            Console.WriteLine("");
             Workspace.CreateSubDirectories();
 
             TargetConfig = GetBuildTargetConfig(buildTargetName);

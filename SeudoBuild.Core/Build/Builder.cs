@@ -67,39 +67,59 @@ namespace SeudoBuild
             Console.WriteLine("Build process completed.");
         }
 
-        void PrintSequenceHeader(string sequenceName)
+        TOutSeq InitializeSequence<TOutSeq>(string sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
+            where TOutSeq : PipelineSequenceResults, new()
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet(sequenceName);
             BuildConsole.IndentLevel++;
+
+            if (sequenceSteps.Count == 0)
+            {
+                BuildConsole.WriteAlert($"No {sequenceName} steps.");
+                return new TOutSeq { IsSuccess = false, Exception = new Exception($"No {sequenceName} steps.") };
+            }
+            return new TOutSeq { IsSuccess = true };
         }
 
-        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, Workspace workspace)
+        // First step of pipeline execution
+        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, Workspace workspace)
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
         {
-            PrintSequenceHeader(sequenceName);
+            // Initialize the sequence
+            TOutSeq results = InitializeSequence<TOutSeq>(sequenceName, sequenceSteps);
+            if (!results.IsSuccess)
+            {
+                return results;
+            }
 
-            Func<IPipelineStep<TOutSeq, TOutStep>, TOutStep> stepExecuteCallback = (step) =>
+            // Run the sequence
+            results = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TOutSeq, TOutStep>>(sequenceName, sequenceSteps, (step) =>
             {
                 return step.ExecuteStep(workspace);
-            };
-
-            TOutSeq result = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TOutSeq, TOutStep>>(sequenceName, sequenceSteps, stepExecuteCallback, workspace);
-            return result;
+            });
+            return results;
         }
 
-        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
+        // Pipeline execution step that had a step before it
+        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
             where TInSeq : PipelineSequenceResults // previous sequence results
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
         {
-            PrintSequenceHeader(sequenceName);
+            // Initialize the sequence
+            TOutSeq results = InitializeSequence<TOutSeq>(sequenceName, sequenceSteps);
+            if (!results.IsSuccess)
+            {
+                return results;
+            }
 
+            // Verify that the pipeline has not previously failed
             if (!previousSequence.IsSuccess)
             {
                 BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
-                var results = new TOutSeq
+                results = new TOutSeq
                 {
                     IsSuccess = false,
                     Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.")
@@ -107,16 +127,15 @@ namespace SeudoBuild
                 return results;
             }
 
-            Func<IPipelineStep<TInSeq, TOutSeq, TOutStep>, TOutStep> stepExecuteCallback = (step) =>
+            // Run the sequence
+            results = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TInSeq, TOutSeq, TOutStep>>(sequenceName, sequenceSteps, (step) =>
             {
                 return step.ExecuteStep(previousSequence, workspace);
-            };
-
-            TOutSeq result = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TInSeq, TOutSeq, TOutStep>>(sequenceName, sequenceSteps, stepExecuteCallback, workspace, previousSequence.IsSuccess);
-            return result;
+            });
+            return results;
         }
 
-        TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string sequenceName, IEnumerable<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep> stepExecuteCallback, Workspace workspace, bool prevSequenceIsSuccess = true)
+        TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string sequenceName, IReadOnlyCollection<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep> stepExecuteCallback)
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
             where TPipeStep : class, IPipelineStep
@@ -124,8 +143,8 @@ namespace SeudoBuild
             // Pipeline sequence result
             var results = new TOutSeq();
 
-            const int startIndex = -1;
-            int stepIndex = startIndex;
+            //const int startIndex = -1;
+            //int stepIndex = startIndex;
             TPipeStep currentStep = null;
 
             var stopwatch = new Stopwatch();
@@ -133,7 +152,7 @@ namespace SeudoBuild
 
             foreach (var step in sequenceSteps)
             {
-                stepIndex++;
+                //stepIndex++;
                 currentStep = step;
 
                 BuildConsole.WriteBullet(step.Type);
@@ -146,7 +165,7 @@ namespace SeudoBuild
                 {
                     results.IsSuccess = false;
                     results.Exception = stepResult.Exception;
-                    string error = $"{sequenceName} sequence failed on step {stepIndex} ({currentStep.Type})";
+                    string error = $"{sequenceName} sequence failed on step {currentStep.Type}";
                     BuildConsole.WriteFailure(error);
                     break;
                 }
@@ -154,14 +173,6 @@ namespace SeudoBuild
 
             stopwatch.Stop();
             results.Duration = stopwatch.Elapsed;
-
-            if (stepIndex == startIndex)
-            {
-                BuildConsole.WriteAlert($"No {sequenceName} steps.");
-                results.IsSuccess = false;
-                results.Exception = new Exception($"No {sequenceName} steps.");
-                return results;
-            }
 
             results.IsSuccess = true;
             return results;
