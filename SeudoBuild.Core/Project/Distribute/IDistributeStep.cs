@@ -2,7 +2,7 @@
 
 namespace SeudoBuild
 {
-    public interface IDistributeStep : IPipelineStep<ArchiveSequenceResults, ArchiveStepResults, DistributeStepResults>
+    public interface IDistributeStep : IPipelineStep<ArchiveSequenceResults, ArchiveStepResults, DistributeSequenceResults, DistributeStepResults>
     {
     }
 }

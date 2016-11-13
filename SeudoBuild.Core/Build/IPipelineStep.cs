@@ -1,12 +1,13 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public interface IPipelineStep<InSeq, InStep, OutStep>
-        where InSeq : PipelineSequenceResults<InStep> // previous sequence's sequence result type
-        where InStep : PipelineStepResults, new() // previous sequence's step result type
-        where OutStep : PipelineStepResults // this sequence's step result type
+    public interface IPipelineStep<TInSeq, TInStep, TOutSeq, TOutStep>
+        where TInSeq : PipelineSequenceResults<TInStep> // previous sequence results
+        where TInStep : PipelineStepResults, new() // previous step results
+        where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
+        where TOutStep : PipelineStepResults, new() // current step results
     {
         string Type { get; }
-        OutStep ExecuteStep(InSeq previousSequence, Workspace workspace);
+        TOutStep ExecuteStep(TInSeq previousSequence, Workspace workspace);
     }
 }

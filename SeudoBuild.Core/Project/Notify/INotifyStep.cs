@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public interface INotifyStep : IPipelineStep<DistributeSequenceResults, DistributeStepResults, NotifyStepResults>
+    public interface INotifyStep : IPipelineStep<DistributeSequenceResults, DistributeStepResults, NotifySequenceResults, NotifyStepResults>
     {
     }
 }

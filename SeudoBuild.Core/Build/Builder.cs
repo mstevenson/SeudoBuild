@@ -48,11 +48,9 @@ namespace SeudoBuild
             // Grab changes from version control system
             VCSResults vcsResults = UpdateWorkingCopy(pipeline);
 
-            // TODO handle VCS failure, pass the result through to the Build step
-
             // Build
-            var buildResults = Build(vcsResults, pipeline);
-            var step = buildResults.StepResults[0];
+            BuildSequenceResults buildResults = Build(vcsResults, pipeline);
+            BuildStepResults step = buildResults.StepResults[0];
             replacements["project_name"] = step.ProjectName;
             replacements["build_target_name"] = step.BuildTargetName;
             replacements["app_version"] = step.AppVersion.ToString ();
@@ -61,16 +59,13 @@ namespace SeudoBuild
 
             // Archive
             //var archiveResults = Archive(buildResults, pipeline);
-            var archiveResults = ExecuteSequence<BuildSequenceResults, BuildStepResults, ArchiveSequenceResults, ArchiveStepResults>
-                ("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
+            var archiveResults = ExecuteSequence("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
 
             // Distribute
-            var distributeResults = ExecuteSequence<ArchiveSequenceResults, ArchiveStepResults, DistributeSequenceResults, DistributeStepResults>
-                ("Distribute", pipeline.DistributeSteps, archiveResults, pipeline.Workspace);
+            var distributeResults = ExecuteSequence("Distribute", pipeline.DistributeSteps, archiveResults, pipeline.Workspace);
 
             // Notify
-            var notifyResults = ExecuteSequence<DistributeSequenceResults, DistributeStepResults, NotifySequenceResults, NotifyStepResults>
-                ("Notify", pipeline.NotifySteps, distributeResults, pipeline.Workspace);
+            var notifyResults = ExecuteSequence("Notify", pipeline.NotifySteps, distributeResults, pipeline.Workspace);
 
             // Done
             BuildConsole.IndentLevel = 0;
@@ -115,20 +110,30 @@ namespace SeudoBuild
             BuildConsole.WriteBullet("Build");
             BuildConsole.IndentLevel = 1;
 
+            BuildSequenceResults results = new BuildSequenceResults();
+
+            if (!vcsResults.Success)
+            {
+                BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
+                results.IsSuccess = false;
+                results.Exception = new Exception($"Skipped build sequence, VCS update failed.");
+                return results;
+            }
+
             // Bail if nothing to build
             if (pipeline.BuildSteps.Count == 0)
             {
                 BuildConsole.WriteAlert("No build steps");
                 //return new BuildStepResults { Status = BuildCompletionStatus.Faulted };
-                return new BuildSequenceResults { IsSuccess = false, Exception = new Exception("No build steps.") };
+                results.IsSuccess = false;
+                results.Exception = new Exception("No build steps.");
+                return results;
             }
 
             bool isFaulted = false;
 
             // Delete all files in the build output directory
             pipeline.Workspace.CleanBuildOutputDirectory();
-
-            var sequenceResults = new BuildSequenceResults();
 
             // TODO add app version
             var stepResults = new BuildStepResults
@@ -140,7 +145,7 @@ namespace SeudoBuild
                 //Status = BuildCompletionStatus.Running
             };
 
-            sequenceResults.StepResults.Add(stepResults);
+            results.StepResults.Add(stepResults);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -172,32 +177,32 @@ namespace SeudoBuild
             if (!isFaulted)
             {
                 //buildInfo.Status = BuildCompletionStatus.Completed;
-                sequenceResults.IsSuccess = true;
+                results.IsSuccess = true;
                 BuildConsole.WriteSuccess("Build steps completed in " + stepResults.BuildDuration.ToString(@"hh\:mm\:ss"));
             }
             else
             {
-                sequenceResults.IsSuccess = false;
+                results.IsSuccess = false;
                 string error = $"Build failed on step {stepIndex} ({currentStep.Type})";
-                sequenceResults.Exception = new Exception(error);
+                results.Exception = new Exception(error);
                 BuildConsole.WriteFailure(error);
             }
 
-            return sequenceResults;
+            return results;
         }
 
-        OutSeq ExecuteSequence<InSeq, InStep, OutSeq, OutStep>(string sequenceName, IEnumerable<IPipelineStep<InSeq,InStep,OutStep>> sequenceSteps, InSeq previousSequence, Workspace workspace)
-            where InSeq : PipelineSequenceResults<InStep> // previous sequence results
-            where InStep : PipelineStepResults, new() // previous step results
-            where OutSeq : PipelineSequenceResults<OutStep>, new() // current sequence results
-            where OutStep : PipelineStepResults, new() // current step results
+        TOutSeq ExecuteSequence<TInSeq, TInStep, TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TInSeq,TInStep,TOutSeq,TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
+            where TInSeq : PipelineSequenceResults<TInStep> // previous sequence results
+            where TInStep : PipelineStepResults, new() // previous step results
+            where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
+            where TOutStep : PipelineStepResults, new() // current step results
         {
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteBullet(sequenceName);
             BuildConsole.IndentLevel++;
 
             // Pipeline sequence result
-            var results = new OutSeq();
+            var results = new TOutSeq();
 
             if (!previousSequence.IsSuccess)
             {
@@ -208,7 +213,7 @@ namespace SeudoBuild
             }
 
             int stepIndex = -1;
-            IPipelineStep<InSeq, InStep, OutStep> currentStep = null;
+            IPipelineStep<TInSeq, TInStep, TOutSeq, TOutStep> currentStep = null;
             foreach (var step in sequenceSteps)
             {
                 BuildConsole.WriteBullet(step.Type);
