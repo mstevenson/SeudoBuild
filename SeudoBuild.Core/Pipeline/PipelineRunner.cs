@@ -9,11 +9,11 @@ namespace SeudoBuild
     /// <summary>
     /// 
     /// </summary>
-    public class Builder
+    public class PipelineRunner
     {
-        BuilderConfig builderConfig;
+        PipelineConfig builderConfig;
 
-        public Builder(BuilderConfig config)
+        public PipelineRunner(PipelineConfig config)
         {
             this.builderConfig = config;
         }

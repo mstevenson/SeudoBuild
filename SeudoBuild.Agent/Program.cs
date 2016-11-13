@@ -114,8 +114,8 @@ namespace SeudoBuild.Agent
                         // Config file's directory
                         outputPath = new FileInfo(options.BuildVerb.ProjectConfigPath).Directory.FullName;
                     }
-                    BuilderConfig builderConfig = new BuilderConfig { ProjectsPath = outputPath };
-                    Builder builder = new Builder(builderConfig);
+                    PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
+                    PipelineRunner builder = new PipelineRunner(builderConfig);
                     builder.ExecutePipeline(projectConfig, options.BuildVerb.BuildTarget);
                 }
             }
