@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Ionic.Zip;
 
 namespace SeudoBuild
@@ -32,17 +33,24 @@ namespace SeudoBuild
 
             BuildConsole.WriteLine($"Creating zip file {filename}");
 
-            // Save zip file
-            using (var zipFile = new ZipFile())
+            try
             {
-                zipFile.AddDirectory(workspace.BuildOutputDirectory);
-                zipFile.Save(filepath);
+                // Save zip file
+                using (var zipFile = new ZipFile())
+                {
+                    zipFile.AddDirectory(workspace.BuildOutputDirectory);
+                    zipFile.Save(filepath);
+                }
+
+                BuildConsole.WriteLine("Zip file saved");
+
+                var results = new ArchiveStepResults { ArchiveFileName = filename, IsSuccess = true };
+                return results;
             }
-
-            BuildConsole.WriteLine("Zip file saved");
-
-            var archiveInfo = new ArchiveStepResults { ArchiveFileName = filename };
-            return archiveInfo;
+            catch (Exception e)
+            {
+                return new ArchiveStepResults { IsSuccess = false, Exception = e };
+            }
         }
     }
 }
