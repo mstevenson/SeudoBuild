@@ -1,12 +1,12 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace SeudoBuild
+namespace SeudoBuild.Data
 {
-    public interface ISourceModule
+    public interface INotifyModule
     {
         Type ArchiveStepType { get; }
         JsonConverter ConfigConverter { get; }
-        bool MatchesConfigType(SourceStepConfig config);
+        bool MatchesConfigType(NotifyStepConfig config);
     }
 }

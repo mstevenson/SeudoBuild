@@ -27,12 +27,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Renci.SshNet">
-      <HintPath>..\packages\SSH.NET.2016.0.0\lib\net40\Renci.SshNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -50,7 +44,6 @@
     <Compile Include="Pipeline\DistributeStepResults.cs" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="Macros.cs" />
-    <Compile Include="Serializer.cs" />
     <Compile Include="Pipeline\BuildCompletionStatus.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\IFileSystem.cs" />
@@ -64,27 +57,18 @@
     <Compile Include="Pipeline\BuildStepResults.cs" />
     <Compile Include="Pipeline\SourceSequenceResults.cs" />
     <Compile Include="Pipeline\SourceStepResults.cs" />
-    <Compile Include="Modules\IArchiveModule.cs" />
-    <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Project\INotifyStep.cs" />
     <Compile Include="Project\IArchiveStep.cs" />
-    <Compile Include="Modules\INotifyModule.cs" />
-    <Compile Include="Modules\IBuildModule.cs" />
-    <Compile Include="Modules\ISourceModule.cs" />
-    <Compile Include="Modules\IDistributeModule.cs" />
     <Compile Include="Project\IDistributeStep.cs" />
     <Compile Include="Project\ISourceStep.cs" />
     <Compile Include="Project\IBuildStep.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Compile Include="ModuleLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />
     <Folder Include="Project\" />
     <Folder Include="Pipeline\" />
     <Folder Include="IO\" />
-    <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">

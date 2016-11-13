@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using SeudoBuild;
 using CommandLine;
 using CommandLine.Text;
 using System.IO;
+using SeudoBuild.Data;
 
 namespace SeudoBuild.Agent
 {

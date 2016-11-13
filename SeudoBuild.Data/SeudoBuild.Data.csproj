@@ -45,9 +45,18 @@
     <Compile Include="SourceStepConfigConverter.cs" />
     <Compile Include="BuildStepConfig.cs" />
     <Compile Include="BuildStepConfigConverter.cs" />
+    <Compile Include="Serializer.cs" />
+    <Compile Include="Modules\IArchiveModule.cs" />
+    <Compile Include="Modules\IBuildModule.cs" />
+    <Compile Include="Modules\IDistributeModule.cs" />
+    <Compile Include="Modules\INotifyModule.cs" />
+    <Compile Include="Modules\ISourceModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Modules\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
