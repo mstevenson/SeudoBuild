@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Core.Tests", "Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Data", "SeudoBuild.Data\SeudoBuild.Data.csproj", "{01882F9A-84F7-494D-9604-633BAA622209}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{050C779A-572A-4685-B189-D0BABDAE5CD9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{050C779A-572A-4685-B189-D0BABDAE5CD9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ZipArchive", "SeudoBuild.Modules.ZipArchive\SeudoBuild.Modules.ZipArchive.csproj", "{73895975-FD53-407B-9F97-E6622BEB1049}"
 EndProject
