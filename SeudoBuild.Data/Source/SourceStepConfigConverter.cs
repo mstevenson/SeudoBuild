@@ -2,20 +2,20 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SeudoBuild.VCS
+namespace SeudoBuild
 {
-    public class VCSConfigConverter : JsonConverter
+    public class SourceStepConfigConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(VCSConfig));
+            return (objectType == typeof(SourceStepConfig));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jobj = JObject.Load(reader);
             if (jobj["Type"].Value<string>() == "Git")
-                return jobj.ToObject<Git.GitVCSConfig>(serializer);
+                return jobj.ToObject<GitSourceConfig>(serializer);
 
             return null;
         }

@@ -47,12 +47,7 @@
     <Compile Include="RunProcessAsTask\ProcessEx.overloads.cs" />
     <Compile Include="RunProcessAsTask\ProcessResults.cs" />
     <Compile Include="Workspace.cs" />
-    <Compile Include="VersionControl\Git\GitVCS.cs" />
-    <Compile Include="VersionControl\Git\LFSFilter.cs" />
     <Compile Include="Project\ProjectConfig.cs" />
-    <Compile Include="VersionControl\VersionControlSystem.cs" />
-    <Compile Include="VersionControl\VCSConfig.cs" />
-    <Compile Include="VersionControl\Git\GitVCSConfig.cs" />
     <Compile Include="Project\BuildTargetConfig.cs" />
     <Compile Include="Project\Archive\FolderArchiveStep.cs" />
     <Compile Include="Project\Archive\ZipArchiveStep.cs" />
@@ -74,7 +69,6 @@
     <Compile Include="Serializer.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
     <Compile Include="Build\BuildCompletionStatus.cs" />
-    <Compile Include="VersionControl\VCSConfigConverter.cs" />
     <Compile Include="Project\Build\ShellBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep.cs" />
     <Compile Include="Project\Build\UnityExecuteMethodBuildStep.cs" />
@@ -96,6 +90,8 @@
     <Compile Include="Build\SourceSequenceResults.cs" />
     <Compile Include="Build\SourceStepResults.cs" />
     <Compile Include="Project\Source\GitSourceStep.cs" />
+    <Compile Include="Project\Source\SourceStepBase.cs" />
+    <Compile Include="Project\Source\LFSFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -103,8 +99,6 @@
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />
     <Folder Include="Project\" />
-    <Folder Include="VersionControl\" />
-    <Folder Include="VersionControl\Git\" />
     <Folder Include="Project\Distribute\" />
     <Folder Include="Project\Archive\" />
     <Folder Include="Project\Build\" />

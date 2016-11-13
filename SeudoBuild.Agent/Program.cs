@@ -95,16 +95,16 @@ namespace SeudoBuild.Agent
                 var buildSubOptions = (BuildSubOptions)invokedVerbInstance;
                 ProjectConfig projectConfig = null;
 
-                try
-                {
+                //try
+                //{
                     var s = new Serializer();
                     projectConfig = s.Deserialize<ProjectConfig>(buildSubOptions.ProjectConfigPath);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Can't parse project config:");
-                    Console.WriteLine(e.Message);
-                }
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.WriteLine("Can't parse project config:");
+                //    Console.WriteLine(e.Message);
+                //}
 
                 if (projectConfig != null)
                 {

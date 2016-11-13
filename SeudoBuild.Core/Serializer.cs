@@ -12,7 +12,7 @@ namespace SeudoBuild
 
             JsonConverter[] converters = 
             {
-                new VCSConfigConverter(),
+                new SourceStepConfigConverter(),
                 new BuildStepConfigConverter(),
                 new ArchiveStepConfigConverter(),
                 new DistributeStepConfigConverter(),

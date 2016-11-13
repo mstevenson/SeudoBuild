@@ -54,15 +54,8 @@ namespace SeudoBuild
             // Clean
             pipeline.Workspace.CleanBuildOutputDirectory();
 
-            // Grab changes from version control system
-            // FIXME remove vcsResults, use sourceResults instead
-            SourceSequenceResults vcsResults = UpdateWorkingCopy(pipeline);
-            replacements["commit_identifier"] = vcsResults.CurrentCommitIdentifier;
-
-            // TODO move VCS interaction into an ExecuteSequence call
-
             // Run pipeline
-            var sourceResults = ExecuteSequence("Source", pipeline.SourceSteps, pipeline.Workspace);
+            var sourceResults = ExecuteSequence("Update Source", pipeline.SourceSteps, pipeline.Workspace);
             var buildResults = ExecuteSequence("Build", pipeline.BuildSteps, sourceResults, pipeline.Workspace);
             var archiveResults = ExecuteSequence("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
             var distributeResults = ExecuteSequence("Distribute", pipeline.DistributeSteps, archiveResults, pipeline.Workspace);
@@ -72,38 +65,6 @@ namespace SeudoBuild
             BuildConsole.IndentLevel = 0;
             BuildConsole.WriteLine("");
             Console.WriteLine("Build process completed.");
-        }
-
-        // FIXME move UpdateWorkingCopy into a SourceStep
-        SourceSequenceResults UpdateWorkingCopy(ProjectPipeline pipeline)
-        {
-            VersionControlSystem vcs = pipeline.VersionControlSystem;
-
-            BuildConsole.WriteBullet($"Update working copy ({vcs.TypeName})");
-            BuildConsole.IndentLevel++;
-
-            var results = new SourceSequenceResults();
-
-            try
-            {
-                if (vcs.IsWorkingCopyInitialized)
-                {
-                    vcs.Update();
-                }
-                else
-                {
-                    vcs.Download();
-                }
-            }
-            catch (Exception e)
-            {
-                results.IsSuccess = false;
-                results.Exception = e;
-            }
-
-            results.CurrentCommitIdentifier = vcs.CurrentCommit;
-            results.IsSuccess = true;
-            return results;
         }
 
         void PrintSequenceHeader(string sequenceName)
@@ -163,7 +124,8 @@ namespace SeudoBuild
             // Pipeline sequence result
             var results = new TOutSeq();
 
-            int stepIndex = -1;
+            const int startIndex = -1;
+            int stepIndex = startIndex;
             TPipeStep currentStep = null;
 
             var stopwatch = new Stopwatch();
@@ -193,7 +155,7 @@ namespace SeudoBuild
             stopwatch.Stop();
             results.Duration = stopwatch.Elapsed;
 
-            if (stepIndex == 0)
+            if (stepIndex == startIndex)
             {
                 BuildConsole.WriteAlert($"No {sequenceName} steps.");
                 results.IsSuccess = false;

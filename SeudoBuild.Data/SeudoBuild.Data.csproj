@@ -56,7 +56,7 @@
     <Compile Include="Notify\NotifyStepConfigConverter.cs" />
     <Compile Include="Source\GitSourceConfig.cs" />
     <Compile Include="Source\SourceStepConfig.cs" />
-    <Compile Include="Source\SourceStepConverter.cs" />
+    <Compile Include="Source\SourceStepConfigConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Archive\" />

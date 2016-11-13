@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using SeudoBuild.VCS;
 using SeudoBuild.VCS.Git;
 
+using System.IO;
+using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
+using System.Diagnostics;
+
 namespace SeudoBuild
 {
     public class ProjectPipeline
     {
-        public VersionControlSystem VersionControlSystem { get; private set; }
+        //public VersionControlSystem VersionControlSystem { get; private set; }
         public List<ISourceStep> SourceSteps { get; private set; }
         public List<IBuildStep> BuildSteps { get; private set; }
         public List<IArchiveStep> ArchiveSteps { get; private set; }
@@ -42,7 +47,7 @@ namespace SeudoBuild
 
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 
-            VersionControlSystem = InitializeVersionControlSystem();
+            //VersionControlSystem = InitializeVersionControlSystem();
             SourceSteps = GenerateSourceSteps();
             BuildSteps = GenerateBuildSteps();
             ArchiveSteps = GenerateArchiveSteps();
@@ -62,16 +67,16 @@ namespace SeudoBuild
             return null;
         }
 
-        VersionControlSystem InitializeVersionControlSystem()
-        {
-            if (TargetConfig.VCSConfiguration is GitVCSConfig)
-            {
-                var gitConfig = (GitVCSConfig)TargetConfig.VCSConfiguration;
-                var vcs = new GitVCS(Workspace, gitConfig);
-                return vcs;
-            }
-            throw new Exception("Could not identify VCS type from target configuration");
-        }
+        //VersionControlSystem InitializeVersionControlSystem()
+        //{
+        //    if (TargetConfig.VCSConfiguration is GitVCSConfig)
+        //    {
+        //        var gitConfig = (GitVCSConfig)TargetConfig.VCSConfiguration;
+        //        var vcs = new GitVCS(Workspace, gitConfig);
+        //        return vcs;
+        //    }
+        //    throw new Exception("Could not identify VCS type from target configuration");
+        //}
 
         List<ISourceStep> GenerateSourceSteps()
         {
