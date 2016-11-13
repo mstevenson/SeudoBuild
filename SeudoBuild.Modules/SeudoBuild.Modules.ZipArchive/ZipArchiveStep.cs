@@ -22,7 +22,7 @@ namespace SeudoBuild.Modules.ZipArchive
                 // Remove file extension in case it was accidentally included in the config data
                 string filename = Path.GetFileNameWithoutExtension(config.Filename);
                 // Replace in-line variables
-                filename = workspace.Replacements.ReplaceVariablesInText(config.Filename);
+                filename = workspace.Macros.ReplaceVariablesInText(config.Filename);
                 // Sanitize
                 filename = filename.Replace(' ', '_');
                 filename = filename + ".zip";

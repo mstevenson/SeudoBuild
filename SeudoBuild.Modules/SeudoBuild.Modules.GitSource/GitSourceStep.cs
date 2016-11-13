@@ -36,7 +36,7 @@ namespace SeudoBuild.Modules.GitSource
         public SourceStepResults ExecuteStep(Workspace workspace)
         {
             // FIXME
-            //replacements["commit_identifier"] = vcsResults.CurrentCommitIdentifier;
+            //macros["commit_identifier"] = vcsResults.CurrentCommitIdentifier;
 
             BuildConsole.IndentLevel++;
 

@@ -49,7 +49,7 @@
     <Compile Include="Pipeline\BuildSequenceResults.cs" />
     <Compile Include="Pipeline\DistributeStepResults.cs" />
     <Compile Include="BuildConsole.cs" />
-    <Compile Include="TextReplacements.cs" />
+    <Compile Include="Macros.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Pipeline\BuildCompletionStatus.cs" />
     <Compile Include="IO\FileSystem.cs" />

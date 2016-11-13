@@ -45,13 +45,13 @@ namespace SeudoBuild
 
             // Setup pipeline
             var pipeline = ProjectPipeline.Create(builderConfig.ProjectsPath, projectConfig, buildTargetName, loader);
-            var replacements = pipeline.Workspace.Replacements;
-            replacements["project_name"] = pipeline.ProjectConfig.ProjectName;
-            replacements["build_target_name"] = pipeline.TargetConfig.TargetName;
-            replacements["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+            var macros = pipeline.Workspace.Macros;
+            macros["project_name"] = pipeline.ProjectConfig.ProjectName;
+            macros["build_target_name"] = pipeline.TargetConfig.TargetName;
+            macros["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
 
             // TODO
-            //replacements["app_version"] = 
+            //macros["app_version"] = 
 
             // Clean
             pipeline.Workspace.CleanBuildOutputDirectory();

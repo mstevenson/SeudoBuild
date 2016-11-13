@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SeudoBuild
 {
-    // Text replacement variables:
+    // Macros:
     // 
     // %project_name% -- the name for the entire project
     // %build_target_name% -- the specific target that was built
@@ -66,7 +66,7 @@ namespace SeudoBuild
             set
             {
                 workingDirectory = value;
-                Replacements["working_directory"] = workingDirectory;
+                Macros["working_directory"] = workingDirectory;
             }
         }
         string workingDirectory = "";
@@ -84,7 +84,7 @@ namespace SeudoBuild
             set
             {
                 buildOutputDirectory = value;
-                Replacements["build_output_directory"] = buildOutputDirectory;
+                Macros["build_output_directory"] = buildOutputDirectory;
             }
         }
         string buildOutputDirectory = "";
@@ -101,7 +101,7 @@ namespace SeudoBuild
             set
             {
                 archivesDirectory = value;
-                Replacements["archives_directory"] = archivesDirectory;
+                Macros["archives_directory"] = archivesDirectory;
             }
         }
         string archivesDirectory = "";
@@ -118,12 +118,12 @@ namespace SeudoBuild
             set
             {
                 logsDirectory = value;
-                Replacements["logs_directory"] = logsDirectory;
+                Macros["logs_directory"] = logsDirectory;
             }
         }
         string logsDirectory = "";
 
-        public TextReplacements Replacements { get; } = new TextReplacements();
+        public Macros Macros { get; } = new Macros();
 
         public Workspace(string projectDirectory)
         {

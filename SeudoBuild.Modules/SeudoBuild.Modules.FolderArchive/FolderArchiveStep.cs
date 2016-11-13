@@ -18,7 +18,7 @@ namespace SeudoBuild
         {
             try
             {
-                string folderName = workspace.Replacements.ReplaceVariablesInText(config.FolderName);
+                string folderName = workspace.Macros.ReplaceVariablesInText(config.FolderName);
                 string source = workspace.BuildOutputDirectory;
                 string dest = $"{workspace.ArchivesDirectory}/{folderName}";
 
