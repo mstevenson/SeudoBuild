@@ -16,8 +16,11 @@ namespace SeudoBuild.Agent
             [VerbOption("submit", HelpText = "Submit a build request for a remote build agent to fulfill.")]
             public SubmitSubOptions SubmitVerb { get; set; }
 
-            [VerbOption("listen", HelpText = "Listen for and fulfill build requests.")]
-            public ListenSubOptions ListenVerb { get; set; }
+            [VerbOption("queue", HelpText = "Queue build requests received over the network.")]
+            public QueueSubOptions QueueVerb { get; set; }
+
+            [VerbOption("deploy", HelpText = "Listen for deployment messages.")]
+            public DeploySubOptions DeployVerb { get; set; }
 
             [HelpOption]
             public string GetUsage()
@@ -46,10 +49,6 @@ namespace SeudoBuild.Agent
             public string OutputPath { get; set; }
         }
 
-        class ListenSubOptions
-        {
-        }
-
         class SubmitSubOptions
         {
             [Option('p', "project-config", HelpText = "Path to a project configuration file.", Required = true)]
@@ -60,6 +59,14 @@ namespace SeudoBuild.Agent
 
             [Option('h', "host", HelpText = "URI for a specific build agent. If not set, the job will be broadcast to all available agents.")]
             public string Host { get; set; }
+        }
+
+        class QueueSubOptions
+        {
+        }
+
+        class DeploySubOptions
+        {
         }
 
         public static void Main(string[] args)
@@ -130,7 +137,7 @@ namespace SeudoBuild.Agent
             // Listen for jobs on the network
             else if (invokedVerb == "listen")
             {
-                var listenSubOptions = (ListenSubOptions)invokedVerbInstance;
+                var listenSubOptions = (QueueSubOptions)invokedVerbInstance;
                 var server = new BuildQueue();
                 server.Start();
             }
