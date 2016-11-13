@@ -11,33 +11,33 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Data", "SeudoBui
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{050C779A-572A-4685-B189-D0BABDAE5CD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ZipArchive", "SeudoBuild.Modules.ZipArchive\SeudoBuild.Modules.ZipArchive.csproj", "{73895975-FD53-407B-9F97-E6622BEB1049}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ZipArchive", "SeudoBuild.Modules\SeudoBuild.Modules.ZipArchive\SeudoBuild.Modules.ZipArchive.csproj", "{73895975-FD53-407B-9F97-E6622BEB1049}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Archive", "Archive", "{43A74BC8-5A12-4697-81C2-6C1B7B3256C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.FolderArchive", "SeudoBuild.Modules.ZipArchive\SeudoBuild.Modules.FolderArchive\SeudoBuild.Modules.FolderArchive.csproj", "{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.FolderArchive", "SeudoBuild.Modules\SeudoBuild.Modules.FolderArchive\SeudoBuild.Modules.FolderArchive.csproj", "{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notify", "Notify", "{91192B40-56D1-4F58-BC60-1B41269AFB32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.EmailNotify", "SeudoBuild.Modules.EmailNotify\SeudoBuild.Modules.EmailNotify.csproj", "{D86370C6-FE1E-4677-8D42-9C861C01B47F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.EmailNotify", "SeudoBuild.Modules\SeudoBuild.Modules.EmailNotify\SeudoBuild.Modules.EmailNotify.csproj", "{D86370C6-FE1E-4677-8D42-9C861C01B47F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{900780D6-2BCF-45B8-AA48-C03CF745621E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.GitSource", "SeudoBuild.Modules.GitSource\SeudoBuild.Modules.GitSource.csproj", "{98F1110E-302E-4F6E-99EE-F73118AA8D71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.GitSource", "SeudoBuild.Modules\SeudoBuild.Modules.GitSource\SeudoBuild.Modules.GitSource.csproj", "{98F1110E-302E-4F6E-99EE-F73118AA8D71}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Distribute", "Distribute", "{61FB7240-8334-4295-B040-19C9565E4B26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.FTPDistribute", "SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.FTPDistribute.csproj", "{12283418-7700-4402-82F0-AF8567DD80B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.FTPDistribute", "SeudoBuild.Modules\SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.FTPDistribute.csproj", "{12283418-7700-4402-82F0-AF8567DD80B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SteamDistribute", "SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.SteamDistribute\SeudoBuild.Modules.SteamDistribute.csproj", "{6096B113-5817-4CE8-843C-CF5CBA64D655}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SteamDistribute", "SeudoBuild.Modules\SeudoBuild.Modules.SteamDistribute\SeudoBuild.Modules.SteamDistribute.csproj", "{6096B113-5817-4CE8-843C-CF5CBA64D655}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SFTPDistribute", "SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.SFTPDistribute\SeudoBuild.Modules.SFTPDistribute.csproj", "{6E953097-7C24-40D6-8E18-2AF54E32F512}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SFTPDistribute", "SeudoBuild.Modules\SeudoBuild.Modules.SFTPDistribute\SeudoBuild.Modules.SFTPDistribute.csproj", "{6E953097-7C24-40D6-8E18-2AF54E32F512}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{AF420A05-83DA-4134-8341-039265759DBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ShellBuild", "SeudoBuild.Modules.ShellBuild\SeudoBuild.Modules.ShellBuild.csproj", "{60677416-FC65-4780-84DC-A1B77DF2DFC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ShellBuild", "SeudoBuild.Modules\SeudoBuild.Modules.ShellBuild\SeudoBuild.Modules.ShellBuild.csproj", "{60677416-FC65-4780-84DC-A1B77DF2DFC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.UnityBuild", "SeudoBuild.Modules.ShellBuild\SeudoBuild.Modules.UnityBuild\SeudoBuild.Modules.UnityBuild.csproj", "{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.UnityBuild", "SeudoBuild.Modules\SeudoBuild.Modules.UnityBuild\SeudoBuild.Modules.UnityBuild.csproj", "{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

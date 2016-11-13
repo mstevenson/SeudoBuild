@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{73895975-FD53-407B-9F97-E6622BEB1049}</ProjectGuid>
+    <ProjectGuid>{12283418-7700-4402-82F0-AF8567DD80B9}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.ZipArchive</RootNamespace>
-    <AssemblyName>SeudoBuild.Modules.ZipArchive</AssemblyName>
+    <RootNamespace>SeudoBuild.Modules.FTPDistribute</RootNamespace>
+    <AssemblyName>SeudoBuild.Modules.FTPDistribute</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -28,32 +28,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="DotNetZip">
-      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZipArchiveStep.cs" />
-    <Compile Include="ZipArchiveConfig.cs" />
-    <Compile Include="ZipArchiveModule.cs" />
-    <Compile Include="ZipArchiveConfigConverter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">
-      <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
-      <Name>SeudoBuild.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-    </ProjectReference>
+    <Compile Include="FTPDistributeStep.cs" />
+    <Compile Include="FTPDistributeConfig.cs" />
+    <Compile Include="FTPDistributeConfigConverter.cs" />
+    <Compile Include="FTPDistributeModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
+      <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
+      <Name>SeudoBuild.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
+      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
+      <Name>SeudoBuild.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

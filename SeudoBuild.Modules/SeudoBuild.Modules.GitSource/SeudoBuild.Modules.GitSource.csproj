@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{12283418-7700-4402-82F0-AF8567DD80B9}</ProjectGuid>
+    <ProjectGuid>{98F1110E-302E-4F6E-99EE-F73118AA8D71}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.FTPDistribute</RootNamespace>
-    <AssemblyName>SeudoBuild.Modules.FTPDistribute</AssemblyName>
+    <RootNamespace>SeudoBuild.Modules.GitSource</RootNamespace>
+    <AssemblyName>SeudoBuild.Modules.GitSource</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,25 +30,29 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="LibGit2Sharp">
+      <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FTPDistributeStep.cs" />
-    <Compile Include="FTPDistributeConfig.cs" />
-    <Compile Include="FTPDistributeConfigConverter.cs" />
-    <Compile Include="FTPDistributeModule.cs" />
+    <Compile Include="GitSourceConfig.cs" />
+    <Compile Include="GitSourceStep.cs" />
+    <Compile Include="LFSFilter.cs" />
+    <Compile Include="GitSourceConfigConverter.cs" />
+    <Compile Include="GitSourceModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
       <Name>SeudoBuild.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
       <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
       <Name>SeudoBuild.Data</Name>
     </ProjectReference>
