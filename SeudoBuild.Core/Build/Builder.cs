@@ -55,14 +55,15 @@ namespace SeudoBuild
             pipeline.Workspace.CleanBuildOutputDirectory();
 
             // Grab changes from version control system
+            // FIXME remove vcsResults, use sourceResults instead
             SourceSequenceResults vcsResults = UpdateWorkingCopy(pipeline);
             replacements["commit_identifier"] = vcsResults.CurrentCommitIdentifier;
 
             // TODO move VCS interaction into an ExecuteSequence call
 
             // Run pipeline
-            //var sourceResults = ExecuteSequence("Source", pipeline.SourceSteps, pipeline.Workspace);
-            var buildResults = ExecuteSequence("Build", pipeline.BuildSteps, vcsResults, pipeline.Workspace);
+            var sourceResults = ExecuteSequence("Source", pipeline.SourceSteps, pipeline.Workspace);
+            var buildResults = ExecuteSequence("Build", pipeline.BuildSteps, sourceResults, pipeline.Workspace);
             var archiveResults = ExecuteSequence("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
             var distributeResults = ExecuteSequence("Distribute", pipeline.DistributeSteps, archiveResults, pipeline.Workspace);
             var notifyResults = ExecuteSequence("Notify", pipeline.NotifySteps, distributeResults, pipeline.Workspace);
@@ -73,6 +74,7 @@ namespace SeudoBuild
             Console.WriteLine("Build process completed.");
         }
 
+        // FIXME move UpdateWorkingCopy into a SourceStep
         SourceSequenceResults UpdateWorkingCopy(ProjectPipeline pipeline)
         {
             VersionControlSystem vcs = pipeline.VersionControlSystem;
@@ -104,13 +106,26 @@ namespace SeudoBuild
             return results;
         }
 
-        TOutSeq ExecuteSequence<TInSeq, TInStep, TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TInSeq, TInStep, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
-            where TInSeq : PipelineSequenceResults<TInStep> // previous sequence results
-            where TInStep : PipelineStepResults, new() // previous step results
+        void PrintSequenceHeader(string sequenceName)
+        {
+            BuildConsole.IndentLevel = 0;
+            BuildConsole.WriteBullet(sequenceName);
+            BuildConsole.IndentLevel++;
+        }
+
+        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, Workspace workspace)
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
         {
-            return ExecuteSequence<TInSeq, TOutSeq, TOutStep>(sequenceName, sequenceSteps, previousSequence, workspace);
+            PrintSequenceHeader(sequenceName);
+
+            Func<IPipelineStep<TOutSeq, TOutStep>, TOutStep> stepExecuteCallback = (step) =>
+            {
+                return step.ExecuteStep(workspace);
+            };
+
+            TOutSeq result = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TOutSeq, TOutStep>>(sequenceName, sequenceSteps, stepExecuteCallback, workspace);
+            return result;
         }
 
         TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
@@ -118,23 +133,38 @@ namespace SeudoBuild
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
         {
-            BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteBullet(sequenceName);
-            BuildConsole.IndentLevel++;
-
-            // Pipeline sequence result
-            var results = new TOutSeq();
+            PrintSequenceHeader(sequenceName);
 
             if (!previousSequence.IsSuccess)
             {
                 BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
-                results.IsSuccess = false;
-                results.Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.");
+                var results = new TOutSeq
+                {
+                    IsSuccess = false,
+                    Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.")
+                };
                 return results;
             }
 
+            Func<IPipelineStep<TInSeq, TOutSeq, TOutStep>, TOutStep> stepExecuteCallback = (step) =>
+            {
+                return step.ExecuteStep(previousSequence, workspace);
+            };
+
+            TOutSeq result = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TInSeq, TOutSeq, TOutStep>>(sequenceName, sequenceSteps, stepExecuteCallback, workspace, previousSequence.IsSuccess);
+            return result;
+        }
+
+        TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string sequenceName, IEnumerable<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep> stepExecuteCallback, Workspace workspace, bool prevSequenceIsSuccess = true)
+            where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
+            where TOutStep : PipelineStepResults, new() // current step results
+            where TPipeStep : class, IPipelineStep
+        {
+            // Pipeline sequence result
+            var results = new TOutSeq();
+
             int stepIndex = -1;
-            IPipelineStep<TInSeq, TOutSeq, TOutStep> currentStep = null;
+            TPipeStep currentStep = null;
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -146,7 +176,9 @@ namespace SeudoBuild
 
                 BuildConsole.WriteBullet(step.Type);
 
-                var stepResult = step.ExecuteStep(previousSequence, workspace);
+                TOutStep stepResult = null;
+                stepResult = stepExecuteCallback.Invoke(step);
+
                 results.StepResults.Add(stepResult);
                 if (!stepResult.IsSuccess)
                 {
