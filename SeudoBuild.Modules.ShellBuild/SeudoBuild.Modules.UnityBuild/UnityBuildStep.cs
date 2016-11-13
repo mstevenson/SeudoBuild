@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.UnityBuild
 {
     public abstract class UnityBuildStep : IBuildStep
     {

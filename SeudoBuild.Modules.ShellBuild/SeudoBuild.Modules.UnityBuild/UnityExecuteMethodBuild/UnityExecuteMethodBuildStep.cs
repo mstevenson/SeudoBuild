@@ -1,5 +1,4 @@
-﻿
-namespace SeudoBuild
+﻿namespace SeudoBuild.Modules.UnityBuild
 {
     public class UnityExecuteMethodBuildStep : UnityBuildStep
     {

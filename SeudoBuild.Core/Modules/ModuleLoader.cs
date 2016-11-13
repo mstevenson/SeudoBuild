@@ -34,22 +34,22 @@ namespace SeudoBuild
                 throw e;
             }
 
-            Type pluginInfo = null;
+            Type moduleInfo = null;
             try
             {
                 Type[] types = assembly.GetTypes();
-                Assembly core = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals("Lab.Core"));
-                Type type = core.GetType("Lab.Core.IPlugin");
+                Assembly core = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals("SeudoBuild"));
+                Type type = core.GetType("SeudoBuild.IBuildModule");
                 foreach (var t in types)
                     if (type.IsAssignableFrom((Type)t))
                     {
-                        pluginInfo = t;
+                        moduleInfo = t;
                         break;
                     }
 
-                if (pluginInfo != null)
+                if (moduleInfo != null)
                 {
-                    var obj = Activator.CreateInstance(pluginInfo);
+                    var obj = Activator.CreateInstance(moduleInfo);
                     IArchiveModule module = (IArchiveModule)obj;
                     archiveModules.Add(module);
                 }

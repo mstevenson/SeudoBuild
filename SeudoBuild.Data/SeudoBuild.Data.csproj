@@ -34,28 +34,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Notify\NotifyStepConfig.cs" />
-    <Compile Include="Distribute\DistributeStepConfig.cs" />
-    <Compile Include="Build\UnityExecuteMethodBuildConfig.cs" />
-    <Compile Include="Build\UnityParameterizedBuildConfig.cs" />
-    <Compile Include="Build\UnityPlatform.cs" />
-    <Compile Include="Build\UnityStandardBuildConfig.cs" />
-    <Compile Include="Archive\ArchiveStepConfig.cs" />
-    <Compile Include="Archive\ArchiveStepConfigConverter.cs" />
-    <Compile Include="Build\BuildStepConfig.cs" />
     <Compile Include="VersionNumber.cs" />
-    <Compile Include="Build\BuildStepConfigConverter.cs" />
-    <Compile Include="Distribute\DistributeStepConfigConverter.cs" />
-    <Compile Include="Notify\NotifyStepConfigConverter.cs" />
-    <Compile Include="Source\SourceStepConfig.cs" />
-    <Compile Include="Source\SourceStepConfigConverter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Archive\" />
-    <Folder Include="Build\" />
-    <Folder Include="Distribute\" />
-    <Folder Include="Notify\" />
-    <Folder Include="Source\" />
+    <Compile Include="DistributeStepConfig.cs" />
+    <Compile Include="DistributeStepConfigConverter.cs" />
+    <Compile Include="NotifyStepConfig.cs" />
+    <Compile Include="NotifyStepConfigConverter.cs" />
+    <Compile Include="ArchiveStepConfig.cs" />
+    <Compile Include="ArchiveStepConfigConverter.cs" />
+    <Compile Include="SourceStepConfig.cs" />
+    <Compile Include="SourceStepConfigConverter.cs" />
+    <Compile Include="BuildStepConfig.cs" />
+    <Compile Include="BuildStepConfigConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

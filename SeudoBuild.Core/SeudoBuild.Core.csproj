@@ -43,7 +43,6 @@
     <Compile Include="Project\ProjectConfig.cs" />
     <Compile Include="Project\BuildTargetConfig.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
-    <Compile Include="Project\Build\IBuildStep.cs" />
     <Compile Include="Pipeline\PipelineConfig.cs" />
     <Compile Include="Pipeline\PipelineRunner.cs" />
     <Compile Include="Pipeline\ArchiveStepResults.cs" />
@@ -53,11 +52,6 @@
     <Compile Include="TextReplacements.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Pipeline\BuildCompletionStatus.cs" />
-    <Compile Include="Project\Build\UnityBuildStep.cs" />
-    <Compile Include="Project\Build\UnityExecuteMethodBuildStep.cs" />
-    <Compile Include="Project\Build\UnityParameterizedBuildStep.cs" />
-    <Compile Include="Project\Build\UnityStandardBuildStep.cs" />
-    <Compile Include="Project\Build\UnityInstallation.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="Pipeline\ArchiveSequenceResults.cs" />
@@ -68,8 +62,6 @@
     <Compile Include="Pipeline\IPipelineStep.cs" />
     <Compile Include="Pipeline\PipelineStepResults.cs" />
     <Compile Include="Pipeline\BuildStepResults.cs" />
-    <Compile Include="Project\Build\UnityLogParser.cs" />
-    <Compile Include="Project\Source\ISourceStep.cs" />
     <Compile Include="Pipeline\SourceSequenceResults.cs" />
     <Compile Include="Pipeline\SourceStepResults.cs" />
     <Compile Include="Modules\IArchiveModule.cs" />
@@ -81,6 +73,8 @@
     <Compile Include="Modules\ISourceModule.cs" />
     <Compile Include="Modules\IDistributeModule.cs" />
     <Compile Include="Project\IDistributeStep.cs" />
+    <Compile Include="Project\ISourceStep.cs" />
+    <Compile Include="Project\IBuildStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -88,11 +82,8 @@
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />
     <Folder Include="Project\" />
-    <Folder Include="Project\Distribute\" />
-    <Folder Include="Project\Build\" />
     <Folder Include="Pipeline\" />
     <Folder Include="IO\" />
-    <Folder Include="Project\Source\" />
     <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>

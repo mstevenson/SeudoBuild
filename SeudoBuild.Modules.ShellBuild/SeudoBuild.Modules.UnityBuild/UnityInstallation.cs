@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.UnityBuild
 {
     public class UnityInstallation
     {

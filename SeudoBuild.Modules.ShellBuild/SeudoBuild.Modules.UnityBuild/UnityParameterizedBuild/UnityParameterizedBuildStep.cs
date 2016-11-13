@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using RunProcessAsTask;
 using System.IO;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.UnityBuild
 {
     public class UnityParameterizedBuildStep : UnityBuildStep
     {

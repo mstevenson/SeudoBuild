@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SeudoBuild.Modules.UnityBuild</RootNamespace>
+    <AssemblyName>SeudoBuild.Modules.UnityBuild</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnityExecuteMethodBuild\UnityExecuteMethodBuildConfig.cs" />
+    <Compile Include="UnityParameterizedBuild\UnityParameterizedBuildConfig.cs" />
+    <Compile Include="UnityPlatform.cs" />
+    <Compile Include="UnityStandardBuild\UnityStandardBuildConfig.cs" />
+    <Compile Include="UnityExecuteMethodBuild\UnityExecuteMethodBuildStep.cs" />
+    <Compile Include="UnityStandardBuild\UnityStandardBuildStep.cs" />
+    <Compile Include="UnityParameterizedBuild\UnityParameterizedBuildStep.cs" />
+    <Compile Include="UnityBuildStep.cs" />
+    <Compile Include="UnityLogParser.cs" />
+    <Compile Include="UnityInstallation.cs" />
+    <Compile Include="UnityExecuteMethodBuild\UnityExecuteMethodBuildModule.cs" />
+    <Compile Include="UnityParameterizedBuild\UnityParameterizedBuildModule.cs" />
+    <Compile Include="UnityStandardBuild\UnityStandardBuildModule.cs" />
+    <Compile Include="UnityBuildConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
+      <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
+      <Name>SeudoBuild.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
+      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
+      <Name>SeudoBuild.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UnityExecuteMethodBuild\" />
+    <Folder Include="UnityParameterizedBuild\" />
+    <Folder Include="UnityStandardBuild\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
