@@ -27,9 +27,9 @@ namespace SeudoBuild
             };
 
             var args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {workspace.WorkingDirectory} -logfile {Workspace.StandardOutputPath}";
-            var buildResult = ExecuteUnity(unityInstallation, args, workspace);
+            var results = ExecuteUnity(unityInstallation, args, workspace);
 
-            return buildResult;
+            return results;
         }
     }
 }

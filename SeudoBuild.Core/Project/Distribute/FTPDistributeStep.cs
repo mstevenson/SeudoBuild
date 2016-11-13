@@ -18,16 +18,21 @@ namespace SeudoBuild
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {
-            foreach (var archiveInfo in archiveResults.StepResults)
+            try
             {
-                Upload(archiveInfo, workspace);
+                foreach (var archiveInfo in archiveResults.StepResults)
+                {
+                    Upload(archiveInfo, workspace);
+                }
+                return new DistributeStepResults { IsSuccess = true };
             }
-
-            // FIXME
-            return new DistributeStepResults();
+            catch (Exception e)
+            {
+                return new DistributeStepResults { IsSuccess = false, Exception = e };
+            }
         }
 
-        public void Upload (ArchiveStepResults archiveInfo, Workspace workspace)
+        void Upload (ArchiveStepResults archiveInfo, Workspace workspace)
         {
             // Get the object used to communicate with the server.
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{config.URL}:{config.Port}/{config.BasePath}/{archiveInfo.ArchiveFileName}");
@@ -44,25 +49,18 @@ namespace SeudoBuild
 
             FileStream fileStream = file.OpenRead();
 
-            try
+            Stream stream = request.GetRequestStream();
+            int length = 0;
+            while ((length = fileStream.Read(buffer, 0, bufferLength)) != 0)
             {
-                Stream stream = request.GetRequestStream();
-                int length = 0;
-                while ((length = fileStream.Read(buffer, 0, bufferLength)) != 0)
-                {
-                    stream.Write(buffer, 0, length);
-                }
-                stream.Close();
-                fileStream.Close();
+                stream.Write(buffer, 0, length);
+            }
+            stream.Close();
+            fileStream.Close();
 
-                FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-                BuildConsole.WriteLine($"Upload File Complete, status {response.StatusDescription}");
-                response.Close();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+            BuildConsole.WriteLine($"Upload File Complete, status {response.StatusDescription}");
+            response.Close();
         }
     }
 }

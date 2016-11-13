@@ -16,20 +16,27 @@ namespace SeudoBuild
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
         {
-            string folderName = workspace.Replacements.ReplaceVariablesInText(config.FolderName);
-            string source = workspace.BuildOutputDirectory;
-            string dest = $"{workspace.ArchivesDirectory}/{folderName}";
-
-            // Remove old directory
-            if (Directory.Exists(dest))
+            try
             {
-                Directory.Delete(dest, true);
+                string folderName = workspace.Replacements.ReplaceVariablesInText(config.FolderName);
+                string source = workspace.BuildOutputDirectory;
+                string dest = $"{workspace.ArchivesDirectory}/{folderName}";
+
+                // Remove old directory
+                if (Directory.Exists(dest))
+                {
+                    Directory.Delete(dest, true);
+                }
+
+                CopyDirectory(source, dest);
+
+                var results = new ArchiveStepResults { ArchiveFileName = folderName, IsSuccess = true };
+                return results;
             }
-
-            CopyDirectory(source, dest);
-
-            var archiveInfo = new ArchiveStepResults { ArchiveFileName = folderName };
-            return archiveInfo;
+            catch (System.Exception e)
+            {
+                return new ArchiveStepResults { IsSuccess = false, Exception = e };
+            }
         }
 
         void CopyDirectory(string source, string dest)

@@ -17,24 +17,24 @@ namespace SeudoBuild
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
         {
-            // Remove file extension in case it was accidentally included in the config data
-            string filename = Path.GetFileNameWithoutExtension(config.Filename);
-            // Replace in-line variables
-            filename = workspace.Replacements.ReplaceVariablesInText(config.Filename);
-            // Sanitize
-            filename = filename.Replace(' ', '_');
-            filename = filename + ".zip";
-            string filepath = $"{workspace.ArchivesDirectory}/{filename}";
-
-            // Remove old file
-            if (File.Exists(filepath)) {
-                File.Delete(filepath);
-            }
-
-            BuildConsole.WriteLine($"Creating zip file {filename}");
-
             try
             {
+                // Remove file extension in case it was accidentally included in the config data
+                string filename = Path.GetFileNameWithoutExtension(config.Filename);
+                // Replace in-line variables
+                filename = workspace.Replacements.ReplaceVariablesInText(config.Filename);
+                // Sanitize
+                filename = filename.Replace(' ', '_');
+                filename = filename + ".zip";
+                string filepath = $"{workspace.ArchivesDirectory}/{filename}";
+
+                // Remove old file
+                if (File.Exists(filepath)) {
+                    File.Delete(filepath);
+                }
+
+                BuildConsole.WriteLine($"Creating zip file {filename}");
+
                 // Save zip file
                 using (var zipFile = new ZipFile())
                 {

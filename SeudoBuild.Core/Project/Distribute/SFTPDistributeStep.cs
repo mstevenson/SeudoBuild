@@ -19,13 +19,18 @@ namespace SeudoBuild
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {
-            foreach (var archiveInfo in archiveResults.StepResults)
+            try
             {
-                Upload(archiveInfo, workspace);
+                foreach (var archiveInfo in archiveResults.StepResults)
+                {
+                    Upload(archiveInfo, workspace);
+                }
+                return new DistributeStepResults { IsSuccess = true };
             }
-
-            // FIXME
-            return new DistributeStepResults();
+            catch (Exception e)
+            {
+                return new DistributeStepResults { IsSuccess = false, Exception = e };
+            }
         }
 
         public void Upload(ArchiveStepResults archiveInfo, Workspace workspace)

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace SeudoBuild
 {
@@ -28,50 +29,57 @@ namespace SeudoBuild
 
         public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
         {
-            // Replace variables in string that begin and end with the % character
-            var command = workspace.Replacements.ReplaceVariablesInText(config.Command);
-            // Escape quotes
-            command = command.Replace(@"""", @"\""");
-
-            var startInfo = new ProcessStartInfo
+            try
             {
-                FileName = "bash",
-                Arguments = $"-c \"{command}\"",
-                WorkingDirectory = workspace.WorkingDirectory,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            };
+                // Replace variables in string that begin and end with the % character
+                var command = workspace.Replacements.ReplaceVariablesInText(config.Command);
+                // Escape quotes
+                command = command.Replace(@"""", @"\""");
 
-            var process = new Process { StartInfo = startInfo };
-            process.Start();
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = "bash",
+                    Arguments = $"-c \"{command}\"",
+                    WorkingDirectory = workspace.WorkingDirectory,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
 
-            System.Console.ForegroundColor = System.ConsoleColor.Cyan;
+                var process = new Process { StartInfo = startInfo };
+                process.Start();
 
-            while (!process.StandardOutput.EndOfStream)
-            {
-                string line = process.StandardOutput.ReadLine();
-                BuildConsole.WriteLine(line);
+                System.Console.ForegroundColor = System.ConsoleColor.Cyan;
+
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    string line = process.StandardOutput.ReadLine();
+                    BuildConsole.WriteLine(line);
+                }
+
+                process.WaitForExit();
+                System.Console.ResetColor();
+
+                // FIXME fill in more build step result properties?
+
+                var results = new BuildStepResults();
+                int exitCode = process.ExitCode;
+                if (exitCode == 0)
+                {
+                    results.IsSuccess = true;
+                    results.Exception = new Exception("Build process exited abnoramlly");
+                }
+                else
+                {
+                    results.IsSuccess = false;
+                }
+
+                return results;
             }
-
-            process.WaitForExit();
-            System.Console.ResetColor();
-
-            // FIXME fill in more build step result properties?
-
-            var buildStepResult = new BuildStepResults();
-            int exitCode = process.ExitCode;
-            if (exitCode == 0)
+            catch (Exception e)
             {
-                buildStepResult.IsSuccess = true;
-                buildStepResult.Exception = new System.Exception("Build process exited abnoramlly");
+                return new BuildStepResults { IsSuccess = false, Exception = e };
             }
-            else
-            {
-                buildStepResult.IsSuccess = false;
-            }
-
-            return buildStepResult;
         }
     }
 }

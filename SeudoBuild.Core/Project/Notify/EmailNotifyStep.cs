@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Mail;
 
 namespace SeudoBuild
@@ -16,10 +17,15 @@ namespace SeudoBuild
 
         public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, Workspace workspace)
         {
-            SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");
-
-            // FIXME
-            return new NotifyStepResults();
+            try
+            {
+                SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");
+                return new NotifyStepResults { IsSuccess = true };
+            }
+            catch (Exception e)
+            {
+                return new NotifyStepResults { IsSuccess = false, Exception = e };
+            }
         }
 
         void SendMessage(string from, string to, string subject, string body)
@@ -42,7 +48,7 @@ namespace SeudoBuild
             message.Body = body;
             client.Send(message);
 
-            BuildConsole.WriteLine("Email notification send");
+            BuildConsole.WriteLine("Email notification sent");
         }
     }
 }

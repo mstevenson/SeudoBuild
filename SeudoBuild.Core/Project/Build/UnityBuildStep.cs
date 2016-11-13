@@ -64,18 +64,18 @@ namespace SeudoBuild
                 writer.Close();
             }
 
-            var buildResult = new BuildStepResults();
+            var results = new BuildStepResults();
             if (unityProcess.ExitCode == 0)
             {
-                buildResult.IsSuccess = true;
+                results.IsSuccess = true;
             }
             else
             {
-                buildResult.IsSuccess = false;
-                buildResult.Exception = new Exception("Build process exited abnormally");
+                results.IsSuccess = false;
+                results.Exception = new Exception("Build process exited abnormally");
             }
 
-            return buildResult;
+            return results;
         }
 
         protected string GetBuildLogPath(Workspace workspace)
