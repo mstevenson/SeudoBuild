@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.GitSourc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Distribute", "Distribute", "{61FB7240-8334-4295-B040-19C9565E4B26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.FTPDistribute", "SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.FTPDistribute.csproj", "{12283418-7700-4402-82F0-AF8567DD80B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SteamDistribute", "SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.SteamDistribute\SeudoBuild.Modules.SteamDistribute.csproj", "{6096B113-5817-4CE8-843C-CF5CBA64D655}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +69,14 @@ Global
 		{98F1110E-302E-4F6E-99EE-F73118AA8D71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98F1110E-302E-4F6E-99EE-F73118AA8D71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98F1110E-302E-4F6E-99EE-F73118AA8D71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12283418-7700-4402-82F0-AF8567DD80B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12283418-7700-4402-82F0-AF8567DD80B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12283418-7700-4402-82F0-AF8567DD80B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12283418-7700-4402-82F0-AF8567DD80B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6096B113-5817-4CE8-843C-CF5CBA64D655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6096B113-5817-4CE8-843C-CF5CBA64D655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6096B113-5817-4CE8-843C-CF5CBA64D655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6096B113-5817-4CE8-843C-CF5CBA64D655}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -106,5 +118,7 @@ Global
 		{900780D6-2BCF-45B8-AA48-C03CF745621E} = {050C779A-572A-4685-B189-D0BABDAE5CD9}
 		{98F1110E-302E-4F6E-99EE-F73118AA8D71} = {900780D6-2BCF-45B8-AA48-C03CF745621E}
 		{61FB7240-8334-4295-B040-19C9565E4B26} = {050C779A-572A-4685-B189-D0BABDAE5CD9}
+		{12283418-7700-4402-82F0-AF8567DD80B9} = {61FB7240-8334-4295-B040-19C9565E4B26}
+		{6096B113-5817-4CE8-843C-CF5CBA64D655} = {61FB7240-8334-4295-B040-19C9565E4B26}
 	EndGlobalSection
 EndGlobal

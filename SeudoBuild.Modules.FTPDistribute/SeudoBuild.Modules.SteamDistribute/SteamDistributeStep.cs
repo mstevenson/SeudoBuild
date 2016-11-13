@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.SteamDistribute
 {
     public class SteamDistributeStep : IDistributeStep
     {

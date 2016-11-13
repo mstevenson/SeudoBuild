@@ -43,9 +43,7 @@
     <Compile Include="Project\ProjectConfig.cs" />
     <Compile Include="Project\BuildTargetConfig.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
-    <Compile Include="Project\Distribute\FTPDistributeStep.cs" />
     <Compile Include="Project\Distribute\IDistributeStep.cs" />
-    <Compile Include="Project\Distribute\SteamDistributeStep.cs" />
     <Compile Include="Project\Build\IBuildStep.cs" />
     <Compile Include="Pipeline\PipelineConfig.cs" />
     <Compile Include="Pipeline\PipelineRunner.cs" />

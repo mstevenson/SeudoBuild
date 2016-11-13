@@ -1,5 +1,6 @@
 ﻿using System;
-namespace SeudoBuild
+
+namespace SeudoBuild.Modules.FTPDistribute
 {
     public class FTPDistributeConfig : DistributeStepConfig
     {

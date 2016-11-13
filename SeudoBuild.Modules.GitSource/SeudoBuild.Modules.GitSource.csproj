@@ -42,6 +42,7 @@
     <Compile Include="GitSourceStep.cs" />
     <Compile Include="LFSFilter.cs" />
     <Compile Include="GitSourceConfigConverter.cs" />
+    <Compile Include="GitSourceModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

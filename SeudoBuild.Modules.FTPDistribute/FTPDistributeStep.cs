@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using System.Collections.Generic;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.FTPDistribute
 {
     public class FTPDistributeStep : IDistributeStep
     {

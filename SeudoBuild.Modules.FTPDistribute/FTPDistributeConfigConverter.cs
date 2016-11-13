@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.FTPDistribute
 {
-    public class DistributeStepConfigConverter : JsonConverter
+    public class EmailNotifyConfigConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -14,15 +14,10 @@ namespace SeudoBuild
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jobj = JObject.Load(reader);
-            //if (jobj["Type"].Value<string>() == "FTP Upload")
-            //    return jobj.ToObject<FTPDistributeConfig>(serializer);
-
-            if (jobj["Type"].Value<string>() == "SFTP Upload")
-                return jobj.ToObject<SFTPDistributeConfig>(serializer);
-
-            //if (jobj["Type"].Value<string>() == "Steam Upload")
-            //    return jobj.ToObject<SteamDistributeConfig>(serializer);
-            
+            if (jobj["Type"].Value<string>() == "FTP Upload")
+            {
+                return jobj.ToObject<FTPDistributeConfig>(serializer);
+            }
             return null;
         }
 
