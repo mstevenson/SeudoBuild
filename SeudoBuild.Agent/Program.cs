@@ -2,6 +2,7 @@
 using CommandLine;
 using CommandLine.Text;
 using System.IO;
+using System.Linq;
 
 namespace SeudoBuild.Agent
 {
@@ -74,20 +75,20 @@ namespace SeudoBuild.Agent
             object invokedVerbInstance = null;
             var options = new Options();
 
-            if (args.Length == 0)
-            {
-                string help = options.GetUsage();
-                Console.WriteLine(help);
-                return;
-            }
+            //if (args.Length == 0)
+            //{
+            //    string help = options.GetUsage();
+            //    Console.WriteLine(help);
+            //    return;
+            //}
 
-            var parseSuccess = Parser.Default.ParseArguments(args, options, (verb, subOptions) =>
-            {
-                // if parsing succeeds the verb name and correct instance
-                // will be passed to onVerbCommand delegate (string,object)
-                invokedVerb = verb;
-                invokedVerbInstance = subOptions;
-            });
+            //var parseSuccess = Parser.Default.ParseArguments(args, options, (verb, subOptions) =>
+            //{
+            //    // if parsing succeeds the verb name and correct instance
+            //    // will be passed to onVerbCommand delegate (string,object)
+            //    invokedVerb = verb;
+            //    invokedVerbInstance = subOptions;
+            //});
 
             //if (!parseSuccess)
             //{
@@ -95,8 +96,12 @@ namespace SeudoBuild.Agent
             //}
 
 
+            // Load pipeline modules
+
             ModuleLoader modules = new ModuleLoader();
-            modules.LoadAllAssemblies("./Modules"); 
+            modules.LoadAllAssemblies("./Modules");
+
+            PrintLoadedModules(modules);
 
 
             // Build locally
@@ -147,6 +152,31 @@ namespace SeudoBuild.Agent
                 var server = new BuildQueue();
                 server.Start();
             }
+        }
+
+        static void PrintLoadedModules(ModuleLoader modules)
+        {
+            BuildConsole.WriteLine("Loaded pipeline modules:");
+            BuildConsole.IndentLevel++;
+
+            string line = "";
+
+            line = "Source:      " + string.Join(", ", modules.sourceModules.Select(m => m.Name).ToArray());
+            BuildConsole.WritePlus(line);
+
+            line = "Build:       " + string.Join(", ", modules.buildModules.Select(m => m.Name).ToArray());
+            BuildConsole.WritePlus(line);
+
+            line = "Archive:     " + string.Join(", ", modules.archiveModules.Select(m => m.Name).ToArray());
+            BuildConsole.WritePlus(line);
+
+            line = "Distribute:  " + string.Join(", ", modules.distributeModules.Select(m => m.Name).ToArray());
+            BuildConsole.WritePlus(line);
+
+            line = "Notify:      " + string.Join(", ", modules.notifyModules.Select(m => m.Name).ToArray());
+            BuildConsole.WritePlus(line);
+
+            BuildConsole.IndentLevel--;
         }
     }
 }

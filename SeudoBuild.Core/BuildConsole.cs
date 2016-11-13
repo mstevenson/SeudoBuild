@@ -37,6 +37,12 @@ namespace SeudoBuild
             Console.WriteLine($"{indentString}• {value}");
         }
 
+        public static void WritePlus(string value)
+        {
+            Console.ResetColor();
+            Console.WriteLine($"{indentString}+ {value}");
+        }
+
         public static void WriteSuccess(string value)
         {
             ConsoleColor originalColor = Console.ForegroundColor;

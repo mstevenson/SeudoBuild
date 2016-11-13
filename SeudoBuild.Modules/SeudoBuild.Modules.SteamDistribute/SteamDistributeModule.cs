@@ -5,6 +5,8 @@ namespace SeudoBuild.Modules.SteamDistribute
 {
     public class SteamDistributeModule : IDistributeModule
     {
+        public string Name { get; } = "Steam";
+
         public Type StepType { get; } = typeof(SteamDistributeStep);
 
         public JsonConverter ConfigConverter { get; } = new SteamDistributeConfigConverter();

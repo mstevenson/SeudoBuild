@@ -10,13 +10,11 @@ namespace SeudoBuild
 
     public class ModuleLoader
     {
-        const string namespaceName = "SeudoBuild";
-
-        List<ISourceModule> sourceModules = new List<ISourceModule>();
-        List<IBuildModule> buildModules = new List<IBuildModule>();
-        List<IArchiveModule> archiveModules = new List<IArchiveModule>();
-        List<IDistributeModule> distributeModules = new List<IDistributeModule>();
-        List<INotifyModule> notifyModules = new List<INotifyModule>();
+        public List<ISourceModule> sourceModules = new List<ISourceModule>();
+        public List<IBuildModule> buildModules = new List<IBuildModule>();
+        public List<IArchiveModule> archiveModules = new List<IArchiveModule>();
+        public List<IDistributeModule> distributeModules = new List<IDistributeModule>();
+        public List<INotifyModule> notifyModules = new List<INotifyModule>();
 
         public void Load(string file)
         {
@@ -29,11 +27,11 @@ namespace SeudoBuild
                 return;
             }
 
-            Assembly assembly = null;
+            Assembly moduleAssembly = null;
 
             try
             {
-                assembly = Assembly.LoadFile(file);
+                moduleAssembly = Assembly.LoadFile(file);
             }
             catch (Exception e)
             {
@@ -41,50 +39,51 @@ namespace SeudoBuild
             }
 
             var moduleTypes = new List<Type>();
+
             try
             {
-                Type[] types = assembly.GetTypes();
-                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals(namespaceName));
                 foreach (string moduleInterfaceName in new string[] { nameof(ISourceModule), nameof(IBuildModule), nameof(IArchiveModule), nameof(IDistributeModule), nameof(INotifyModule) })
                 {
-                    Type targetType = coreAssembly.GetType($"{namespaceName}.{moduleInterfaceName}");
+                    Type[] types = moduleAssembly.GetTypes();
+                    Assembly core = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals($"SeudoBuild.Core"));
+
+                    Type targetType = core.GetType($"SeudoBuild.{moduleInterfaceName}");
                     foreach (var type in types)
                     {
                         if (targetType.IsAssignableFrom(type))
                         {
                             moduleTypes.Add(type);
-                            break;
                         }
                     }
+                }
 
-                    foreach (Type type in moduleTypes)
+                foreach (Type type in moduleTypes)
+                {
+                    object obj = Activator.CreateInstance(type);
+                    if (typeof(ISourceModule).IsAssignableFrom(type))
                     {
-                        object obj = Activator.CreateInstance(type);
-                        if (type is ISourceModule)
-                        {
-                            ISourceModule moduleInfo = (ISourceModule)obj;
-                            sourceModules.Add(moduleInfo);
-                        }
-                        else if (type is IBuildModule)
-                        {
-                            IBuildModule moduleInfo = (IBuildModule)obj;
-                            buildModules.Add(moduleInfo);
-                        }
-                        if (type is IArchiveModule)
-                        {
-                            IArchiveModule moduleInfo = (IArchiveModule)obj;
-                            archiveModules.Add(moduleInfo);
-                        }
-                        if (type is IDistributeModule)
-                        {
-                            IDistributeModule moduleInfo = (IDistributeModule)obj;
-                            distributeModules.Add(moduleInfo);
-                        }
-                        if (type is INotifyModule)
-                        {
-                            INotifyModule moduleInfo = (INotifyModule)obj;
-                            notifyModules.Add(moduleInfo);
-                        }
+                        ISourceModule moduleInfo = (ISourceModule)obj;
+                        sourceModules.Add(moduleInfo);
+                    }
+                    else if (typeof(IBuildModule).IsAssignableFrom(type))
+                    {
+                        IBuildModule moduleInfo = (IBuildModule)obj;
+                        buildModules.Add(moduleInfo);
+                    }
+                    if (typeof(IArchiveModule).IsAssignableFrom(type))
+                    {
+                        IArchiveModule moduleInfo = (IArchiveModule)obj;
+                        archiveModules.Add(moduleInfo);
+                    }
+                    if (typeof(IDistributeModule).IsAssignableFrom(type))
+                    {
+                        IDistributeModule moduleInfo = (IDistributeModule)obj;
+                        distributeModules.Add(moduleInfo);
+                    }
+                    if (typeof(INotifyModule).IsAssignableFrom(type))
+                    {
+                        INotifyModule moduleInfo = (INotifyModule)obj;
+                        notifyModules.Add(moduleInfo);
                     }
                 }
             }
