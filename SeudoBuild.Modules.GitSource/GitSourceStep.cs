@@ -5,7 +5,7 @@ using LibGit2Sharp.Handlers;
 using System.Diagnostics;
 
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.GitSource
 {
     public class GitSourceStep : ISourceStep
     {

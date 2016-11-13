@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using LibGit2Sharp;
 
-namespace SeudoBuild.VCS.Git
+namespace SeudoBuild.Modules.GitSource
 {
     public class LFSFilter : Filter
     {

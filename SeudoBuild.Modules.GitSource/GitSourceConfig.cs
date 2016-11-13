@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild
+﻿namespace SeudoBuild.Modules.GitSource
 {
     public class GitSourceConfig : SourceStepConfig
     {

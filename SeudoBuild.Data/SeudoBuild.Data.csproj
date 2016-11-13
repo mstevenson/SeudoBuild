@@ -51,7 +51,6 @@
     <Compile Include="Build\BuildStepConfigConverter.cs" />
     <Compile Include="Distribute\DistributeStepConfigConverter.cs" />
     <Compile Include="Notify\NotifyStepConfigConverter.cs" />
-    <Compile Include="Source\GitSourceConfig.cs" />
     <Compile Include="Source\SourceStepConfig.cs" />
     <Compile Include="Source\SourceStepConfigConverter.cs" />
   </ItemGroup>

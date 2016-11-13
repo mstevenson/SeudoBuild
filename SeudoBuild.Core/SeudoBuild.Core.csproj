@@ -1,5 +1,4 @@
 ﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -30,9 +29,6 @@
     <Reference Include="System" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="LibGit2Sharp">
-      <HintPath>..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
     </Reference>
     <Reference Include="Renci.SshNet">
       <HintPath>..\packages\SSH.NET.2016.0.0\lib\net40\Renci.SshNet.dll</HintPath>
@@ -81,9 +77,6 @@
     <Compile Include="Project\Source\ISourceStep.cs" />
     <Compile Include="Pipeline\SourceSequenceResults.cs" />
     <Compile Include="Pipeline\SourceStepResults.cs" />
-    <Compile Include="Project\Source\GitSourceStep.cs" />
-    <Compile Include="Project\Source\SourceStepBase.cs" />
-    <Compile Include="Project\Source\LFSFilter.cs" />
     <Compile Include="Modules\IArchiveModule.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Project\INotifyStep.cs" />

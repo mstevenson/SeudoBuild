@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.GitSource
 {
-    public class SourceStepConfigConverter : JsonConverter
+    public class GitSourceConfigConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -13,10 +13,11 @@ namespace SeudoBuild
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            //JObject jobj = JObject.Load(reader);
-            //if (jobj["Type"].Value<string>() == "Git")
-            //    return jobj.ToObject<GitSourceConfig>(serializer);
-
+            JObject jobj = JObject.Load(reader);
+            if (jobj["Type"].Value<string>() == "Git")
+            {
+                return jobj.ToObject<GitSourceConfig>(serializer);
+            }
             return null;
         }
 

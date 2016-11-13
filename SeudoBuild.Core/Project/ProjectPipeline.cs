@@ -1,12 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SeudoBuild.VCS;
-using SeudoBuild.VCS.Git;
-
-using System.IO;
-using LibGit2Sharp;
-using LibGit2Sharp.Handlers;
-using System.Diagnostics;
 
 namespace SeudoBuild
 {
