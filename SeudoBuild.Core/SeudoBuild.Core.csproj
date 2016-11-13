@@ -34,9 +34,6 @@
     <Reference Include="LibGit2Sharp">
       <HintPath>..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetZip">
-      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-    </Reference>
     <Reference Include="Renci.SshNet">
       <HintPath>..\packages\SSH.NET.2016.0.0\lib\net40\Renci.SshNet.dll</HintPath>
     </Reference>
@@ -49,15 +46,10 @@
     <Compile Include="Workspace.cs" />
     <Compile Include="Project\ProjectConfig.cs" />
     <Compile Include="Project\BuildTargetConfig.cs" />
-    <Compile Include="Project\Archive\FolderArchiveStep.cs" />
-    <Compile Include="Project\Archive\ZipArchiveStep.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
-    <Compile Include="Project\Archive\IArchiveStep.cs" />
-    <Compile Include="Project\Notify\EmailNotifyStep.cs" />
     <Compile Include="Project\Distribute\FTPDistributeStep.cs" />
     <Compile Include="Project\Distribute\IDistributeStep.cs" />
     <Compile Include="Project\Distribute\SteamDistributeStep.cs" />
-    <Compile Include="Project\Notify\INotifyStep.cs" />
     <Compile Include="Project\Build\IBuildStep.cs" />
     <Compile Include="Pipeline\PipelineConfig.cs" />
     <Compile Include="Pipeline\PipelineRunner.cs" />
@@ -92,6 +84,14 @@
     <Compile Include="Project\Source\GitSourceStep.cs" />
     <Compile Include="Project\Source\SourceStepBase.cs" />
     <Compile Include="Project\Source\LFSFilter.cs" />
+    <Compile Include="Modules\IArchiveModule.cs" />
+    <Compile Include="Modules\ModuleLoader.cs" />
+    <Compile Include="Project\INotifyStep.cs" />
+    <Compile Include="Project\IArchiveStep.cs" />
+    <Compile Include="Modules\INotifyModule.cs" />
+    <Compile Include="Modules\IBuildModule.cs" />
+    <Compile Include="Modules\ISourceModule.cs" />
+    <Compile Include="Modules\IDistributeModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -100,12 +100,11 @@
     <Folder Include="RunProcessAsTask\" />
     <Folder Include="Project\" />
     <Folder Include="Project\Distribute\" />
-    <Folder Include="Project\Archive\" />
     <Folder Include="Project\Build\" />
-    <Folder Include="Project\Notify\" />
     <Folder Include="Pipeline\" />
     <Folder Include="IO\" />
     <Folder Include="Project\Source\" />
+    <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">

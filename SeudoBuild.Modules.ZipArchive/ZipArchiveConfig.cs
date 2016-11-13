@@ -1,5 +1,4 @@
-﻿using System;
-namespace SeudoBuild
+﻿namespace SeudoBuild.Modules.ZipArchive
 {
     public class ZipArchiveConfig : ArchiveStepConfig
     {

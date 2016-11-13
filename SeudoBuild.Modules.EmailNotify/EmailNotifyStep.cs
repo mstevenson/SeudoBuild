@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Mail;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.EmailNotify
 {
     public class EmailNotifyStep : INotifyStep
     {

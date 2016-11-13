@@ -2,7 +2,7 @@
 using System.IO;
 using Ionic.Zip;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.ZipArchive
 {
     public class ZipArchiveStep : IArchiveStep
     {

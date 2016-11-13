@@ -24,10 +24,10 @@ namespace SeudoBuild
 
         public Workspace Workspace { get; private set; }
 
-        public static ProjectPipeline Create(string baseDirectory, ProjectConfig config, string buildTargetName)
+        public static ProjectPipeline Create(string baseDirectory, ProjectConfig config, string buildTargetName, ModuleLoader loader)
         {
             var pipeline = new ProjectPipeline(config, buildTargetName);
-            pipeline.Initialize(baseDirectory, buildTargetName);
+            pipeline.Initialize(baseDirectory, buildTargetName, loader);
             return pipeline;
         }
 
@@ -36,7 +36,7 @@ namespace SeudoBuild
             this.ProjectConfig = config;
         }
 
-        void Initialize(string projectsBaseDirectory, string buildTargetName)
+        void Initialize(string projectsBaseDirectory, string buildTargetName, ModuleLoader loader)
         {
             string projectNameSanitized = ProjectConfig.ProjectName.Replace(' ', '_');
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
@@ -49,11 +49,11 @@ namespace SeudoBuild
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 
             //VersionControlSystem = InitializeVersionControlSystem();
-            SourceSteps = GenerateSourceSteps();
-            BuildSteps = GenerateBuildSteps();
-            ArchiveSteps = GenerateArchiveSteps();
-            DistributeSteps = GenerateDistributeSteps();
-            NotifySteps = GenerateNotifySteps();
+            SourceSteps = GenerateSourceSteps(loader);
+            BuildSteps = GenerateBuildSteps(loader);
+            ArchiveSteps = GenerateArchiveSteps(loader);
+            DistributeSteps = GenerateDistributeSteps(loader);
+            NotifySteps = GenerateNotifySteps(loader);
         }
 
         BuildTargetConfig GetBuildTargetConfig(string targetName)
@@ -68,102 +68,57 @@ namespace SeudoBuild
             return null;
         }
 
-        //VersionControlSystem InitializeVersionControlSystem()
-        //{
-        //    if (TargetConfig.VCSConfiguration is GitVCSConfig)
-        //    {
-        //        var gitConfig = (GitVCSConfig)TargetConfig.VCSConfiguration;
-        //        var vcs = new GitVCS(Workspace, gitConfig);
-        //        return vcs;
-        //    }
-        //    throw new Exception("Could not identify VCS type from target configuration");
-        //}
-
-        List<ISourceStep> GenerateSourceSteps()
+        List<ISourceStep> GenerateSourceSteps(ModuleLoader loader)
         {
             var steps = new List<ISourceStep>();
             foreach (var stepConfig in TargetConfig.SourceSteps)
             {
-                if (stepConfig is GitSourceConfig)
-                {
-                    steps.Add(new GitSourceStep((GitSourceConfig)stepConfig, Workspace));
-                }
+                ISourceStep step = loader.CreateSourceStep(stepConfig);
+                steps.Add(step);
             }
             return steps;
         }
 
-        List<IBuildStep> GenerateBuildSteps()
+        List<IBuildStep> GenerateBuildSteps(ModuleLoader loader)
         {
             var steps = new List<IBuildStep>();
             foreach (var stepConfig in TargetConfig.BuildSteps)
             {
-                if (stepConfig is UnityStandardBuildConfig)
-                {
-                    steps.Add(new UnityStandardBuildStep((UnityStandardBuildConfig)stepConfig, Workspace));
-                }
-                if (stepConfig is UnityExecuteMethodBuildConfig)
-                {
-                    steps.Add(new UnityExecuteMethodBuildStep((UnityExecuteMethodBuildConfig)stepConfig, Workspace));
-                }
-                if (stepConfig is UnityParameterizedBuildConfig)
-                {
-                    steps.Add(new UnityParameterizedBuildStep((UnityParameterizedBuildConfig)stepConfig, Workspace));
-                }
-                else if (stepConfig is ShellBuildStepConfig)
-                {
-                    steps.Add(new ShellBuildStep((ShellBuildStepConfig)stepConfig, Workspace));
-                }
+                IBuildStep step = loader.CreateBuildStep(stepConfig);
+                steps.Add(step);
             }
             return steps;
         }
 
-        List<IArchiveStep> GenerateArchiveSteps()
+        List<IArchiveStep> GenerateArchiveSteps(ModuleLoader loader)
         {
             var steps = new List<IArchiveStep>();
             foreach (var stepConfig in TargetConfig.ArchiveSteps)
             {
-                if (stepConfig is ZipArchiveConfig)
-                {
-                    steps.Add(new ZipArchiveStep((ZipArchiveConfig)stepConfig));
-                }
-                else if (stepConfig is FolderArchiveConfig)
-                {
-                    steps.Add(new FolderArchiveStep((FolderArchiveConfig)stepConfig));
-                }
+                IArchiveStep archiveStep = loader.CreateArchiveStep(stepConfig);
+                steps.Add(archiveStep);
             }
             return steps;
         }
 
-        List<IDistributeStep> GenerateDistributeSteps()
+        List<IDistributeStep> GenerateDistributeSteps(ModuleLoader loader)
         {
             var steps = new List<IDistributeStep>();
             foreach (var stepConfig in TargetConfig.DistributeSteps)
             {
-                if (stepConfig is FTPDistributeConfig)
-                {
-                    steps.Add(new FTPDistributeStep((FTPDistributeConfig)stepConfig));
-                }
-                if (stepConfig is SFTPDistributeConfig)
-                {
-                    steps.Add(new SFTPDistributeStep((SFTPDistributeConfig)stepConfig));
-                }
-                else if (stepConfig is SteamDistributeConfig)
-                {
-                    steps.Add(new SteamDistributeStep((SteamDistributeConfig)stepConfig));
-                }
+                IDistributeStep step = loader.CreateDistributeStep(stepConfig);
+                steps.Add(step);
             }
             return steps;
         }
 
-        List<INotifyStep> GenerateNotifySteps()
+        List<INotifyStep> GenerateNotifySteps(ModuleLoader loader)
         {
             var steps = new List<INotifyStep>();
             foreach (var stepConfig in TargetConfig.NotifySteps)
             {
-                if (stepConfig is EmailNotifyConfig)
-                {
-                    steps.Add(new EmailNotifyStep((EmailNotifyConfig)stepConfig));
-                }
+                INotifyStep step = loader.CreateNotifyStep(stepConfig);
+                steps.Add(step);
             }
             return steps;
         }

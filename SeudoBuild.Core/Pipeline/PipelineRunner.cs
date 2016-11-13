@@ -35,6 +35,9 @@ namespace SeudoBuild
                 throw new ArgumentException("The specified build target could not be found in the project.", "buildTargetName");
             }
 
+            ModuleLoader loader = new ModuleLoader();
+            loader.LoadAll();
+
             Console.WriteLine("\nRunning SeudoBuild Pipeline:");
 
             BuildConsole.WriteLine($"Project: {projectConfig.ProjectName}");
@@ -42,7 +45,7 @@ namespace SeudoBuild
             Console.WriteLine("");
 
             // Setup pipeline
-            var pipeline = ProjectPipeline.Create(builderConfig.ProjectsPath, projectConfig, buildTargetName);
+            var pipeline = ProjectPipeline.Create(builderConfig.ProjectsPath, projectConfig, buildTargetName, loader);
             var replacements = pipeline.Workspace.Replacements;
             replacements["project_name"] = pipeline.ProjectConfig.ProjectName;
             replacements["build_target_name"] = pipeline.TargetConfig.TargetName;

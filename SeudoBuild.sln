@@ -9,6 +9,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Core.Tests", "Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Data", "SeudoBuild.Data\SeudoBuild.Data.csproj", "{01882F9A-84F7-494D-9604-633BAA622209}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{050C779A-572A-4685-B189-D0BABDAE5CD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ZipArchive", "SeudoBuild.Modules.ZipArchive\SeudoBuild.Modules.ZipArchive.csproj", "{73895975-FD53-407B-9F97-E6622BEB1049}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Archive", "Archive", "{43A74BC8-5A12-4697-81C2-6C1B7B3256C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.FolderArchive", "SeudoBuild.Modules.ZipArchive\SeudoBuild.Modules.FolderArchive\SeudoBuild.Modules.FolderArchive.csproj", "{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notify", "Notify", "{91192B40-56D1-4F58-BC60-1B41269AFB32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.EmailNotify", "SeudoBuild.Modules.EmailNotify\SeudoBuild.Modules.EmailNotify.csproj", "{D86370C6-FE1E-4677-8D42-9C861C01B47F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +43,18 @@ Global
 		{01882F9A-84F7-494D-9604-633BAA622209}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01882F9A-84F7-494D-9604-633BAA622209}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01882F9A-84F7-494D-9604-633BAA622209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73895975-FD53-407B-9F97-E6622BEB1049}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73895975-FD53-407B-9F97-E6622BEB1049}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73895975-FD53-407B-9F97-E6622BEB1049}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73895975-FD53-407B-9F97-E6622BEB1049}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D86370C6-FE1E-4677-8D42-9C861C01B47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D86370C6-FE1E-4677-8D42-9C861C01B47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D86370C6-FE1E-4677-8D42-9C861C01B47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D86370C6-FE1E-4677-8D42-9C861C01B47F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -62,5 +86,12 @@ Global
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{73895975-FD53-407B-9F97-E6622BEB1049} = {43A74BC8-5A12-4697-81C2-6C1B7B3256C8}
+		{43A74BC8-5A12-4697-81C2-6C1B7B3256C8} = {050C779A-572A-4685-B189-D0BABDAE5CD9}
+		{14BCE30B-B04C-4D41-8CBD-5898A5013EAA} = {43A74BC8-5A12-4697-81C2-6C1B7B3256C8}
+		{91192B40-56D1-4F58-BC60-1B41269AFB32} = {050C779A-572A-4685-B189-D0BABDAE5CD9}
+		{D86370C6-FE1E-4677-8D42-9C861C01B47F} = {91192B40-56D1-4F58-BC60-1B41269AFB32}
 	EndGlobalSection
 EndGlobal

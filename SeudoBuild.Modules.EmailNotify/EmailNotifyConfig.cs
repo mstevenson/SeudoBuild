@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild
+﻿namespace SeudoBuild.Modules.EmailNotify
 {
     public class EmailNotifyConfig : NotifyStepConfig
     {

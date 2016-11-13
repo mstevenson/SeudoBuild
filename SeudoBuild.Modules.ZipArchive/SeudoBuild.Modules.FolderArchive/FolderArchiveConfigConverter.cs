@@ -2,21 +2,22 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.ZipArchive
 {
-    public class NotifyStepConfigConverter : JsonConverter
+    public class FolderArchiveConfigConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(NotifyStepConfig));
+            return (objectType == typeof(ArchiveStepConfig));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            //JObject jobj = JObject.Load(reader);
-            //if (jobj["Type"].Value<string>() == "Email Notification")
-            //    return jobj.ToObject<EmailNotifyConfig>(serializer);
-            
+            JObject jobj = JObject.Load(reader);
+            if (jobj["Type"].Value<string>() == "Folder")
+            {
+                return jobj.ToObject<FolderArchiveConfig>(serializer);
+            }
             return null;
         }
 

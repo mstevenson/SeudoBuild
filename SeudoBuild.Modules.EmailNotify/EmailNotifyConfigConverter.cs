@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.EmailNotify
 {
-    public class NotifyStepConfigConverter : JsonConverter
+    public class EmailNotifyConfigConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -13,10 +13,11 @@ namespace SeudoBuild
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            //JObject jobj = JObject.Load(reader);
-            //if (jobj["Type"].Value<string>() == "Email Notification")
-            //    return jobj.ToObject<EmailNotifyConfig>(serializer);
-            
+            JObject jobj = JObject.Load(reader);
+            if (jobj["Type"].Value<string>() == "Email Notification")
+            {
+                return jobj.ToObject<EmailNotifyConfig>(serializer);
+            }
             return null;
         }
 
