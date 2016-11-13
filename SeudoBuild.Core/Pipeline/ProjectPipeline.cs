@@ -42,11 +42,11 @@ namespace SeudoBuild
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 
             //VersionControlSystem = InitializeVersionControlSystem();
-            SourceSteps = GenerateSourceSteps(loader);
-            BuildSteps = GenerateBuildSteps(loader);
-            ArchiveSteps = GenerateArchiveSteps(loader);
-            DistributeSteps = GenerateDistributeSteps(loader);
-            NotifySteps = GenerateNotifySteps(loader);
+            SourceSteps = GetPipelineSteps<ISourceStep>(loader);
+            BuildSteps = GetPipelineSteps<IBuildStep>(loader);
+            ArchiveSteps = GetPipelineSteps<IArchiveStep>(loader);
+            DistributeSteps = GetPipelineSteps<IDistributeStep>(loader);
+            NotifySteps = GetPipelineSteps<INotifyStep>(loader);
         }
 
         BuildTargetConfig GetBuildTargetConfig(string targetName)
@@ -61,56 +61,13 @@ namespace SeudoBuild
             return null;
         }
 
-        List<ISourceStep> GenerateSourceSteps(ModuleLoader loader)
+        List<T> GetPipelineSteps<T>(ModuleLoader loader)
+            where T : IPipelineStep
         {
-            var steps = new List<ISourceStep>();
+            var steps = new List<T>();
             foreach (var stepConfig in TargetConfig.SourceSteps)
             {
-                ISourceStep step = loader.CreateSourceStep(stepConfig);
-                steps.Add(step);
-            }
-            return steps;
-        }
-
-        List<IBuildStep> GenerateBuildSteps(ModuleLoader loader)
-        {
-            var steps = new List<IBuildStep>();
-            foreach (var stepConfig in TargetConfig.BuildSteps)
-            {
-                IBuildStep step = loader.CreateBuildStep(stepConfig);
-                steps.Add(step);
-            }
-            return steps;
-        }
-
-        List<IArchiveStep> GenerateArchiveSteps(ModuleLoader loader)
-        {
-            var steps = new List<IArchiveStep>();
-            foreach (var stepConfig in TargetConfig.ArchiveSteps)
-            {
-                IArchiveStep archiveStep = loader.CreateArchiveStep(stepConfig);
-                steps.Add(archiveStep);
-            }
-            return steps;
-        }
-
-        List<IDistributeStep> GenerateDistributeSteps(ModuleLoader loader)
-        {
-            var steps = new List<IDistributeStep>();
-            foreach (var stepConfig in TargetConfig.DistributeSteps)
-            {
-                IDistributeStep step = loader.CreateDistributeStep(stepConfig);
-                steps.Add(step);
-            }
-            return steps;
-        }
-
-        List<INotifyStep> GenerateNotifySteps(ModuleLoader loader)
-        {
-            var steps = new List<INotifyStep>();
-            foreach (var stepConfig in TargetConfig.NotifySteps)
-            {
-                INotifyStep step = loader.CreateNotifyStep(stepConfig);
+                T step = loader.CreatePipelineStep<T>(stepConfig);
                 steps.Add(step);
             }
             return steps;

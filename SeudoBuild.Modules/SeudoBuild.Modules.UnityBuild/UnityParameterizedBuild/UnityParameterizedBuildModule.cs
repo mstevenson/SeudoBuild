@@ -6,11 +6,11 @@ namespace SeudoBuild.Modules.UnityBuild
 {
     public class UnityParameterizedBuildModule : IBuildModule
     {
-        public Type ArchiveStepType { get; } = typeof(UnityParameterizedBuildStep);
+        public Type StepType { get; } = typeof(UnityParameterizedBuildStep);
 
         public JsonConverter ConfigConverter { get; } = new UnityBuildConverter();
 
-        public bool MatchesConfigType(BuildStepConfig config)
+        public bool MatchesConfigType(StepConfig config)
         {
             return config is UnityParameterizedBuildConfig;
         }

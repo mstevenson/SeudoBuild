@@ -6,11 +6,11 @@ namespace SeudoBuild.Modules.SFTPDistribute
 {
     public class SFTPDistributeModule : IDistributeModule
     {
-        public Type ArchiveStepType { get; } = typeof(SFTPDistributeStep);
+        public Type StepType { get; } = typeof(SFTPDistributeStep);
 
         public JsonConverter ConfigConverter { get; } = new SFTPDistributeConfigConverter();
 
-        public bool MatchesConfigType(DistributeStepConfig config)
+        public bool MatchesConfigType(StepConfig config)
         {
             return config is SFTPDistributeConfig;
         }

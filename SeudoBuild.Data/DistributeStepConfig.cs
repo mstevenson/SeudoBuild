@@ -1,10 +1,8 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public abstract class DistributeStepConfig
+    public abstract class DistributeStepConfig : StepConfig
     {
-        public abstract string Type { get; }
-
         /// <summary>
         /// The name of the archive to distribute.
         /// </summary>

@@ -6,11 +6,11 @@ namespace SeudoBuild.Modules.SteamDistribute
 {
     public class SteamDistributeModule : IDistributeModule
     {
-        public Type ArchiveStepType { get; } = typeof(SteamDistributeStep);
+        public Type StepType { get; } = typeof(SteamDistributeStep);
 
         public JsonConverter ConfigConverter { get; } = new SteamDistributeConfigConverter();
 
-        public bool MatchesConfigType(DistributeStepConfig config)
+        public bool MatchesConfigType(StepConfig config)
         {
             return config is SteamDistributeConfig;
         }

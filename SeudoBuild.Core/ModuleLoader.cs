@@ -121,42 +121,17 @@ namespace SeudoBuild
             //}
         }
 
-        public ISourceStep CreateSourceStep(SourceStepConfig config)
-        {
-            // TODO
-            return default(ISourceStep);
-        }
-
-        public IBuildStep CreateBuildStep(BuildStepConfig config)
-        {
-            // TODO
-            return default(IBuildStep);
-        }
-
-        public IArchiveStep CreateArchiveStep(ArchiveStepConfig config)
+        public T CreatePipelineStep<T>(StepConfig config)
+            where T : IPipelineStep
         {
             foreach (var module in archiveModules)
             {
                 if (module.MatchesConfigType(config))
                 {
-                    Activator.CreateInstance(module.ArchiveStepType, config);
+                    Activator.CreateInstance(module.StepType, config);
                 }
             }
-
-            // TODO use Activator to create an archive step
-            return default(IArchiveStep);
-        }
-
-        public IDistributeStep CreateDistributeStep(DistributeStepConfig config)
-        {
-            // TODO
-            return default(IDistributeStep);
-        }
-
-        public INotifyStep CreateNotifyStep(NotifyStepConfig config)
-        {
-            // TODO
-            return default(INotifyStep);
+            return default(T);
         }
     }
 }

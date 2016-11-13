@@ -6,11 +6,11 @@ namespace SeudoBuild.Modules.EmailNotify
 {
     public class EmailNotifyModule : INotifyModule
     {
-        public Type ArchiveStepType { get; } = typeof(EmailNotifyStep);
+        public Type StepType { get; } = typeof(EmailNotifyStep);
 
         public JsonConverter ConfigConverter { get; } = new EmailNotifyConfigConverter();
 
-        public bool MatchesConfigType(NotifyStepConfig config)
+        public bool MatchesConfigType(StepConfig config)
         {
             return config is EmailNotifyConfig;
         }

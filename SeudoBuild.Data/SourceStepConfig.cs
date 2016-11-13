@@ -1,7 +1,6 @@
 ﻿namespace SeudoBuild
 {
-    public abstract class SourceStepConfig
+    public abstract class SourceStepConfig : StepConfig
     {
-        public abstract string Type { get; }
     }
 }

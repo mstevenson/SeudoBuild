@@ -6,11 +6,11 @@ namespace SeudoBuild.Modules.ZipArchive
 {
     public class FolderArchiveModule : IArchiveModule
     {
-        public Type ArchiveStepType { get; } = typeof(FolderArchiveStep);
+        public Type StepType { get; } = typeof(FolderArchiveStep);
 
         public JsonConverter ConfigConverter { get; } = new FolderArchiveConfigConverter();
 
-        public bool MatchesConfigType(ArchiveStepConfig config)
+        public bool MatchesConfigType(StepConfig config)
         {
             return config is FolderArchiveConfig;
         }

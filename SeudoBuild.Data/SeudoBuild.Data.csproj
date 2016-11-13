@@ -51,6 +51,8 @@
     <Compile Include="Modules\IDistributeModule.cs" />
     <Compile Include="Modules\INotifyModule.cs" />
     <Compile Include="Modules\ISourceModule.cs" />
+    <Compile Include="Modules\IModule.cs" />
+    <Compile Include="StepConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

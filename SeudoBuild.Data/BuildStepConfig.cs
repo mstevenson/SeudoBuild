@@ -1,9 +1,7 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public abstract class BuildStepConfig
+    public abstract class BuildStepConfig : StepConfig
     {
-        public abstract string Type { get; }
-        public string Id { get; }
     }
 }

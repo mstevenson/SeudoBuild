@@ -3,10 +3,7 @@ using Newtonsoft.Json;
 
 namespace SeudoBuild.Data
 {
-    public interface INotifyModule
+    public interface INotifyModule : IModule
     {
-        Type ArchiveStepType { get; }
-        JsonConverter ConfigConverter { get; }
-        bool MatchesConfigType(NotifyStepConfig config);
     }
 }
