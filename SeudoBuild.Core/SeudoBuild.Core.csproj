@@ -34,23 +34,12 @@
     <Compile Include="RunProcessAsTask\ProcessEx.overloads.cs" />
     <Compile Include="RunProcessAsTask\ProcessResults.cs" />
     <Compile Include="Workspace.cs" />
-    <Compile Include="Project\ProjectConfig.cs" />
-    <Compile Include="Project\BuildTargetConfig.cs" />
-    <Compile Include="Project\ProjectPipeline.cs" />
     <Compile Include="Pipeline\PipelineConfig.cs" />
     <Compile Include="Pipeline\PipelineRunner.cs" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="Macros.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\IFileSystem.cs" />
-    <Compile Include="Pipeline\PipelineSequenceResults.cs" />
-    <Compile Include="Pipeline\IPipelineStep.cs" />
-    <Compile Include="Pipeline\PipelineStepResults.cs" />
-    <Compile Include="Project\INotifyStep.cs" />
-    <Compile Include="Project\IArchiveStep.cs" />
-    <Compile Include="Project\IDistributeStep.cs" />
-    <Compile Include="Project\ISourceStep.cs" />
-    <Compile Include="Project\IBuildStep.cs" />
     <Compile Include="ModuleLoader.cs" />
     <Compile Include="Pipeline\Results\ArchiveSequenceResults.cs" />
     <Compile Include="Pipeline\Results\ArchiveStepResults.cs" />
@@ -63,13 +52,24 @@
     <Compile Include="Pipeline\Results\SourceStepResults.cs" />
     <Compile Include="Pipeline\Results\NotifySequenceResults.cs" />
     <Compile Include="Pipeline\Results\NotifyStepResults.cs" />
+    <Compile Include="Pipeline\Steps\IArchiveStep.cs" />
+    <Compile Include="Pipeline\Steps\IBuildStep.cs" />
+    <Compile Include="Pipeline\Steps\IDistributeStep.cs" />
+    <Compile Include="Pipeline\Steps\INotifyStep.cs" />
+    <Compile Include="Pipeline\Steps\ISourceStep.cs" />
+    <Compile Include="Pipeline\Steps\IPipelineStep.cs" />
+    <Compile Include="Pipeline\Results\PipelineSequenceResults.cs" />
+    <Compile Include="Pipeline\Results\PipelineStepResults.cs" />
+    <Compile Include="Pipeline\ProjectPipeline.cs" />
+    <Compile Include="Pipeline\ProjectConfig.cs" />
+    <Compile Include="Pipeline\BuildTargetConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />
-    <Folder Include="Project\" />
     <Folder Include="Pipeline\" />
     <Folder Include="IO\" />
     <Folder Include="Pipeline\Results\" />
+    <Folder Include="Pipeline\Steps\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
