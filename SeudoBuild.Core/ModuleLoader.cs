@@ -10,6 +10,8 @@ namespace SeudoBuild
 
     public class ModuleLoader
     {
+        const string namespaceName = "SeudoBuild";
+
         List<ISourceModule> sourceModules = new List<ISourceModule>();
         List<IBuildModule> buildModules = new List<IBuildModule>();
         List<IArchiveModule> archiveModules = new List<IArchiveModule>();
@@ -42,10 +44,10 @@ namespace SeudoBuild
             try
             {
                 Type[] types = assembly.GetTypes();
-                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals("SeudoBuild"));
+                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals(namespaceName));
                 foreach (string moduleInterfaceName in new string[] { nameof(ISourceModule), nameof(IBuildModule), nameof(IArchiveModule), nameof(IDistributeModule), nameof(INotifyModule) })
                 {
-                    Type targetType = coreAssembly.GetType($"SeudoBuild.{moduleInterfaceName}");
+                    Type targetType = coreAssembly.GetType($"{namespaceName}.{moduleInterfaceName}");
                     foreach (var type in types)
                     {
                         if (targetType.IsAssignableFrom(type))
@@ -92,32 +94,18 @@ namespace SeudoBuild
             }
         }
 
-        public void LoadAll()
+        public void LoadAllAssemblies(string modulesFolder)
         {
-            string[] files = Directory.GetFiles("./Modules/", "*.dll");
-            foreach (var s in files)
+            string[] moduleDirs = Directory.GetDirectories(modulesFolder);
+            foreach (var dir in moduleDirs)
             {
-                string path = Path.Combine(Environment.CurrentDirectory, s);
-                Load(path);
+                string[] files = Directory.GetFiles(dir, "*.dll");
+                foreach (var s in files)
+                {
+                    string path = Path.Combine(Environment.CurrentDirectory, s);
+                    Load(path);
+                }
             }
-
-            //for (int i = 0; i < modules.Count; i++)
-            //{
-            //    IModule p = modules.ElementAt(i);
-            //    try
-            //    {
-            //        if (!p.OnAllLoaded())
-            //        {
-            //            modules.RemoveAt(i);
-            //            --i;
-            //        }
-            //    }
-            //    catch (Exception)
-            //    {
-            //        modules.RemoveAt(i);
-            //        --i;
-            //    }
-            //}
         }
 
         public T CreatePipelineStep<T>(StepConfig config)

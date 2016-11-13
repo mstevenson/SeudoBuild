@@ -94,6 +94,11 @@ namespace SeudoBuild.Agent
             //    Environment.Exit(Parser.DefaultExitCodeFail);
             //}
 
+
+            ModuleLoader modules = new ModuleLoader();
+            modules.LoadAllAssemblies("./Modules"); 
+
+
             // Build locally
             if (invokedVerb == "build")
             {
@@ -119,9 +124,11 @@ namespace SeudoBuild.Agent
                         // Config file's directory
                         outputPath = new FileInfo(options.BuildVerb.ProjectConfigPath).Directory.FullName;
                     }
+
                     PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
+
                     PipelineRunner builder = new PipelineRunner(builderConfig);
-                    builder.ExecutePipeline(projectConfig, options.BuildVerb.BuildTarget);
+                    builder.ExecutePipeline(projectConfig, options.BuildVerb.BuildTarget, modules);
                 }
             }
 
@@ -134,9 +141,9 @@ namespace SeudoBuild.Agent
             }
 
             // Listen for jobs on the network
-            else if (invokedVerb == "listen")
+            else if (invokedVerb == "queue")
             {
-                var listenSubOptions = (QueueSubOptions)invokedVerbInstance;
+                var queueSubOptions = (QueueSubOptions)invokedVerbInstance;
                 var server = new BuildQueue();
                 server.Start();
             }
