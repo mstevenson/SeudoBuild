@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.ShellBuild
 {
     /// <summary>
     /// Executes an arbitrary shell script as part of a build process.

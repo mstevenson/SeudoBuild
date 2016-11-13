@@ -2,27 +2,22 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.ShellBuild
 {
-    public class DistributeStepConfigConverter : JsonConverter
+    public class ShellBuildConfigConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(DistributeStepConfig));
+            return (objectType == typeof(BuildStepConfig));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jobj = JObject.Load(reader);
-            //if (jobj["Type"].Value<string>() == "FTP Upload")
-            //    return jobj.ToObject<FTPDistributeConfig>(serializer);
-
-            //if (jobj["Type"].Value<string>() == "SFTP Upload")
-            //    return jobj.ToObject<SFTPDistributeConfig>(serializer);
-
-            //if (jobj["Type"].Value<string>() == "Steam Upload")
-            //    return jobj.ToObject<SteamDistributeConfig>(serializer);
-            
+            if (jobj["Type"].Value<string>() == "FTP Upload")
+            {
+                return jobj.ToObject<ShellBuildStepConfig>(serializer);
+            }
             return null;
         }
 

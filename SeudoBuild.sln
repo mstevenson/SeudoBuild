@@ -31,6 +31,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.FTPDistr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SteamDistribute", "SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.SteamDistribute\SeudoBuild.Modules.SteamDistribute.csproj", "{6096B113-5817-4CE8-843C-CF5CBA64D655}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SFTPDistribute", "SeudoBuild.Modules.FTPDistribute\SeudoBuild.Modules.SFTPDistribute\SeudoBuild.Modules.SFTPDistribute.csproj", "{6E953097-7C24-40D6-8E18-2AF54E32F512}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{AF420A05-83DA-4134-8341-039265759DBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ShellBuild", "SeudoBuild.Modules.ShellBuild\SeudoBuild.Modules.ShellBuild.csproj", "{60677416-FC65-4780-84DC-A1B77DF2DFC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +83,14 @@ Global
 		{6096B113-5817-4CE8-843C-CF5CBA64D655}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6096B113-5817-4CE8-843C-CF5CBA64D655}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6096B113-5817-4CE8-843C-CF5CBA64D655}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E953097-7C24-40D6-8E18-2AF54E32F512}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E953097-7C24-40D6-8E18-2AF54E32F512}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E953097-7C24-40D6-8E18-2AF54E32F512}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E953097-7C24-40D6-8E18-2AF54E32F512}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60677416-FC65-4780-84DC-A1B77DF2DFC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60677416-FC65-4780-84DC-A1B77DF2DFC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60677416-FC65-4780-84DC-A1B77DF2DFC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60677416-FC65-4780-84DC-A1B77DF2DFC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -120,5 +134,8 @@ Global
 		{61FB7240-8334-4295-B040-19C9565E4B26} = {050C779A-572A-4685-B189-D0BABDAE5CD9}
 		{12283418-7700-4402-82F0-AF8567DD80B9} = {61FB7240-8334-4295-B040-19C9565E4B26}
 		{6096B113-5817-4CE8-843C-CF5CBA64D655} = {61FB7240-8334-4295-B040-19C9565E4B26}
+		{6E953097-7C24-40D6-8E18-2AF54E32F512} = {61FB7240-8334-4295-B040-19C9565E4B26}
+		{AF420A05-83DA-4134-8341-039265759DBC} = {050C779A-572A-4685-B189-D0BABDAE5CD9}
+		{60677416-FC65-4780-84DC-A1B77DF2DFC1} = {AF420A05-83DA-4134-8341-039265759DBC}
 	EndGlobalSection
 EndGlobal

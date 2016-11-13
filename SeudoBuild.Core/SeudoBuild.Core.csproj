@@ -43,7 +43,6 @@
     <Compile Include="Project\ProjectConfig.cs" />
     <Compile Include="Project\BuildTargetConfig.cs" />
     <Compile Include="Project\ProjectPipeline.cs" />
-    <Compile Include="Project\Distribute\IDistributeStep.cs" />
     <Compile Include="Project\Build\IBuildStep.cs" />
     <Compile Include="Pipeline\PipelineConfig.cs" />
     <Compile Include="Pipeline\PipelineRunner.cs" />
@@ -53,9 +52,7 @@
     <Compile Include="BuildConsole.cs" />
     <Compile Include="TextReplacements.cs" />
     <Compile Include="Serializer.cs" />
-    <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
     <Compile Include="Pipeline\BuildCompletionStatus.cs" />
-    <Compile Include="Project\Build\ShellBuildStep.cs" />
     <Compile Include="Project\Build\UnityBuildStep.cs" />
     <Compile Include="Project\Build\UnityExecuteMethodBuildStep.cs" />
     <Compile Include="Project\Build\UnityParameterizedBuildStep.cs" />
@@ -83,6 +80,7 @@
     <Compile Include="Modules\IBuildModule.cs" />
     <Compile Include="Modules\ISourceModule.cs" />
     <Compile Include="Modules\IDistributeModule.cs" />
+    <Compile Include="Project\IDistributeStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

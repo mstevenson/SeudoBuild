@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
-namespace SeudoBuild
+namespace SeudoBuild.Modules.SFTPDistribute
 {
     public class SFTPDistributeStep : IDistributeStep
     {
