@@ -73,7 +73,6 @@
     <Compile Include="TextReplacements.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Project\Distribute\SFTPDistributeStep.cs" />
-    <Compile Include="Build\BuildResult.cs" />
     <Compile Include="Build\BuildCompletionStatus.cs" />
     <Compile Include="Build\VCSResults.cs" />
     <Compile Include="VersionControl\VCSConfigConverter.cs" />

@@ -23,7 +23,10 @@ namespace SeudoBuild
 
         public string Type { get; } = "Shell Script";
 
-        public BuildResult Execute()
+
+        // FIXME change from BuildResult to BuildStepResults
+
+        public BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace)
         {
             // Replace variables in string that begin and end with the % character
             var command = workspace.Replacements.ReplaceVariablesInText(config.Command);
@@ -54,18 +57,21 @@ namespace SeudoBuild
             process.WaitForExit();
             System.Console.ResetColor();
 
-            var buildResult = new BuildResult();
+            // FIXME fill in more build step result properties?
+
+            var buildStepResult = new BuildStepResults();
             int exitCode = process.ExitCode;
             if (exitCode == 0)
             {
-                buildResult.Status = BuildCompletionStatus.Completed;
+                buildStepResult.IsSuccess = true;
+                buildStepResult.Exception = new System.Exception("Build process exited abnoramlly");
             }
             else
             {
-                buildResult.Status = BuildCompletionStatus.Faulted;
+                buildStepResult.IsSuccess = false;
             }
 
-            return buildResult;
+            return buildStepResult;
         }
     }
 }

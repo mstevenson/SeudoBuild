@@ -19,10 +19,10 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Unity Parameterized Build";
 
-        public override BuildResult Execute()
+        public override BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace)
         {
             // TODO
-            return new BuildResult { Status = BuildCompletionStatus.Faulted };
+            return null;
         }
 
         Task<ProcessResults> Run(UnityInstallation unity, UnityParameterizedBuildConfig config, Workspace workspace)

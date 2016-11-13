@@ -2,10 +2,8 @@
 
 namespace SeudoBuild
 {
-    public class VCSResults
+    public class VCSResults : PipelineSequenceResults
     {
-        public bool Success { get; set; }
-        public Exception Exception { get; set; }
         public string CurrentCommitIdentifier { get; set; }
     }
 }

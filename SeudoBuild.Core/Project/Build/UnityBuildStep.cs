@@ -11,9 +11,9 @@ namespace SeudoBuild
     {
         public abstract string Type { get; }
 
-        public abstract BuildResult Execute();
+        public abstract BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace);
 
-        protected BuildResult ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace)
+        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace)
         {
             BuildConsole.WriteLine($"Building with Unity {unityInstallation.Version}");
 
@@ -64,14 +64,15 @@ namespace SeudoBuild
                 writer.Close();
             }
 
-            var buildResult = new BuildResult();
+            var buildResult = new BuildStepResults();
             if (unityProcess.ExitCode == 0)
             {
-                buildResult.Status = BuildCompletionStatus.Completed;
+                buildResult.IsSuccess = true;
             }
             else
             {
-                buildResult.Status = BuildCompletionStatus.Faulted;
+                buildResult.IsSuccess = false;
+                buildResult.Exception = new Exception("Build process exited abnormally");
             }
 
             return buildResult;

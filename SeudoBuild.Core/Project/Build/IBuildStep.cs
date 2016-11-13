@@ -1,9 +1,7 @@
 ﻿using System;
 namespace SeudoBuild
 {
-    public interface IBuildStep
+    public interface IBuildStep : IPipelineStep<VCSResults, BuildSequenceResults, BuildStepResults>
     {
-        string Type { get; }
-        BuildResult Execute();
     }
 }

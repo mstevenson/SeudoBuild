@@ -84,6 +84,11 @@ namespace SeudoBuild
 
         public string ProcessLogLine(string line)
         {
+            if (line == null)
+            {
+                return null;
+            }
+
             foreach (var match in universalMatches)
             {
                 if (line.Contains(match.text))

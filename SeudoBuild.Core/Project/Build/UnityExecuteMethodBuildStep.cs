@@ -14,7 +14,7 @@ namespace SeudoBuild
 
         public override string Type { get; } = "Unity Execute Method";
 
-        public override BuildResult Execute()
+        public override BuildStepResults ExecuteStep(VCSResults vcsResults, Workspace workspace)
         {
             // FIXME don't hard-code
 

@@ -41,24 +41,28 @@ namespace SeudoBuild
             BuildConsole.WriteLine($"Target:  {buildTargetName}");
             BuildConsole.WriteLine("");
 
-            // Setup pipelin
+            // Setup pipeline
             var pipeline = ProjectPipeline.Create(builderConfig.ProjectsPath, projectConfig, buildTargetName);
             var replacements = pipeline.Workspace.Replacements;
+            replacements["project_name"] = pipeline.ProjectConfig.ProjectName;
+            replacements["build_target_name"] = pipeline.TargetConfig.TargetName;
+            replacements["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+
+            // TODO
+            replacements["app_version"] = pipeline.TargetConfig.ToString();
+
+            // Clean
+            pipeline.Workspace.CleanBuildOutputDirectory();
 
             // Grab changes from version control system
             VCSResults vcsResults = UpdateWorkingCopy(pipeline);
+            replacements["commit_identifier"] = vcsResults.CurrentCommitIdentifier;
 
             // Build
-            BuildSequenceResults buildResults = Build(vcsResults, pipeline);
+            BuildSequenceResults buildResults = ExecuteSequence("Build", pipeline.BuildSteps, vcsResults, pipeline.Workspace);
             BuildStepResults step = buildResults.StepResults[0];
-            replacements["project_name"] = step.ProjectName;
-            replacements["build_target_name"] = step.BuildTargetName;
-            replacements["app_version"] = step.AppVersion.ToString ();
-            replacements["build_date"] = step.BuildDate.ToString("yyyy-dd-M--HH-mm-ss");
-            replacements["commit_identifier"] = step.CommitIdentifier;
 
             // Archive
-            //var archiveResults = Archive(buildResults, pipeline);
             var archiveResults = ExecuteSequence("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
 
             // Distribute
@@ -95,103 +99,75 @@ namespace SeudoBuild
             }
             catch (Exception e)
             {
-                results.Success = false;
+                results.IsSuccess = false;
                 results.Exception = e;
             }
 
             results.CurrentCommitIdentifier = vcs.CurrentCommit;
-            results.Success = true;
+            results.IsSuccess = true;
             return results;
         }
 
-        BuildSequenceResults Build(VCSResults vcsResults, ProjectPipeline pipeline)
+        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
+            where TInSeq : PipelineSequenceResults // previous sequence results
+            where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
+            where TOutStep : PipelineStepResults, new() // current step results
         {
             BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteBullet("Build");
-            BuildConsole.IndentLevel = 1;
+            BuildConsole.WriteBullet(sequenceName);
+            BuildConsole.IndentLevel++;
 
-            BuildSequenceResults results = new BuildSequenceResults();
+            // Pipeline sequence result
+            var results = new TOutSeq();
 
-            if (!vcsResults.Success)
+            if (!previousSequence.IsSuccess)
             {
                 BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
                 results.IsSuccess = false;
-                results.Exception = new Exception($"Skipped build sequence, VCS update failed.");
+                results.Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.");
                 return results;
             }
 
-            // Bail if nothing to build
-            if (pipeline.BuildSteps.Count == 0)
-            {
-                BuildConsole.WriteAlert("No build steps");
-                //return new BuildStepResults { Status = BuildCompletionStatus.Faulted };
-                results.IsSuccess = false;
-                results.Exception = new Exception("No build steps.");
-                return results;
-            }
-
-            bool isFaulted = false;
-
-            // Delete all files in the build output directory
-            pipeline.Workspace.CleanBuildOutputDirectory();
-
-            // TODO add app version
-            var stepResults = new BuildStepResults
-            {
-                BuildDate = DateTime.Now,
-                ProjectName = pipeline.ProjectConfig.ProjectName,
-                BuildTargetName = pipeline.TargetConfig.TargetName,
-                CommitIdentifier = vcsResults.CurrentCommitIdentifier,
-                //Status = BuildCompletionStatus.Running
-            };
-
-            results.StepResults.Add(stepResults);
+            int stepIndex = -1;
+            IPipelineStep<TInSeq, TOutSeq, TOutStep> currentStep = null;
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            IBuildStep currentStep = null;
-            int stepIndex = 0;
 
-            // Build
-            foreach (var step in pipeline.BuildSteps)
+            foreach (var step in sequenceSteps)
             {
                 stepIndex++;
                 currentStep = step;
-                BuildConsole.WriteBullet($"{step.Type} (step {stepIndex}/{pipeline.BuildSteps.Count})");
-                BuildConsole.IndentLevel++;
 
-                var stepResult = step.Execute();
+                BuildConsole.WriteBullet(step.Type);
 
-                BuildConsole.IndentLevel--;
-                if (stepResult.Status == BuildCompletionStatus.Faulted)
+                var stepResult = step.ExecuteStep(previousSequence, workspace);
+                results.StepResults.Add(stepResult);
+                if (!stepResult.IsSuccess)
                 {
-                    isFaulted = true;
-                    //buildInfo.Status = BuildCompletionStatus.Faulted;
+                    results.IsSuccess = false;
+                    results.Exception = stepResult.Exception;
+                    string error = $"{sequenceName} sequence failed on step {stepIndex} ({currentStep.Type})";
+                    BuildConsole.WriteFailure(error);
                     break;
                 }
             }
 
             stopwatch.Stop();
-            stepResults.BuildDuration = stopwatch.Elapsed;
+            results.Duration = stopwatch.Elapsed;
 
-            if (!isFaulted)
+            if (stepIndex == 0)
             {
-                //buildInfo.Status = BuildCompletionStatus.Completed;
-                results.IsSuccess = true;
-                BuildConsole.WriteSuccess("Build steps completed in " + stepResults.BuildDuration.ToString(@"hh\:mm\:ss"));
-            }
-            else
-            {
+                BuildConsole.WriteAlert($"No {sequenceName} steps.");
                 results.IsSuccess = false;
-                string error = $"Build failed on step {stepIndex} ({currentStep.Type})";
-                results.Exception = new Exception(error);
-                BuildConsole.WriteFailure(error);
+                results.Exception = new Exception($"No {sequenceName} steps.");
+                return results;
             }
 
             return results;
         }
 
-        TOutSeq ExecuteSequence<TInSeq, TInStep, TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TInSeq,TInStep,TOutSeq,TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
+        TOutSeq ExecuteSequence<TInSeq, TInStep, TOutSeq, TOutStep>(string sequenceName, IEnumerable<IPipelineStep<TInSeq, TInStep, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
             where TInSeq : PipelineSequenceResults<TInStep> // previous sequence results
             where TInStep : PipelineStepResults, new() // previous step results
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
@@ -214,12 +190,16 @@ namespace SeudoBuild
 
             int stepIndex = -1;
             IPipelineStep<TInSeq, TInStep, TOutSeq, TOutStep> currentStep = null;
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             foreach (var step in sequenceSteps)
             {
-                BuildConsole.WriteBullet(step.Type);
-
                 stepIndex++;
                 currentStep = step;
+
+                BuildConsole.WriteBullet(step.Type);
 
                 var stepResult = step.ExecuteStep(previousSequence, workspace);
                 results.StepResults.Add(stepResult);
@@ -233,9 +213,12 @@ namespace SeudoBuild
                 }
             }
 
+            stopwatch.Stop();
+            results.Duration = stopwatch.Elapsed;
+
             if (stepIndex == 0)
             {
-                BuildConsole.WriteAlert($"No {sequenceName} steps");
+                BuildConsole.WriteAlert($"No {sequenceName} steps.");
                 results.IsSuccess = false;
                 results.Exception = new Exception($"No {sequenceName} steps.");
                 return results;
