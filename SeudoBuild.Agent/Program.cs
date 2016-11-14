@@ -49,6 +49,8 @@ namespace SeudoBuild.Agent
         [Verb("name", Hidden = true)]
         class NameSubOptions
         {
+            [Option('r', "random")]
+            public bool Random { get; set; }
         }
 
         public static void Main(string[] args)
@@ -129,7 +131,15 @@ namespace SeudoBuild.Agent
 
         static int ShowAgentName(NameSubOptions opts)
         {
-            string name = AgentName.GetRandomName();
+            string name = null;
+            if (opts.Random)
+            {
+                name = AgentName.GetRandomName();
+            }
+            else
+            {
+                name = AgentName.GetUniqueAgentName();
+            }
             Console.WriteLine();
             Console.WriteLine(name);
             Console.WriteLine();

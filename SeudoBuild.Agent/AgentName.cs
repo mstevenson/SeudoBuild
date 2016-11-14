@@ -8,6 +8,18 @@ namespace SeudoBuild.Agent
         public static string GetRandomName()
         {
             var rand = new Random();
+            return GetName(rand);
+        }
+
+        public static string GetUniqueAgentName()
+        {
+            int hash = GetMacAddresses().GetHashCode();
+            var rand = new Random(hash);
+            return GetName(rand);
+        }
+
+        static string GetName(Random rand)
+        {
             var adjective = adjectives[rand.Next(0, adjectives.Length)];
             var animal = animals[rand.Next(0, animals.Length)];
             string name = $"{adjective}-{animal}";
@@ -163,9 +175,7 @@ namespace SeudoBuild.Agent
             "Curlew",
             "Deer",
             "Dinosaur",
-            "Dog",
             "Dolphin",
-            "Donkey",
             "Dotterel",
             "Dove",
             "Dragonfly",
