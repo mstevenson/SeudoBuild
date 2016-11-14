@@ -11,14 +11,14 @@ namespace SeudoBuild.Agent
         [Verb("build", HelpText = "Create a local build.")]
         class BuildSubOptions
         {
-            [Option('p', "project-config", HelpText = "Path to a project build configuration file.", Required = true)]
-            public string ProjectConfigPath { get; set; }
-
             [Option('t', "build-target", HelpText = "Name of the build target as specified in the project configuration file. If no build target is specified, the first target will be used.")]
             public string BuildTarget { get; set; }
 
             [Option('o', "output-folder", HelpText = "Path to the build output folder.")]
             public string OutputPath { get; set; }
+
+            [Value(0, MetaName = "project", HelpText = "Path to a project configuration file.", Required = true)]
+            public string ProjectConfigPath { get; set; }
         }
 
         [Verb("submit", HelpText = "Submit a build request for a remote build agent to fulfill.")]
