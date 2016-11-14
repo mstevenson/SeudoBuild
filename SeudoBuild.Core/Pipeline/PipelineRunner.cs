@@ -56,11 +56,11 @@ namespace SeudoBuild
             pipeline.Workspace.CleanBuildOutputDirectory();
 
             // Run pipeline
-            var sourceResults = ExecuteSequence("Update Source", pipeline.SourceSteps, pipeline.Workspace);
-            var buildResults = ExecuteSequence("Build", pipeline.BuildSteps, sourceResults, pipeline.Workspace);
-            var archiveResults = ExecuteSequence("Archive", pipeline.ArchiveSteps, buildResults, pipeline.Workspace);
-            var distributeResults = ExecuteSequence("Distribute", pipeline.DistributeSteps, archiveResults, pipeline.Workspace);
-            var notifyResults = ExecuteSequence("Notify", pipeline.NotifySteps, distributeResults, pipeline.Workspace);
+            var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), pipeline.Workspace);
+            var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, pipeline.Workspace);
+            var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, pipeline.Workspace);
+            var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, pipeline.Workspace);
+            var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, pipeline.Workspace);
 
             // Done
             BuildConsole.IndentLevel = 0;

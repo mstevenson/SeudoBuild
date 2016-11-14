@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace SeudoBuild.Modules.UnityBuild
 {
-    public class UnityBuildConverter : JsonConverter
+    public class UnityBuildConfigConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {

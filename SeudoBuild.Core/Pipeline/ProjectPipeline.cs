@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SeudoBuild
 {
     public class ProjectPipeline
     {
-        //public VersionControlSystem VersionControlSystem { get; private set; }
-        public List<ISourceStep> SourceSteps { get; private set; }
-        public List<IBuildStep> BuildSteps { get; private set; }
-        public List<IArchiveStep> ArchiveSteps { get; private set; }
-        public List<IDistributeStep> DistributeSteps { get; private set; }
-        public List<INotifyStep> NotifySteps { get; private set; }
+        Dictionary<Type, IEnumerable<IPipelineStep>> stepTypeMap = new Dictionary<Type, IEnumerable<IPipelineStep>>();
 
         public ProjectConfig ProjectConfig { get; private set; }
         public BuildTargetConfig TargetConfig { get; private set; }
-
         public Workspace Workspace { get; private set; }
+
+        public IReadOnlyCollection<T> GetPipelineSteps<T>()
+            where T : IPipelineStep
+        {
+            IEnumerable<IPipelineStep> steps = null;
+            stepTypeMap.TryGetValue(typeof(T), out steps);
+            return steps.Cast<T>().ToList();
+        }
 
         public static ProjectPipeline Create(string baseDirectory, ProjectConfig config, string buildTargetName, ModuleLoader loader)
         {
@@ -42,11 +45,11 @@ namespace SeudoBuild
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 
             //VersionControlSystem = InitializeVersionControlSystem();
-            SourceSteps = GetPipelineSteps<ISourceStep>(loader, Workspace);
-            BuildSteps = GetPipelineSteps<IBuildStep>(loader, Workspace);
-            ArchiveSteps = GetPipelineSteps<IArchiveStep>(loader, Workspace);
-            DistributeSteps = GetPipelineSteps<IDistributeStep>(loader, Workspace);
-            NotifySteps = GetPipelineSteps<INotifyStep>(loader, Workspace);
+            stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(loader, Workspace);
+            stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(loader, Workspace);
+            stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(loader, Workspace);
+            stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(loader, Workspace);
+            stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(loader, Workspace);
         }
 
         BuildTargetConfig GetBuildTargetConfig(string targetName)
@@ -61,19 +64,43 @@ namespace SeudoBuild
             return null;
         }
 
-        List<T> GetPipelineSteps<T>(ModuleLoader loader, Workspace workspace)
+        IReadOnlyCollection<T> CreatePipelineSteps<T>(ModuleLoader loader, Workspace workspace)
             where T : class, IPipelineStep
         {
-            var steps = new List<T>();
-            foreach (var stepConfig in TargetConfig.SourceSteps)
+            IEnumerable<StepConfig> allStepConfigs = null;
+
+            List<T> pipelineSteps = new List<T>();
+
+            if (typeof(T) == typeof(ISourceStep))
+            {
+                allStepConfigs = TargetConfig.SourceSteps;
+            }
+            else if (typeof(T) == typeof(IBuildStep))
+            {
+                allStepConfigs = TargetConfig.BuildSteps;
+            }
+            else if (typeof(T) == typeof(IArchiveStep))
+            {
+                allStepConfigs = TargetConfig.ArchiveSteps;
+            }
+            else if (typeof(T) == typeof(IDistributeStep))
+            {
+                allStepConfigs = TargetConfig.DistributeSteps;
+            }
+            else if (typeof(T) == typeof(INotifyStep))
+            {
+                allStepConfigs = TargetConfig.NotifySteps;
+            }
+
+            foreach (var stepConfig in allStepConfigs)
             {
                 T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
                 if (step != null)
                 {
-                    steps.Add(step);
+                    pipelineSteps.Add(step);
                 }
             }
-            return steps;
+            return pipelineSteps.AsReadOnly();
         }
     }
 }

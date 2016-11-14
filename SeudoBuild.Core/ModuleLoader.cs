@@ -52,7 +52,10 @@ namespace SeudoBuild
             {
                 foreach (var module in kvp.Value)
                 {
-                    converters.Add(module.ConfigConverter);
+                    if (!converters.Contains(module.ConfigConverter))
+                    {
+                        converters.Add(module.ConfigConverter);
+                    }
                 }
             }
             return converters.ToArray();
