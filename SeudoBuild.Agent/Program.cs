@@ -46,14 +46,20 @@ namespace SeudoBuild.Agent
         {
         }
 
+        [Verb("name", Hidden = true)]
+        class NameSubOptions
+        {
+        }
+
         public static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<BuildSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions>(args)
+            Parser.Default.ParseArguments<BuildSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions, NameSubOptions>(args)
                 .MapResult(
                     (BuildSubOptions opts) => Build(opts),
                     (SubmitSubOptions opts) => Submit(opts),
                     (QueueSubOptions opts) => Queue(opts),
                     (DeploySubOptions opts) => Deploy(opts),
+                    (NameSubOptions opts) => ShowAgentName(opts),
                     errs => 1
                 );
         }
@@ -118,6 +124,15 @@ namespace SeudoBuild.Agent
 
         static int Deploy(DeploySubOptions opts)
         {
+            return 0;
+        }
+
+        static int ShowAgentName(NameSubOptions opts)
+        {
+            string name = AgentName.GetRandomName();
+            Console.WriteLine();
+            Console.WriteLine(name);
+            Console.WriteLine();
             return 0;
         }
 
