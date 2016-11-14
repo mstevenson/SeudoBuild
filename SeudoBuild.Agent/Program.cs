@@ -14,7 +14,7 @@ namespace SeudoBuild.Agent
             [Option('p', "project-config", HelpText = "Path to a project build configuration file.", Required = true)]
             public string ProjectConfigPath { get; set; }
 
-            [Option('t', "build-target", HelpText = "Name of the build target as specified in the project configuration file.", Required = true)]
+            [Option('t', "build-target", HelpText = "Name of the build target as specified in the project configuration file. If no build target is specified, the first target will be used.")]
             public string BuildTarget { get; set; }
 
             [Option('o', "output-folder", HelpText = "Path to the build output folder.")]
@@ -96,10 +96,17 @@ namespace SeudoBuild.Agent
                     outputPath = new FileInfo(opts.ProjectConfigPath).Directory.FullName;
                 }
 
-                PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
+                // Find valid target
+                string target = opts.BuildTarget;
+                if (string.IsNullOrEmpty(target))
+                {
+                    // FIXME check to see if a target exists
+                    target = projectConfig.BuildTargets[0].TargetName;
+                }
 
+                PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
                 PipelineRunner builder = new PipelineRunner(builderConfig);
-                builder.ExecutePipeline(projectConfig, opts.BuildTarget, modules);
+                builder.ExecutePipeline(projectConfig, target, modules);
             }
 
             return 0;
