@@ -23,7 +23,7 @@
       <CustomCommands>
         <Command>
           <type>AfterBuild</type>
-          <command>mv ${TargetDir}/NativeBinaries ${TargetDir}/../../</command>
+          <command>mv -f ${TargetDir}/NativeBinaries ${TargetDir}/../../</command>
         </Command>
       </CustomCommands>
     </CustomCommands>
