@@ -8,47 +8,20 @@ namespace SeudoBuild.Agent
 {
     class MainClass
     {
-        class Options
-        {
-            [VerbOption("build", HelpText = "Create a local build.")]
-            public BuildSubOptions BuildVerb { get; set; }
-
-            [VerbOption("submit", HelpText = "Submit a build request for a remote build agent to fulfill.")]
-            public SubmitSubOptions SubmitVerb { get; set; }
-
-            [VerbOption("queue", HelpText = "Queue build requests received over the network.")]
-            public QueueSubOptions QueueVerb { get; set; }
-
-            [VerbOption("deploy", HelpText = "Listen for deployment messages.")]
-            public DeploySubOptions DeployVerb { get; set; }
-
-            [HelpOption]
-            public string GetUsage()
-            {
-                var help = new HelpText
-                {
-                    Heading = new HeadingInfo("SeudoBuild", "1.0"),
-                    AdditionalNewLineAfterOption = true,
-                    AddDashesToOption = true
-                };
-                //help.AddPreOptionsLine("Usage: app -p Someone");
-                help.AddOptions(this);
-                return help;
-            }
-        }
-
+        [Verb("build", HelpText = "Create a local build.")]
         class BuildSubOptions
         {
-            [Option('p', "project-config", HelpText = "Path to a project configuration file.", Required = true)]
+            [Option('p', "project-config", HelpText = "Path to a project build configuration file.", Required = true)]
             public string ProjectConfigPath { get; set; }
 
-            [Option('t', "build-target", HelpText = "Name of the target to build as specified in the project configuration file.", Required = true)]
+            [Option('t', "build-target", HelpText = "Name of the build target as specified in the project configuration file.", Required = true)]
             public string BuildTarget { get; set; }
 
             [Option('o', "output-folder", HelpText = "Path to the build output folder.")]
             public string OutputPath { get; set; }
         }
 
+        [Verb("submit", HelpText = "Submit a build request for a remote build agent to fulfill.")]
         class SubmitSubOptions
         {
             [Option('p', "project-config", HelpText = "Path to a project configuration file.", Required = true)]
@@ -57,105 +30,102 @@ namespace SeudoBuild.Agent
             [Option('t', "build-target", HelpText = "Name of the target to build as specified in the project configuration file.", Required = true)]
             public string BuildTarget { get; set; }
 
-            [Option('h', "host", HelpText = "URI for a specific build agent. If not set, the job will be broadcast to all available agents.")]
+            [Option('a', "agent-name", HelpText = "The unique name of a specific build agent. If not set, the job will be broadcast to all available agents.")]
             public string Host { get; set; }
         }
 
+        [Verb("queue", HelpText = "Queue build requests received over the network.")]
         class QueueSubOptions
         {
+            [Option('p', "port", HelpText = "Port on which to listen for build queue messages.")]
+            public string Host { get; set; }
         }
 
+        [Verb("deploy", HelpText = "Listen for deployment messages.")]
         class DeploySubOptions
         {
         }
 
         public static void Main(string[] args)
         {
-            string invokedVerb = null;
-            object invokedVerbInstance = null;
-            var options = new Options();
+            Parser.Default.ParseArguments<BuildSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions>(args)
+                .MapResult(
+                    (BuildSubOptions opts) => Build(opts),
+                    (SubmitSubOptions opts) => Submit(opts),
+                    (QueueSubOptions opts) => Queue(opts),
+                    (DeploySubOptions opts) => Deploy(opts),
+                    errs => 1
+                );
+        }
 
-            //if (args.Length == 0)
-            //{
-            //    string help = options.GetUsage();
-            //    Console.WriteLine(help);
-            //    return;
-            //}
-
-            //var parseSuccess = Parser.Default.ParseArguments(args, options, (verb, subOptions) =>
-            //{
-            //    // if parsing succeeds the verb name and correct instance
-            //    // will be passed to onVerbCommand delegate (string,object)
-            //    invokedVerb = verb;
-            //    invokedVerbInstance = subOptions;
-            //});
-
-            //if (!parseSuccess)
-            //{
-            //    Environment.Exit(Parser.DefaultExitCodeFail);
-            //}
-
-
+        // Build locally
+        static int Build(BuildSubOptions opts)
+        {
             // Load pipeline modules
+            var modules = LoadModules();
 
+            ProjectConfig projectConfig = null;
+
+            try
+            {
+                var s = new Serializer();
+                projectConfig = s.Deserialize<ProjectConfig>(opts.ProjectConfigPath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Can't parse project config:");
+                Console.WriteLine(e.Message);
+                return 1;
+            }
+
+            if (projectConfig != null)
+            {
+                string outputPath = opts.OutputPath;
+                if (string.IsNullOrEmpty(outputPath))
+                {
+                    // Config file's directory
+                    outputPath = new FileInfo(opts.ProjectConfigPath).Directory.FullName;
+                }
+
+                PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
+
+                PipelineRunner builder = new PipelineRunner(builderConfig);
+                builder.ExecutePipeline(projectConfig, opts.BuildTarget, modules);
+            }
+
+            return 0;
+        }
+
+        // Submit job to the network
+        static int Submit(SubmitSubOptions opts)
+        {
+            var submit = new BuildSubmit();
+            submit.Submit();
+
+            return 0;
+        }
+
+        // Listen for jobs on the network
+        static int Queue(QueueSubOptions opts)
+        {
+            var modules = LoadModules();
+
+            var server = new BuildQueue();
+            server.Start();
+
+            return 0;
+        }
+
+        static int Deploy(DeploySubOptions opts)
+        {
+            return 0;
+        }
+
+        static ModuleLoader LoadModules()
+        {
             ModuleLoader modules = new ModuleLoader();
             modules.LoadAllAssemblies("./Modules");
 
-            PrintLoadedModules(modules);
-
-
-            // Build locally
-            if (invokedVerb == "build")
-            {
-                var buildSubOptions = (BuildSubOptions)invokedVerbInstance;
-                ProjectConfig projectConfig = null;
-
-                //try
-                //{
-                    var s = new Serializer();
-                    projectConfig = s.Deserialize<ProjectConfig>(buildSubOptions.ProjectConfigPath);
-                //}
-                //catch (Exception e)
-                //{
-                //    Console.WriteLine("Can't parse project config:");
-                //    Console.WriteLine(e.Message);
-                //}
-
-                if (projectConfig != null)
-                {
-                    string outputPath = options.BuildVerb.OutputPath;
-                    if (string.IsNullOrEmpty(outputPath))
-                    {
-                        // Config file's directory
-                        outputPath = new FileInfo(options.BuildVerb.ProjectConfigPath).Directory.FullName;
-                    }
-
-                    PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
-
-                    PipelineRunner builder = new PipelineRunner(builderConfig);
-                    builder.ExecutePipeline(projectConfig, options.BuildVerb.BuildTarget, modules);
-                }
-            }
-
-            // Submit job to the network
-            else if (invokedVerb == "submit")
-            {
-                var submitSubOptions = (SubmitSubOptions)invokedVerbInstance;
-                var submit = new BuildSubmit();
-                submit.Submit();
-            }
-
-            // Listen for jobs on the network
-            else if (invokedVerb == "queue")
-            {
-                var queueSubOptions = (QueueSubOptions)invokedVerbInstance;
-                var server = new BuildQueue();
-                server.Start();
-            }
-        }
-
-        static void PrintLoadedModules(ModuleLoader modules)
-        {
             BuildConsole.WriteLine("Loaded pipeline modules:");
             BuildConsole.IndentLevel++;
 
@@ -177,6 +147,8 @@ namespace SeudoBuild.Agent
             BuildConsole.WritePlus(line);
 
             BuildConsole.IndentLevel--;
+
+            return modules;
         }
     }
 }

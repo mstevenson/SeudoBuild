@@ -39,6 +39,7 @@
     <Compile Include="Workspace.cs" />
     <Compile Include="Pipeline\PipelineConfig.cs" />
     <Compile Include="Pipeline\PipelineRunner.cs" />
+    <None Include="packages.config" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="Macros.cs" />
     <Compile Include="IO\FileSystem.cs" />
@@ -88,8 +89,6 @@
       <Name>SeudoBuild.Data</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
