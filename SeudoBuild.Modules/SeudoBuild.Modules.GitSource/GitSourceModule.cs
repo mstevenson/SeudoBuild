@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace SeudoBuild.Modules.GitSource
@@ -9,11 +10,8 @@ namespace SeudoBuild.Modules.GitSource
 
         public Type StepType { get; } = typeof(GitSourceStep);
 
-        public JsonConverter ConfigConverter { get; } = new GitSourceConfigConverter();
+        public Type StepConfigType { get; } = typeof(GitSourceConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is GitSourceConfig;
-        }
+        public string StepConfigName { get; } = "Git";
     }
 }

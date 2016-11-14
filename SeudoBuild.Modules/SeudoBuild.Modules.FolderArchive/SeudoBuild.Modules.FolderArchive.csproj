@@ -37,7 +37,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FolderArchiveStep.cs" />
     <Compile Include="FolderArchiveConfig.cs" />
-    <Compile Include="FolderArchiveConfigConverter.cs" />
     <Compile Include="FolderArchiveModule.cs" />
   </ItemGroup>
   <ItemGroup>

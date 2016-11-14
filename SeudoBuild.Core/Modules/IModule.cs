@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SeudoBuild
 {
@@ -7,7 +7,7 @@ namespace SeudoBuild
     {
         string Name { get; }
         Type StepType { get; }
-        JsonConverter ConfigConverter { get; }
-        bool CanReadConfig(StepConfig config);
+        Type StepConfigType { get; }
+        string StepConfigName { get; }
     }
 }

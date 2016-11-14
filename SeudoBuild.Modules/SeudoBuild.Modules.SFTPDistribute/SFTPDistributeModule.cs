@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SeudoBuild.Modules.SFTPDistribute
 {
@@ -9,11 +9,8 @@ namespace SeudoBuild.Modules.SFTPDistribute
 
         public Type StepType { get; } = typeof(SFTPDistributeStep);
 
-        public JsonConverter ConfigConverter { get; } = new SFTPDistributeConfigConverter();
+        public Type StepConfigType { get; } = typeof(SFTPDistributeConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is SFTPDistributeConfig;
-        }
+        public string StepConfigName { get; } = "SFTP Upload";
     }
 }

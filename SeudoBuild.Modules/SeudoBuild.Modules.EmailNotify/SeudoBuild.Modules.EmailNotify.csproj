@@ -37,7 +37,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmailNotifyStep.cs" />
     <Compile Include="EmailNotifyConfig.cs" />
-    <Compile Include="EmailNotifyConfigConverter.cs" />
     <Compile Include="EmailNotifyModule.cs" />
   </ItemGroup>
   <ItemGroup>

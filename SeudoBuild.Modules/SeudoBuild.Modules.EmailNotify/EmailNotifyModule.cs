@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace SeudoBuild.Modules.EmailNotify
@@ -9,11 +10,8 @@ namespace SeudoBuild.Modules.EmailNotify
 
         public Type StepType { get; } = typeof(EmailNotifyStep);
 
-        public JsonConverter ConfigConverter { get; } = new EmailNotifyConfigConverter();
+        public Type StepConfigType { get; } = typeof(EmailNotifyConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is EmailNotifyConfig;
-        }
+        public string StepConfigName { get; } = "Email Notification";
     }
 }

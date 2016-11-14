@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SeudoBuild.Modules.SteamDistribute
 {
@@ -9,11 +9,8 @@ namespace SeudoBuild.Modules.SteamDistribute
 
         public Type StepType { get; } = typeof(SteamDistributeStep);
 
-        public JsonConverter ConfigConverter { get; } = new SteamDistributeConfigConverter();
+        public Type StepConfigType { get; } = typeof(SteamDistributeConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is SteamDistributeConfig;
-        }
+        public string StepConfigName { get; } = "Steam Upload";
     }
 }

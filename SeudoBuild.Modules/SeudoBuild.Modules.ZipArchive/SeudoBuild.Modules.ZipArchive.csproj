@@ -41,7 +41,6 @@
     <Compile Include="ZipArchiveStep.cs" />
     <Compile Include="ZipArchiveConfig.cs" />
     <Compile Include="ZipArchiveModule.cs" />
-    <Compile Include="ZipArchiveConfigConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">

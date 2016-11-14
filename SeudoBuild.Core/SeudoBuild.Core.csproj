@@ -74,6 +74,7 @@
     <Compile Include="Modules\INotifyModule.cs" />
     <Compile Include="Modules\ISourceModule.cs" />
     <Compile Include="Serializer.cs" />
+    <Compile Include="StepConfigConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />

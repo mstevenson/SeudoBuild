@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SeudoBuild.Modules.FTPDistribute
 {
@@ -9,11 +9,8 @@ namespace SeudoBuild.Modules.FTPDistribute
 
         public Type StepType { get; } = typeof(FTPDistributeStep);
 
-        public JsonConverter ConfigConverter { get; } = new EmailNotifyConfigConverter();
+        public Type StepConfigType { get; } = typeof(FTPDistributeConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is FTPDistributeConfig;
-        }
+        public string StepConfigName { get; } = "FTP Upload";
     }
 }

@@ -50,12 +50,20 @@ namespace SeudoBuild
             List<JsonConverter> converters = new List<JsonConverter>();
             foreach (var kvp in stepTypeToModulesMap)
             {
+                // TODO build a list of json converters, one for each base sep type (source, build, etc)
+                // add specific step config types to each one as reported by each module
+
+                //var conv = new StepConfigConverter<
                 foreach (var module in kvp.Value)
                 {
-                    if (!converters.Contains(module.ConfigConverter))
-                    {
-                        converters.Add(module.ConfigConverter);
-                    }
+                    
+                    throw new System.Exception("Collect all config names and types from each module, build into a StepConfigConverter");
+
+
+                    //if (!converters.Contains(module.ConfigConverter))
+                    //{
+                    //    converters.Add(module.ConfigConverter);
+                    //}
                 }
             }
             return converters.ToArray();
@@ -158,7 +166,7 @@ namespace SeudoBuild
             var modulesForStep = stepTypeToModulesMap[typeof(T)];
             foreach (var module in modulesForStep)
             {
-                if (module.CanReadConfig(config))
+                if (config.GetType() == module.StepConfigType)
                 {
                     // FIXME fragile, this requires each IModule to implement a constructor with an identical signature.
                     // Constructor args can't be enforced by the interface so this is a runtime error.

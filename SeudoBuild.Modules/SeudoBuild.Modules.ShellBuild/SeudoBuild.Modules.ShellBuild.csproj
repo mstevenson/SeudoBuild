@@ -38,7 +38,6 @@
     <Compile Include="ShellBuildStepConfig.cs" />
     <Compile Include="ShellBuildStep.cs" />
     <Compile Include="ShellBuildModule.cs" />
-    <Compile Include="ShellBuildConfigConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

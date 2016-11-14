@@ -9,11 +9,8 @@ namespace SeudoBuild.Modules.UnityBuild
 
         public Type StepType { get; } = typeof(UnityParameterizedBuildStep);
 
-        public JsonConverter ConfigConverter { get; } = new UnityBuildConfigConverter();
+        public Type StepConfigType { get; } = typeof(UnityParameterizedBuildConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is UnityParameterizedBuildConfig;
-        }
+        public string StepConfigName { get; } = "Unity Parameterized Build";
     }
 }

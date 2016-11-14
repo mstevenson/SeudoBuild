@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SeudoBuild.Modules.ShellBuild
 {
@@ -9,11 +9,8 @@ namespace SeudoBuild.Modules.ShellBuild
 
         public Type StepType { get; } = typeof(ShellBuildStep);
 
-        public JsonConverter ConfigConverter { get; } = new ShellBuildConfigConverter();
+        public Type StepConfigType { get; } = typeof(ShellBuildStepConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is ShellBuildStepConfig;
-        }
+        public string StepConfigName { get; } = "Shell Build";
     }
 }

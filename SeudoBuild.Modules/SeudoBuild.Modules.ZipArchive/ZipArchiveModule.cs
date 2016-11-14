@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace SeudoBuild.Modules.ZipArchive
@@ -9,11 +10,9 @@ namespace SeudoBuild.Modules.ZipArchive
 
         public Type StepType { get; } = typeof(ZipArchiveStep);
 
-        public JsonConverter ConfigConverter { get; } = new ZipArchiveConfigConverter();
+        public Type StepConfigType { get; } = typeof(ZipArchiveConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is ZipArchiveConfig;
-        }
+        public string StepConfigName { get; } = "Zip File";
+
     }
 }

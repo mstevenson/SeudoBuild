@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SeudoBuild.Modules.UnityBuild
 {
@@ -9,11 +9,8 @@ namespace SeudoBuild.Modules.UnityBuild
 
         public Type StepType { get; } = typeof(UnityExecuteMethodBuildStep);
 
-        public JsonConverter ConfigConverter { get; } = new UnityBuildConfigConverter();
+        public Type StepConfigType { get; } = typeof(UnityExecuteMethodBuildConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is UnityExecuteMethodBuildConfig;
-        }
+        public string StepConfigName { get; } = "Unity Execute Method";
     }
 }

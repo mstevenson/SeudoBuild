@@ -9,11 +9,8 @@ namespace SeudoBuild.Modules.UnityBuild
 
         public Type StepType { get; } = typeof(UnityStandardBuildStep);
 
-        public JsonConverter ConfigConverter { get; } = new UnityBuildConfigConverter();
+        public Type StepConfigType { get; } = typeof(UnityStandardBuildConfig);
 
-        public bool CanReadConfig(StepConfig config)
-        {
-            return config is UnityStandardBuildConfig;
-        }
+        public string StepConfigName { get; } = "Unity Standard Build";
     }
 }
