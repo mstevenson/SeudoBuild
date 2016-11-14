@@ -16,7 +16,7 @@ namespace SeudoBuild
         public List<IDistributeModule> distributeModules = new List<IDistributeModule>();
         public List<INotifyModule> notifyModules = new List<INotifyModule>();
 
-        public void Load(string file)
+        public void LoadAssembly(string file)
         {
             if (!File.Exists(file))
             {
@@ -102,7 +102,7 @@ namespace SeudoBuild
                 foreach (var s in files)
                 {
                     string path = Path.Combine(Environment.CurrentDirectory, s);
-                    Load(path);
+                    LoadAssembly(path);
                 }
             }
         }

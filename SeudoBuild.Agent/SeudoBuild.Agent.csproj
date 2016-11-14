@@ -6,7 +6,7 @@
     <ProjectGuid>{64E2D8F1-B08C-4B87-A283-252C31693DC6}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>SeudoBuild.Agent</RootNamespace>
-    <AssemblyName>SeudoBuildAgent</AssemblyName>
+    <AssemblyName>SeudoBuild</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
