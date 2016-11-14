@@ -42,7 +42,7 @@ namespace SeudoBuild.Modules.UnityBuild
             args.Add("-executeMethod");
             args.Add(methodName);
             args.Add("-projectPath");
-            args.Add(workspace.WorkingDirectory);
+            args.Add(Path.Combine(workspace.WorkingDirectory, config.SubDirectory));
             args.Add("-logfile");
             args.Add(Workspace.StandardOutputPath);
 

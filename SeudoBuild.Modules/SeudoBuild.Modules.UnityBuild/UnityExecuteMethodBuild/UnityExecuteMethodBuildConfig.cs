@@ -16,6 +16,11 @@ namespace SeudoBuild.Modules.UnityBuild
         /// <summary>
         /// A static method in the UnityEditor namespace matching this name will be executed.
         /// </summary>
-        public string MethodName { get; set; }
+        public string MethodName { get; set; } = "";
+
+        /// <summary>
+        /// A path relative to the working directory that contains a Unity project.
+        /// </summary>
+        public string SubDirectory { get; set; } = "";
     }
 }

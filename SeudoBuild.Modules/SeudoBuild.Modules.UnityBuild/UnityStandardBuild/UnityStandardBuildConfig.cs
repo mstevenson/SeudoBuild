@@ -9,7 +9,7 @@ namespace SeudoBuild.Modules.UnityBuild
     {
         public override string Type { get; } = "Unity Standard Build";
 
-        public string OutputName { get; set; }
+        public string OutputName { get; set; } = "";
 
         /// <summary>
         /// If ExecuteStaticMethod is false, a standard build will be performed
@@ -21,5 +21,7 @@ namespace SeudoBuild.Modules.UnityBuild
         /// The installed Unity executable to build with.
         /// </summary>
         public VersionNumber UnityVersionNumber { get; set; }
+
+        public string SubDirectory { get; set; } = "";
     }
 }

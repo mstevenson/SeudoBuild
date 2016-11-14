@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace SeudoBuild.Modules.UnityBuild
 {
@@ -13,9 +11,22 @@ namespace SeudoBuild.Modules.UnityBuild
 
         public abstract BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace);
 
-        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace)
+        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace, string relativeUnityProjectFolder)
         {
             BuildConsole.WriteLine($"Building with Unity {unityInstallation.Version}");
+
+            string projectFolderPath = Path.Combine(workspace.WorkingDirectory, relativeUnityProjectFolder);
+
+            // Validate Unity project folder contents
+            var dirs = Directory.GetDirectories(projectFolderPath);
+            if (!dirs.Any(path => Path.GetFileName(path) == "Library" || Path.GetFileName(path) == "ProjectSettings"))
+            {
+                return new BuildStepResults
+                {
+                    IsSuccess = false,
+                    Exception = new Exception("Working directory does not appear to contain a Unity project.")
+                };
+            }
 
             var startInfo = new ProcessStartInfo
             {

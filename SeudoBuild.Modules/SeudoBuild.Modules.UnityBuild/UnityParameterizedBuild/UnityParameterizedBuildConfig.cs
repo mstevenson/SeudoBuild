@@ -17,5 +17,10 @@ namespace SeudoBuild.Modules.UnityBuild
         public List<string> SceneList { get; set; } = new List<string>();
         public bool BuildAssetBundles { get; set; }
         public bool CopyAssetBundlesToStreamingAssets { get; set; }
+
+        /// <summary>
+        /// A path relative to the working directory that contains a Unity project.
+        /// </summary>
+        public string SubDirectory { get; set; } = "";
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using RunProcessAsTask;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace SeudoBuild.Modules.UnityBuild
@@ -33,7 +29,7 @@ namespace SeudoBuild.Modules.UnityBuild
             };
 
             var args = GetBuildArgs(config, workspace);
-            var buildResult = ExecuteUnity(unityInstallation, args, workspace);
+            var buildResult = ExecuteUnity(unityInstallation, args, workspace, config.SubDirectory);
 
             return buildResult;
         }
@@ -44,7 +40,7 @@ namespace SeudoBuild.Modules.UnityBuild
             args.Add("-quit");
             args.Add("-batchmode");
             args.Add("-projectPath");
-            args.Add(workspace.WorkingDirectory);
+            args.Add(Path.Combine(workspace.WorkingDirectory, config.SubDirectory));
             args.Add("-logfile");
             args.Add(Workspace.StandardOutputPath);
 

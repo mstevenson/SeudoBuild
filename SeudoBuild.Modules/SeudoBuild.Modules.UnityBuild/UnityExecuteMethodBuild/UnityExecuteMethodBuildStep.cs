@@ -1,4 +1,6 @@
-﻿namespace SeudoBuild.Modules.UnityBuild
+﻿using System.IO;
+
+namespace SeudoBuild.Modules.UnityBuild
 {
     public class UnityExecuteMethodBuildStep : UnityBuildStep
     {
@@ -25,8 +27,10 @@
                 ExePath = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
             };
 
-            var args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {workspace.WorkingDirectory} -logfile {Workspace.StandardOutputPath}";
-            var results = ExecuteUnity(unityInstallation, args, workspace);
+            string projectPath = Path.Combine(workspace.WorkingDirectory, config.SubDirectory);
+
+            var args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {projectPath} -logfile {Workspace.StandardOutputPath}";
+            var results = ExecuteUnity(unityInstallation, args, workspace, config.SubDirectory);
 
             return results;
         }
