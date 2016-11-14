@@ -62,13 +62,16 @@ namespace SeudoBuild
         }
 
         List<T> GetPipelineSteps<T>(ModuleLoader loader, Workspace workspace)
-            where T : IPipelineStep
+            where T : class, IPipelineStep
         {
             var steps = new List<T>();
             foreach (var stepConfig in TargetConfig.SourceSteps)
             {
                 T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
-                steps.Add(step);
+                if (step != null)
+                {
+                    steps.Add(step);
+                }
             }
             return steps;
         }
