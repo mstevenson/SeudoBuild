@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace SeudoBuild
 {
@@ -10,11 +11,52 @@ namespace SeudoBuild
 
     public class ModuleLoader
     {
-        public List<ISourceModule> sourceModules = new List<ISourceModule>();
-        public List<IBuildModule> buildModules = new List<IBuildModule>();
-        public List<IArchiveModule> archiveModules = new List<IArchiveModule>();
-        public List<IDistributeModule> distributeModules = new List<IDistributeModule>();
-        public List<INotifyModule> notifyModules = new List<INotifyModule>();
+        Dictionary<Type, List<IModule>> stepTypeToModulesMap = new Dictionary<Type, List<IModule>>
+        {
+            { typeof(ISourceStep), new List<IModule>() },
+            { typeof(IBuildStep), new List<IModule>() },
+            { typeof(IArchiveStep), new List<IModule>() },
+            { typeof(IDistributeStep), new List<IModule>() },
+            { typeof(INotifyStep), new List<IModule>() }
+        };
+
+        public IEnumerable<ISourceModule> SourceModules
+        {
+            get { return stepTypeToModulesMap[typeof(ISourceStep)].Cast<ISourceModule>(); }
+        }
+
+        public IEnumerable<IBuildModule> BuildModules
+        {
+            get { return stepTypeToModulesMap[typeof(IBuildStep)].Cast<IBuildModule>(); }
+        }
+
+        public IEnumerable<IArchiveModule> ArchiveModules
+        {
+            get { return stepTypeToModulesMap[typeof(IArchiveStep)].Cast<IArchiveModule>(); }
+        }
+
+        public IEnumerable<IDistributeModule> DistributeModules
+        {
+            get { return stepTypeToModulesMap[typeof(IDistributeStep)].Cast<IDistributeModule>(); }
+        }
+
+        public IEnumerable<INotifyModule> NotifyModules
+        {
+            get { return stepTypeToModulesMap[typeof(INotifyStep)].Cast<INotifyModule>(); }
+        }
+
+        public JsonConverter[] GetJsonConverters ()
+        {
+            List<JsonConverter> converters = new List<JsonConverter>();
+            foreach (var kvp in stepTypeToModulesMap)
+            {
+                foreach (var module in kvp.Value)
+                {
+                    converters.Add(module.ConfigConverter);
+                }
+            }
+            return converters.ToArray();
+        }
 
         public void LoadAssembly(string file)
         {
@@ -57,33 +99,33 @@ namespace SeudoBuild
                     }
                 }
 
-                foreach (Type type in moduleTypes)
+                foreach (Type modType in moduleTypes)
                 {
-                    object obj = Activator.CreateInstance(type);
-                    if (typeof(ISourceModule).IsAssignableFrom(type))
+                    object obj = Activator.CreateInstance(modType);
+                    if (typeof(ISourceModule).IsAssignableFrom(modType))
                     {
                         ISourceModule moduleInfo = (ISourceModule)obj;
-                        sourceModules.Add(moduleInfo);
+                        stepTypeToModulesMap[typeof(ISourceStep)].Add(moduleInfo);
                     }
-                    else if (typeof(IBuildModule).IsAssignableFrom(type))
+                    else if (typeof(IBuildModule).IsAssignableFrom(modType))
                     {
                         IBuildModule moduleInfo = (IBuildModule)obj;
-                        buildModules.Add(moduleInfo);
+                        stepTypeToModulesMap[typeof(IBuildStep)].Add(moduleInfo);
                     }
-                    if (typeof(IArchiveModule).IsAssignableFrom(type))
+                    if (typeof(IArchiveModule).IsAssignableFrom(modType))
                     {
                         IArchiveModule moduleInfo = (IArchiveModule)obj;
-                        archiveModules.Add(moduleInfo);
+                        stepTypeToModulesMap[typeof(IArchiveStep)].Add(moduleInfo);
                     }
-                    if (typeof(IDistributeModule).IsAssignableFrom(type))
+                    if (typeof(IDistributeModule).IsAssignableFrom(modType))
                     {
                         IDistributeModule moduleInfo = (IDistributeModule)obj;
-                        distributeModules.Add(moduleInfo);
+                        stepTypeToModulesMap[typeof(IDistributeStep)].Add(moduleInfo);
                     }
-                    if (typeof(INotifyModule).IsAssignableFrom(type))
+                    if (typeof(INotifyModule).IsAssignableFrom(modType))
                     {
                         INotifyModule moduleInfo = (INotifyModule)obj;
-                        notifyModules.Add(moduleInfo);
+                        stepTypeToModulesMap[typeof(INotifyStep)].Add(moduleInfo);
                     }
                 }
             }
@@ -107,14 +149,18 @@ namespace SeudoBuild
             }
         }
 
-        public T CreatePipelineStep<T>(StepConfig config)
+        public T CreatePipelineStep<T>(StepConfig config, Workspace workspace)
             where T : IPipelineStep
         {
-            foreach (var module in archiveModules)
+            var modulesForStep = stepTypeToModulesMap[typeof(T)];
+            foreach (var module in modulesForStep)
             {
-                if (module.MatchesConfigType(config))
+                if (module.CanReadConfig(config))
                 {
-                    Activator.CreateInstance(module.StepType, config);
+                    // FIXME fragile, this requires each IModule to implement a constructor with an identical signature.
+                    // Constructor args can't be enforced by the interface so this is a runtime error.
+                    object obj = Activator.CreateInstance(module.StepType, config, workspace);
+                    return (T)obj;
                 }
             }
             return default(T);

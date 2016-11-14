@@ -11,7 +11,7 @@ namespace SeudoBuild.Modules.EmailNotify
 
         public JsonConverter ConfigConverter { get; } = new EmailNotifyConfigConverter();
 
-        public bool MatchesConfigType(StepConfig config)
+        public bool CanReadConfig(StepConfig config)
         {
             return config is EmailNotifyConfig;
         }

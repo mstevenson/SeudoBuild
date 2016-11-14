@@ -11,7 +11,7 @@ namespace SeudoBuild.Modules.ZipArchive
 
         public JsonConverter ConfigConverter { get; } = new FolderArchiveConfigConverter();
 
-        public bool MatchesConfigType(StepConfig config)
+        public bool CanReadConfig(StepConfig config)
         {
             return config is FolderArchiveConfig;
         }

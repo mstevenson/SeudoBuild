@@ -11,7 +11,7 @@ namespace SeudoBuild.Modules.GitSource
 
         public JsonConverter ConfigConverter { get; } = new GitSourceConfigConverter();
 
-        public bool MatchesConfigType(StepConfig config)
+        public bool CanReadConfig(StepConfig config)
         {
             return config is GitSourceConfig;
         }

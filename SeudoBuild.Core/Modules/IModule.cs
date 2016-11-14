@@ -8,6 +8,6 @@ namespace SeudoBuild
         string Name { get; }
         Type StepType { get; }
         JsonConverter ConfigConverter { get; }
-        bool MatchesConfigType(StepConfig config);
+        bool CanReadConfig(StepConfig config);
     }
 }

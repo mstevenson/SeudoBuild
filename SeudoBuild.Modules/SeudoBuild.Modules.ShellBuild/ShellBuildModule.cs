@@ -11,7 +11,7 @@ namespace SeudoBuild.Modules.ShellBuild
 
         public JsonConverter ConfigConverter { get; } = new ShellBuildConfigConverter();
 
-        public bool MatchesConfigType(StepConfig config)
+        public bool CanReadConfig(StepConfig config)
         {
             return config is ShellBuildStepConfig;
         }

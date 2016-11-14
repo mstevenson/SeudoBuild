@@ -11,7 +11,7 @@ namespace SeudoBuild.Modules.UnityBuild
 
         public JsonConverter ConfigConverter { get; } = new UnityBuildConverter();
 
-        public bool MatchesConfigType(StepConfig config)
+        public bool CanReadConfig(StepConfig config)
         {
             return config is UnityParameterizedBuildConfig;
         }

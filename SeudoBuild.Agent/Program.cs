@@ -70,14 +70,15 @@ namespace SeudoBuild.Agent
         static int Build(BuildSubOptions opts)
         {
             // Load pipeline modules
-            var modules = LoadModules();
+            ModuleLoader modules = LoadModules();
 
             ProjectConfig projectConfig = null;
 
             try
             {
                 var s = new Serializer();
-                projectConfig = s.Deserialize<ProjectConfig>(opts.ProjectConfigPath);
+                var converters = modules.GetJsonConverters();
+                projectConfig = s.Deserialize<ProjectConfig>(opts.ProjectConfigPath, converters);
             }
             catch (Exception e)
             {
@@ -156,19 +157,19 @@ namespace SeudoBuild.Agent
 
             string line = "";
 
-            line = "Source:      " + string.Join(", ", modules.sourceModules.Select(m => m.Name).ToArray());
+            line = "Source:      " + string.Join(", ", modules.SourceModules.Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Build:       " + string.Join(", ", modules.buildModules.Select(m => m.Name).ToArray());
+            line = "Build:       " + string.Join(", ", modules.BuildModules.Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Archive:     " + string.Join(", ", modules.archiveModules.Select(m => m.Name).ToArray());
+            line = "Archive:     " + string.Join(", ", modules.ArchiveModules.Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Distribute:  " + string.Join(", ", modules.distributeModules.Select(m => m.Name).ToArray());
+            line = "Distribute:  " + string.Join(", ", modules.DistributeModules.Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Notify:      " + string.Join(", ", modules.notifyModules.Select(m => m.Name).ToArray());
+            line = "Notify:      " + string.Join(", ", modules.NotifyModules.Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
             BuildConsole.IndentLevel--;

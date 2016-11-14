@@ -11,7 +11,7 @@ namespace SeudoBuild.Modules.SFTPDistribute
 
         public JsonConverter ConfigConverter { get; } = new SFTPDistributeConfigConverter();
 
-        public bool MatchesConfigType(StepConfig config)
+        public bool CanReadConfig(StepConfig config)
         {
             return config is SFTPDistributeConfig;
         }

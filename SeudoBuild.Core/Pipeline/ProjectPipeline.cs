@@ -42,11 +42,11 @@ namespace SeudoBuild
             TargetConfig = GetBuildTargetConfig(buildTargetName);
 
             //VersionControlSystem = InitializeVersionControlSystem();
-            SourceSteps = GetPipelineSteps<ISourceStep>(loader);
-            BuildSteps = GetPipelineSteps<IBuildStep>(loader);
-            ArchiveSteps = GetPipelineSteps<IArchiveStep>(loader);
-            DistributeSteps = GetPipelineSteps<IDistributeStep>(loader);
-            NotifySteps = GetPipelineSteps<INotifyStep>(loader);
+            SourceSteps = GetPipelineSteps<ISourceStep>(loader, Workspace);
+            BuildSteps = GetPipelineSteps<IBuildStep>(loader, Workspace);
+            ArchiveSteps = GetPipelineSteps<IArchiveStep>(loader, Workspace);
+            DistributeSteps = GetPipelineSteps<IDistributeStep>(loader, Workspace);
+            NotifySteps = GetPipelineSteps<INotifyStep>(loader, Workspace);
         }
 
         BuildTargetConfig GetBuildTargetConfig(string targetName)
@@ -61,13 +61,13 @@ namespace SeudoBuild
             return null;
         }
 
-        List<T> GetPipelineSteps<T>(ModuleLoader loader)
+        List<T> GetPipelineSteps<T>(ModuleLoader loader, Workspace workspace)
             where T : IPipelineStep
         {
             var steps = new List<T>();
             foreach (var stepConfig in TargetConfig.SourceSteps)
             {
-                T step = loader.CreatePipelineStep<T>(stepConfig);
+                T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
                 steps.Add(step);
             }
             return steps;

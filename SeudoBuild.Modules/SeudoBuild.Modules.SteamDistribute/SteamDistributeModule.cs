@@ -11,7 +11,7 @@ namespace SeudoBuild.Modules.SteamDistribute
 
         public JsonConverter ConfigConverter { get; } = new SteamDistributeConfigConverter();
 
-        public bool MatchesConfigType(StepConfig config)
+        public bool CanReadConfig(StepConfig config)
         {
             return config is SteamDistributeConfig;
         }
