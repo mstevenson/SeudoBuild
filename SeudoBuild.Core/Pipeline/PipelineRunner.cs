@@ -34,10 +34,12 @@ namespace SeudoBuild
                 throw new ArgumentException("The specified build target could not be found in the project.", "buildTargetName");
             }
 
-            Console.WriteLine("\nRunning SeudoBuild Pipeline:");
-
-            BuildConsole.WriteLine($"Project: {projectConfig.ProjectName}");
-            BuildConsole.WriteLine($"Target:  {buildTargetName}");
+            Console.WriteLine("");
+            BuildConsole.WriteLine("Running Pipeline");
+            BuildConsole.IndentLevel++;
+            BuildConsole.WritePlus($"Project: {projectConfig.ProjectName}");
+            BuildConsole.WritePlus($"Target:  {buildTargetName}");
+            BuildConsole.IndentLevel--;
             Console.WriteLine("");
 
             // Setup pipeline

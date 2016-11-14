@@ -152,7 +152,7 @@ namespace SeudoBuild.Agent
             ModuleLoader modules = new ModuleLoader();
             modules.LoadAllAssemblies("./Modules");
 
-            BuildConsole.WriteLine("Loaded pipeline modules:");
+            BuildConsole.WriteLine("Loading Pipeline Modules");
             BuildConsole.IndentLevel++;
 
             string line = "";
