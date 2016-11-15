@@ -48,16 +48,17 @@ namespace SeudoBuild
         public JsonConverter[] GetJsonConverters ()
         {
             List<JsonConverter> converters = new List<JsonConverter>();
+
+            var sourceConverter = new StepConfigConverter<SourceStepConfig>();
+            var buildConverter = new StepConfigConverter<BuildStepConfig>();
+            var archiveConverter = new StepConfigConverter<ArchiveStepConfig>();
+            var distributeConverter = new StepConfigConverter<DistributeStepConfig>();
+            var notifyConverter = new StepConfigConverter<NotifyStepConfig>();
+
             foreach (var kvp in stepTypeToModulesMap)
             {
                 // Build a list of json converters, one for each base sep type (source, build, etc)
                 // add specific step config types to each one as reported by each module
-
-                var sourceConverter = new StepConfigConverter<SourceStepConfig>();
-                var buildConverter = new StepConfigConverter<BuildStepConfig>();
-                var archiveConverter = new StepConfigConverter<ArchiveStepConfig>();
-                var distributeConverter = new StepConfigConverter<DistributeStepConfig>();
-                var notifyConverter = new StepConfigConverter<NotifyStepConfig>();
 
                 foreach (var module in kvp.Value)
                 {
@@ -83,12 +84,13 @@ namespace SeudoBuild
                     }
                 }
 
-                converters.Add(sourceConverter);
-                converters.Add(buildConverter);
-                converters.Add(archiveConverter);
-                converters.Add(distributeConverter);
-                converters.Add(notifyConverter);
             }
+            converters.Add(sourceConverter);
+            converters.Add(buildConverter);
+            converters.Add(archiveConverter);
+            converters.Add(distributeConverter);
+            converters.Add(notifyConverter);
+
             return converters.ToArray();
         }
 
