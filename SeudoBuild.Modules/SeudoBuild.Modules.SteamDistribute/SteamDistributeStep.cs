@@ -6,7 +6,7 @@ namespace SeudoBuild.Modules.SteamDistribute
     {
         SteamDistributeConfig config;
 
-        public SteamDistributeStep(SteamDistributeConfig config)
+        public SteamDistributeStep(SteamDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }

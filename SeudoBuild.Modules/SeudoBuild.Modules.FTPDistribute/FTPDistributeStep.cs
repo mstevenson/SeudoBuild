@@ -9,7 +9,7 @@ namespace SeudoBuild.Modules.FTPDistribute
     {
         FTPDistributeConfig config;
 
-        public FTPDistributeStep(FTPDistributeConfig config)
+        public FTPDistributeStep(FTPDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }

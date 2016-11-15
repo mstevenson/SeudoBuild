@@ -9,7 +9,7 @@ namespace SeudoBuild.Modules.SFTPDistribute
     {
         SFTPDistributeConfig config;
 
-        public SFTPDistributeStep(SFTPDistributeConfig config)
+        public SFTPDistributeStep(SFTPDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }

@@ -8,7 +8,7 @@ namespace SeudoBuild.Modules.EmailNotify
     {
         EmailNotifyConfig config;
 
-        public EmailNotifyStep(EmailNotifyConfig config)
+        public EmailNotifyStep(EmailNotifyConfig config, Workspace workspace)
         {
             this.config = config;
         }

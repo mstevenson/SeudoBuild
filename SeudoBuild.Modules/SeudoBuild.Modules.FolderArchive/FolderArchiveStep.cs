@@ -7,7 +7,7 @@ namespace SeudoBuild
     {
         FolderArchiveConfig config;
 
-        public FolderArchiveStep(FolderArchiveConfig config)
+        public FolderArchiveStep(FolderArchiveConfig config, Workspace workspace)
         {
             this.config = config;
         }
