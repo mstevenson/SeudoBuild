@@ -50,24 +50,58 @@ namespace SeudoBuild
             List<JsonConverter> converters = new List<JsonConverter>();
             foreach (var kvp in stepTypeToModulesMap)
             {
-                // TODO build a list of json converters, one for each base sep type (source, build, etc)
+                // Build a list of json converters, one for each base sep type (source, build, etc)
                 // add specific step config types to each one as reported by each module
 
-                //var conv = new StepConfigConverter<
+                var sourceConverter = new StepConfigConverter<SourceStepConfig>();
+                var buildConverter = new StepConfigConverter<BuildStepConfig>();
+                var archiveConverter = new StepConfigConverter<ArchiveStepConfig>();
+                var distributeConverter = new StepConfigConverter<DistributeStepConfig>();
+                var notifyConverter = new StepConfigConverter<NotifyStepConfig>();
+
                 foreach (var module in kvp.Value)
                 {
-                    
-                    throw new System.Exception("Collect all config names and types from each module, build into a StepConfigConverter");
-
-
-                    //if (!converters.Contains(module.ConfigConverter))
-                    //{
-                    //    converters.Add(module.ConfigConverter);
-                    //}
+                    if (typeof(SourceStepConfig).IsAssignableFrom(module.StepConfigType))
+                    {
+                        sourceConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                    }
+                    if (typeof(BuildStepConfig).IsAssignableFrom(module.StepConfigType))
+                    {
+                        buildConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                    }
+                    if (typeof(ArchiveStepConfig).IsAssignableFrom(module.StepConfigType))
+                    {
+                        archiveConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                    }
+                    if (typeof(DistributeStepConfig).IsAssignableFrom(module.StepConfigType))
+                    {
+                        distributeConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                    }
+                    if (typeof(NotifyStepConfig).IsAssignableFrom(module.StepConfigType))
+                    {
+                        notifyConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                    }
                 }
+
+                converters.Add(sourceConverter);
+                converters.Add(buildConverter);
+                converters.Add(archiveConverter);
+                converters.Add(distributeConverter);
+                converters.Add(notifyConverter);
             }
             return converters.ToArray();
         }
+
+        //JsonConverter RegisterConverter<T>(IModule module)
+        //    where T : StepConfig
+        //{
+        //    var converter = new StepConfigConverter<SourceStepConfig>();
+        //    if (module.StepConfigType.IsAssignableFrom(typeof(SourceStepConfig)))
+        //    {
+        //        converter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+        //    }
+        //    return converter;
+        //}
 
         public void LoadAssembly(string file)
         {

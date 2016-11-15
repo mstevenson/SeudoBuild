@@ -18,6 +18,15 @@ namespace SeudoBuild
             configTypeMap.Add(jsonName, typeof(U));
         }
 
+        public void RegisterConfigType(string jsonName, Type type)
+        {
+            if (!typeof(T).IsAssignableFrom(type))
+            {
+                throw new ArgumentException($"Type {type} is not assignable from {typeof(T)}");
+            }
+            configTypeMap.Add(jsonName, type);
+        }
+
         public override bool CanConvert(Type objectType)
         {
             return (objectType == typeof(T));
