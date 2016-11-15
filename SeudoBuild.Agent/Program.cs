@@ -37,6 +37,9 @@ namespace SeudoBuild.Agent
         [Verb("queue", HelpText = "Queue build requests received over the network.")]
         class QueueSubOptions
         {
+            [Option('n', "agent-name", HelpText = "A unique name for the build agent. If not set, a name will be generated.")]
+            public string AgentName { get; set; }
+
             [Option('p', "port", HelpText = "Port on which to listen for build queue messages.")]
             public string Host { get; set; }
         }
@@ -126,7 +129,9 @@ namespace SeudoBuild.Agent
         {
             var modules = LoadModules();
 
-            var server = new BuildQueue();
+            string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
+
+            var server = new BuildQueue(agentName);
             server.Start();
 
             return 0;
@@ -180,6 +185,8 @@ namespace SeudoBuild.Agent
             BuildConsole.WritePlus(line);
 
             BuildConsole.IndentLevel--;
+
+            Console.WriteLine("");
 
             return modules;
         }

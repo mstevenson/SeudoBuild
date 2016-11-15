@@ -11,12 +11,19 @@ namespace SeudoBuild.Agent
         CancellationTokenSource cancelTokenSource;
         CancellationToken cancelToken;
 
+        string agentName;
+
+        public BuildQueue(string agentName)
+        {
+            this.agentName = agentName;
+        }
+
         public void Start()
         {
-            Console.WriteLine("Starting server");
+            Console.WriteLine("Starting network build queue");
+            BuildConsole.WriteLine("Build agent name:  " + agentName);
             cancelTokenSource = new CancellationTokenSource();
             cancelToken = cancelTokenSource.Token;
-
 
             using (var server = new ResponseSocket())
             {
