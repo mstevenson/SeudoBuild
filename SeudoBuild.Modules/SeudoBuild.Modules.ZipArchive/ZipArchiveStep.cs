@@ -9,11 +9,6 @@ namespace SeudoBuild.Modules.ZipArchive
         ZipArchiveConfig config;
         Workspace workspace;
 
-        public ZipArchiveStep(ZipArchiveConfig config, Workspace workspace)
-        {
-            this.config = config;
-        }
-
         public string Type { get; } = "Zip File";
 
         public ZipArchiveStep(ZipArchiveConfig config, Workspace workspace)
