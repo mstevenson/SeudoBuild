@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.ShellBui
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.UnityBuild", "SeudoBuild.Modules\SeudoBuild.Modules.UnityBuild\SeudoBuild.Modules.UnityBuild.csproj", "{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SMBDistribute", "SeudoBuild.Modules\SeudoBuild.Modules.SMBDistribute\SeudoBuild.Modules.SMBDistribute.csproj", "{AEBB808B-8C51-4273-AC7B-FC585D52CC49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEBB808B-8C51-4273-AC7B-FC585D52CC49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEBB808B-8C51-4273-AC7B-FC585D52CC49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEBB808B-8C51-4273-AC7B-FC585D52CC49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEBB808B-8C51-4273-AC7B-FC585D52CC49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -144,5 +150,6 @@ Global
 		{AF420A05-83DA-4134-8341-039265759DBC} = {050C779A-572A-4685-B189-D0BABDAE5CD9}
 		{60677416-FC65-4780-84DC-A1B77DF2DFC1} = {AF420A05-83DA-4134-8341-039265759DBC}
 		{915EAE8E-A903-4DB6-9BE5-3BA7F684A3BE} = {AF420A05-83DA-4134-8341-039265759DBC}
+		{AEBB808B-8C51-4273-AC7B-FC585D52CC49} = {61FB7240-8334-4295-B040-19C9565E4B26}
 	EndGlobalSection
 EndGlobal
