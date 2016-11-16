@@ -48,9 +48,7 @@ namespace SeudoBuild
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;
             macros["build_target_name"] = pipeline.TargetConfig.TargetName;
             macros["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-
-            // TODO
-            //macros["app_version"] = 
+            macros["app_version"] = pipeline.TargetConfig.Version.ToString();
 
             // Clean
             pipeline.Workspace.CleanBuildOutputDirectory();

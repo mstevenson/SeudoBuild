@@ -5,6 +5,7 @@ namespace SeudoBuild
     public class BuildTargetConfig
     {
         public string TargetName { get; set; }
+        public VersionNumber Version = new VersionNumber();
         public List<SourceStepConfig> SourceSteps { get; set; } = new List<SourceStepConfig>();
         public List<BuildStepConfig> BuildSteps { get; set; } = new List<BuildStepConfig>();
         public List<ArchiveStepConfig> ArchiveSteps { get; set; } = new List<ArchiveStepConfig>();

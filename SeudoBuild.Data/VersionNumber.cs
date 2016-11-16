@@ -10,7 +10,7 @@
 
         public override string ToString()
         {
-            return $"{Major}.{Minor}.{Patch}{Build}";
+            return $"{Major}.{Minor}.{Patch}{Build}".Replace(' ', '_');
         }
     }
 }
