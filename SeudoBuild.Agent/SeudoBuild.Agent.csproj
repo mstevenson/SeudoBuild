@@ -50,6 +50,7 @@
     <Compile Include="BuildAgentConfig.cs" />
     <Compile Include="DeploymentTarget.cs" />
     <Compile Include="AgentName.cs" />
+    <Compile Include="Net\Bus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">
@@ -63,6 +64,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Net\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

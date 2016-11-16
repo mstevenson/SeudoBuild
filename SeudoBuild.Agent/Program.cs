@@ -27,11 +27,11 @@ namespace SeudoBuild.Agent
             [Option('p', "project-config", HelpText = "Path to a project configuration file.", Required = true)]
             public string ProjectConfigPath { get; set; }
 
-            [Option('t', "build-target", HelpText = "Name of the target to build as specified in the project configuration file.", Required = true)]
+            [Option('t', "build-target", HelpText = "Name of the target to build as specified in the project configuration file.")]
             public string BuildTarget { get; set; }
 
             [Option('a', "agent-name", HelpText = "The unique name of a specific build agent. If not set, the job will be broadcast to all available agents.")]
-            public string Host { get; set; }
+            public string AgentName { get; set; }
         }
 
         [Verb("queue", HelpText = "Queue build requests received over the network.")]
@@ -41,7 +41,7 @@ namespace SeudoBuild.Agent
             public string AgentName { get; set; }
 
             [Option('p', "port", HelpText = "Port on which to listen for build queue messages.")]
-            public string Host { get; set; }
+            public int? Port { get; set; }
         }
 
         [Verb("deploy", HelpText = "Listen for deployment messages.")]
@@ -58,6 +58,8 @@ namespace SeudoBuild.Agent
 
         public static void Main(string[] args)
         {
+            Console.Title = "SeudoBuild";
+
             Parser.Default.ParseArguments<BuildSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions, NameSubOptions>(args)
                 .MapResult(
                     (BuildSubOptions opts) => Build(opts),
@@ -72,6 +74,8 @@ namespace SeudoBuild.Agent
         // Build locally
         static int Build(BuildSubOptions opts)
         {
+            Console.Title = "SeudoBuild • Build";
+
             // Load pipeline modules
             ModuleLoader modules = LoadModules();
 
@@ -118,8 +122,10 @@ namespace SeudoBuild.Agent
         // Submit job to the network
         static int Submit(SubmitSubOptions opts)
         {
+            Console.Title = "SeudoBuild • Submit";
+
             var submit = new BuildSubmit();
-            submit.Submit();
+            submit.Submit(opts.ProjectConfigPath, opts.BuildTarget, opts.AgentName);
 
             return 0;
         }
@@ -127,11 +133,18 @@ namespace SeudoBuild.Agent
         // Listen for jobs on the network
         static int Queue(QueueSubOptions opts)
         {
+            Console.Title = "SeudoBuild • Queue";
+
             var modules = LoadModules();
 
             string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
+            int port = 5555;
+            if (opts.Port.HasValue)
+            {
+                port = opts.Port.Value;
+            }
 
-            var server = new BuildQueue(agentName);
+            var server = new BuildQueue(agentName, port);
             server.Start();
 
             return 0;
