@@ -1,9 +1,8 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace SeudoBuild
 {
     public class SourceSequenceResults : PipelineSequenceResults<SourceStepResults>
     {
-        public string CurrentCommitIdentifier { get; set; }
     }
 }

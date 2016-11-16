@@ -10,9 +10,9 @@ namespace SeudoBuild
         public TimeSpan Duration { get; set; }
     }
 
-    public abstract class PipelineSequenceResults<TStep> : PipelineSequenceResults
-        where TStep : PipelineStepResults, new()
+    public abstract class PipelineSequenceResults<T> : PipelineSequenceResults
+        where T : PipelineStepResults, new()
     {
-        public List<TStep> StepResults { get; } = new List<TStep>();
+        public List<T> StepResults { get; } = new List<T>();
     }
 }

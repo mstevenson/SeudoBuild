@@ -35,9 +35,6 @@ namespace SeudoBuild.Modules.GitSource
 
         public SourceStepResults ExecuteStep(Workspace workspace)
         {
-            // FIXME
-            //macros["commit_identifier"] = vcsResults.CurrentCommitIdentifier;
-
             BuildConsole.IndentLevel++;
 
             var results = new SourceStepResults();
@@ -59,7 +56,7 @@ namespace SeudoBuild.Modules.GitSource
                 results.Exception = e;
             }
 
-            results.CommitIdentifier = CurrentCommit;
+            results.CommitIdentifier = CurrentCommitShortHash;
             results.IsSuccess = true;
             return results;
         }
@@ -88,6 +85,19 @@ namespace SeudoBuild.Modules.GitSource
                     result = repo.Head.Tip.Sha;
                 }
                 return result;
+            }
+        }
+
+        string CurrentCommitShortHash
+        {
+            get
+            {
+                string commit = CurrentCommit;
+                if (commit.Length == 0)
+                {
+                    return "";
+                }
+                return commit.Substring(0, 7);
             }
         }
 
