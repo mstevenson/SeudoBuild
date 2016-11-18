@@ -37,13 +37,16 @@ namespace SeudoBuild
             Console.WriteLine("");
             BuildConsole.WriteLine("Running Pipeline");
             BuildConsole.IndentLevel++;
-            BuildConsole.WritePlus($"Project: {projectConfig.ProjectName}");
-            BuildConsole.WritePlus($"Target:  {buildTargetName}");
+            BuildConsole.WritePlus($"Project:  {projectConfig.ProjectName}");
+            BuildConsole.WritePlus($"Target:   {buildTargetName}");
+            //BuildConsole.WritePlus($"Location: {projectsBaseDirectory}/{projectNameSanitized}"); 
             BuildConsole.IndentLevel--;
             Console.WriteLine("");
 
             // Setup pipeline
-            var pipeline = ProjectPipeline.Create(builderConfig.ProjectsPath, projectConfig, buildTargetName, modules);
+            var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
+            pipeline.InitializeWorkspace(builderConfig.ProjectsPath, new FileSystem());
+            pipeline.LoadBuildStepModules(modules);
             var macros = pipeline.Workspace.Macros;
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;
             macros["build_target_name"] = pipeline.TargetConfig.TargetName;

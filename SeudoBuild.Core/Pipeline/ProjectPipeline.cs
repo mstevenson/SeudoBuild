@@ -20,50 +20,27 @@ namespace SeudoBuild
             return steps.Cast<T>().ToList();
         }
 
-        public static ProjectPipeline Create(string baseDirectory, ProjectConfig config, string buildTargetName, ModuleLoader loader)
-        {
-            var pipeline = new ProjectPipeline(config, buildTargetName);
-            pipeline.Initialize(baseDirectory, buildTargetName, loader);
-            return pipeline;
-        }
-
-        ProjectPipeline (ProjectConfig config, string buildTargetName)
+        public ProjectPipeline (ProjectConfig config, string buildTargetName)
         {
             this.ProjectConfig = config;
+            TargetConfig = ProjectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
         }
 
-        void Initialize(string projectsBaseDirectory, string buildTargetName, ModuleLoader loader)
+        public void InitializeWorkspace(string projectsBaseDirectory, IFileSystem fileSystem)
         {
             string projectNameSanitized = ProjectConfig.ProjectName.Replace(' ', '_');
             string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
-
-            var fileSystem = new FileSystem();
-
             Workspace = new Workspace(projectDirectory, fileSystem);
-            BuildConsole.WriteLine("Saving to " + projectDirectory);
-            Console.WriteLine("");
             Workspace.CreateSubDirectories();
+        }
 
-            TargetConfig = GetBuildTargetConfig(buildTargetName);
-
-            //VersionControlSystem = InitializeVersionControlSystem();
+        public void LoadBuildStepModules(ModuleLoader loader)
+        {
             stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(loader, Workspace);
             stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(loader, Workspace);
             stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(loader, Workspace);
             stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(loader, Workspace);
             stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(loader, Workspace);
-        }
-
-        BuildTargetConfig GetBuildTargetConfig(string targetName)
-        {
-            foreach (var t in ProjectConfig.BuildTargets)
-            {
-                if (t.TargetName == targetName)
-                {
-                    return t;
-                }
-            }
-            return null;
         }
 
         IReadOnlyCollection<T> CreatePipelineSteps<T>(ModuleLoader loader, Workspace workspace)
