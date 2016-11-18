@@ -125,31 +125,34 @@ namespace SeudoBuild
 
         public Macros Macros { get; } = new Macros();
 
-        public Workspace(string projectDirectory)
+        IFileSystem fileSystem;
+
+        public Workspace(string projectDirectory, IFileSystem fileSystem)
         {
             WorkingDirectory = $"{projectDirectory}/Workspace";
             BuildOutputDirectory = $"{projectDirectory}/Output";
             ArchivesDirectory = $"{projectDirectory}/Archives";
             LogsDirectory = $"{projectDirectory}/Logs";
+            this.fileSystem = fileSystem;
         }
 
         public void CreateSubDirectories()
         {
-            if (!Directory.Exists(WorkingDirectory))
+            if (!fileSystem.DirectoryExists(WorkingDirectory))
             {
-                Directory.CreateDirectory(WorkingDirectory);
+                fileSystem.CreateDirectory(WorkingDirectory);
             }
-            if (!Directory.Exists(BuildOutputDirectory))
+            if (!fileSystem.DirectoryExists(BuildOutputDirectory))
             {
-                Directory.CreateDirectory(BuildOutputDirectory);
+                fileSystem.CreateDirectory(BuildOutputDirectory);
             }
-            if (!Directory.Exists(ArchivesDirectory))
+            if (!fileSystem.DirectoryExists(ArchivesDirectory))
             {
-                Directory.CreateDirectory(ArchivesDirectory);
+                fileSystem.CreateDirectory(ArchivesDirectory);
             }
-            if (!Directory.Exists(LogsDirectory))
+            if (!fileSystem.DirectoryExists(LogsDirectory))
             {
-                Directory.CreateDirectory(LogsDirectory);
+                fileSystem.CreateDirectory(LogsDirectory);
             }
         }
 
@@ -175,22 +178,12 @@ namespace SeudoBuild
 
         void CleanDirectory (string directory)
         {
-            if (!Directory.Exists(directory))
+            if (!fileSystem.DirectoryExists(directory))
             {
                 return;
             }
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
-
-            foreach (FileInfo file in directoryInfo.GetFiles())
-            {
-                file.Delete();
-            }
-
-            foreach (DirectoryInfo dir in directoryInfo.GetDirectories())
-            {
-                dir.Delete(true);
-            }
+            fileSystem.DeleteDirectory(directory);
         }
     }
 }

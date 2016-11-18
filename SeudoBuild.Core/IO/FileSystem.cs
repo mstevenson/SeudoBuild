@@ -68,6 +68,31 @@ namespace SeudoBuild
             System.IO.File.Replace(source, destination, backupDestination);
         }
 
+        public bool DirectoryExists(string path)
+        {
+            return System.IO.Directory.Exists(path);
+        }
+
+        public void CreateDirectory(string path)
+        {
+            System.IO.Directory.CreateDirectory(path);
+        }
+
+        public void DeleteDirectory(string directoryPath)
+        {
+            System.IO.DirectoryInfo directoryInfo = new System.IO.DirectoryInfo(directoryPath);
+
+            foreach (System.IO.FileInfo file in directoryInfo.GetFiles())
+            {
+                file.Delete();
+            }
+
+            foreach (System.IO.DirectoryInfo dir in directoryInfo.GetDirectories())
+            {
+                dir.Delete(true);
+            }
+        }
+
         public System.IO.Stream OpenRead(string path)
         {
             var stream = System.IO.File.OpenRead(path);
