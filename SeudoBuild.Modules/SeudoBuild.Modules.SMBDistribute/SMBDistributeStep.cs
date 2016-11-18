@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using Path = System.IO.Path;
 using System.Diagnostics;
 
 namespace SeudoBuild.Modules.SMBDistribute

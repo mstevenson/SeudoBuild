@@ -125,7 +125,7 @@ namespace SeudoBuild
 
         public Macros Macros { get; } = new Macros();
 
-        IFileSystem fileSystem;
+        public IFileSystem FileSystem { get; private set; }
 
         public Workspace(string projectDirectory, IFileSystem fileSystem)
         {
@@ -133,26 +133,26 @@ namespace SeudoBuild
             BuildOutputDirectory = $"{projectDirectory}/Output";
             ArchivesDirectory = $"{projectDirectory}/Archives";
             LogsDirectory = $"{projectDirectory}/Logs";
-            this.fileSystem = fileSystem;
+            this.FileSystem = fileSystem;
         }
 
         public void CreateSubDirectories()
         {
-            if (!fileSystem.DirectoryExists(WorkingDirectory))
+            if (!FileSystem.DirectoryExists(WorkingDirectory))
             {
-                fileSystem.CreateDirectory(WorkingDirectory);
+                FileSystem.CreateDirectory(WorkingDirectory);
             }
-            if (!fileSystem.DirectoryExists(BuildOutputDirectory))
+            if (!FileSystem.DirectoryExists(BuildOutputDirectory))
             {
-                fileSystem.CreateDirectory(BuildOutputDirectory);
+                FileSystem.CreateDirectory(BuildOutputDirectory);
             }
-            if (!fileSystem.DirectoryExists(ArchivesDirectory))
+            if (!FileSystem.DirectoryExists(ArchivesDirectory))
             {
-                fileSystem.CreateDirectory(ArchivesDirectory);
+                FileSystem.CreateDirectory(ArchivesDirectory);
             }
-            if (!fileSystem.DirectoryExists(LogsDirectory))
+            if (!FileSystem.DirectoryExists(LogsDirectory))
             {
-                fileSystem.CreateDirectory(LogsDirectory);
+                FileSystem.CreateDirectory(LogsDirectory);
             }
         }
 
@@ -178,12 +178,12 @@ namespace SeudoBuild
 
         void CleanDirectory (string directory)
         {
-            if (!fileSystem.DirectoryExists(directory))
+            if (!FileSystem.DirectoryExists(directory))
             {
                 return;
             }
 
-            fileSystem.DeleteDirectory(directory);
+            FileSystem.DeleteDirectory(directory);
         }
     }
 }

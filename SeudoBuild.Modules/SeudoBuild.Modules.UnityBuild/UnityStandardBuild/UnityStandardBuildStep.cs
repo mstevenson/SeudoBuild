@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
+using Path = System.IO.Path;
 
 namespace SeudoBuild.Modules.UnityBuild
 {

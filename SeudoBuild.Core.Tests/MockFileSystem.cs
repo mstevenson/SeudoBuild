@@ -181,6 +181,11 @@ namespace SeudoBuild.Core.Tests
             throw new System.NotImplementedException();
         }
 
+        public void DeleteDirectory(string directoryPath)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public System.IO.Stream OpenRead(string path)
         {
             if (!allFiles.ContainsKey(path))

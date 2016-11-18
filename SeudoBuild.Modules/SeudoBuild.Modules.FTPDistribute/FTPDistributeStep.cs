@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Collections.Generic;
 
 namespace SeudoBuild.Modules.FTPDistribute
 {
@@ -40,6 +39,8 @@ namespace SeudoBuild.Modules.FTPDistribute
             request.Method = WebRequestMethods.Ftp.UploadFile;
             request.UseBinary = true;
             request.KeepAlive = true;
+
+            // FIXME abstract IO using IFileSystem
 
             var file = new FileInfo($"{workspace.ArchivesDirectory}/{archiveInfo.ArchiveFileName}");
             request.ContentLength = file.Length;

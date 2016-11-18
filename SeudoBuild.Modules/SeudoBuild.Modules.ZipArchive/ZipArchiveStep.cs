@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using Ionic.Zip;
+using Path = System.IO.Path;
 
 namespace SeudoBuild.Modules.ZipArchive
 {
@@ -21,6 +21,8 @@ namespace SeudoBuild.Modules.ZipArchive
         {
             try
             {
+                var fs = workspace.FileSystem;
+
                 // Remove file extension in case it was accidentally included in the config data
                 string filename = Path.GetFileNameWithoutExtension(config.Filename);
                 // Replace in-line variables
@@ -31,17 +33,18 @@ namespace SeudoBuild.Modules.ZipArchive
                 string filepath = $"{workspace.ArchivesDirectory}/{filename}";
 
                 // Remove old file
-                if (File.Exists(filepath)) {
-                    File.Delete(filepath);
+                if (fs.FileExists(filepath)) {
+                    fs.DeleteFile(filepath);
                 }
 
                 BuildConsole.WriteLine($"Creating zip file {filename}");
 
                 // Save zip file
                 using (var zipFile = new ZipFile())
+                using (var stream = fs.OpenWrite(filepath))
                 {
                     zipFile.AddDirectory(workspace.BuildOutputDirectory);
-                    zipFile.Save(filepath);
+                    zipFile.Save(stream);
                 }
 
                 BuildConsole.WriteLine("Zip file saved");

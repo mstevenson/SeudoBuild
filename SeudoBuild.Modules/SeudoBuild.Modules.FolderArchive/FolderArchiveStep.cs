@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 namespace SeudoBuild
 {
@@ -23,9 +22,9 @@ namespace SeudoBuild
                 string dest = $"{workspace.ArchivesDirectory}/{folderName}";
 
                 // Remove old directory
-                if (Directory.Exists(dest))
+                if (workspace.FileSystem.DirectoryExists(dest))
                 {
-                    Directory.Delete(dest, true);
+                    workspace.FileSystem.DeleteDirectory(dest);
                 }
 
                 CopyDirectory(source, dest);
@@ -41,6 +40,8 @@ namespace SeudoBuild
 
         void CopyDirectory(string source, string dest)
         {
+            // FIXME abstract using IFileSystem
+
             // Get the subdirectories for the specified directory.
             DirectoryInfo sourceDir = new DirectoryInfo(source);
 

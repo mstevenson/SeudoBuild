@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using RunProcessAsTask;
-using System.IO;
+using Path = System.IO.Path;
 
 namespace SeudoBuild.Modules.UnityBuild
 {
@@ -27,7 +27,7 @@ namespace SeudoBuild.Modules.UnityBuild
 
         Task<ProcessResults> Run(UnityInstallation unity, UnityParameterizedBuildConfig config, Workspace workspace)
         {
-            if (!File.Exists(unity.ExePath))
+            if (!workspace.FileSystem.FileExists(unity.ExePath))
             {
                 throw new System.Exception("Unity executable does not exist at path " + unity.ExePath);
             }

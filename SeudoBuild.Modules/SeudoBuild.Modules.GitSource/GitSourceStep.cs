@@ -109,6 +109,8 @@ namespace SeudoBuild.Modules.GitSource
             // Should use UriBuilder, but it doesn't include the password in the resulting uri string
             string urlWithCredentials = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}{uri.AbsolutePath}";
 
+            // FIXME abstract using IFileSystem
+
             File.WriteAllText(credentialsPath, urlWithCredentials);
             credentialsPath = Path.GetFullPath(credentialsPath);
             // FIXME escape spaces in path
