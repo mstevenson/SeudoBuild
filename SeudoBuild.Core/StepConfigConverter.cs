@@ -5,30 +5,32 @@ using System.Collections.Generic;
 
 namespace SeudoBuild
 {
-    public abstract class StepConfigConverter : JsonConverter
+    public class StepConfigConverter : JsonConverter
     {
-        public abstract void RegisterConfigType(string jsonName, Type type);
-    }
+        readonly Type configBaseType;
+        readonly Dictionary<string, Type> configTypeMap = new Dictionary<string, Type>();
 
-    // T should be a base type, like SourceStepConfig,
-    // and U is a derived type, like GitSourceStepConfig
-    public class StepConfigConverter<T> : StepConfigConverter
-        where T : StepConfig
-    {
-        Dictionary<string, Type> configTypeMap = new Dictionary<string, Type>();
-
-        public override void RegisterConfigType(string jsonName, Type type)
+        public StepConfigConverter(Type configBaseType)
         {
-            if (!typeof(T).IsAssignableFrom(type))
+            if (configBaseType == typeof(StepConfig) || !typeof(StepConfig).IsAssignableFrom(configBaseType))
             {
-                throw new ArgumentException($"Type {type} is not assignable from {typeof(T)}");
+                throw new ArgumentException("StepConfigConverter must be given a type that inherits from StepConfig");
+            }
+            this.configBaseType = configBaseType;
+        }
+
+        public void RegisterConfigType(string jsonName, Type type)
+        {
+            if (!configBaseType.IsAssignableFrom(type))
+            {
+                throw new ArgumentException($"Type {type} is not assignable from {configBaseType}");
             }
             configTypeMap.Add(jsonName, type);
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(T));
+            return (objectType == configBaseType);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -57,5 +59,11 @@ namespace SeudoBuild
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class StepConfigConverter<T> : StepConfigConverter
+        where T : StepConfig
+    {
+        public StepConfigConverter() : base(typeof(T)) {}
     }
 }

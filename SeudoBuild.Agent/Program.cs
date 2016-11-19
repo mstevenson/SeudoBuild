@@ -85,7 +85,7 @@ namespace SeudoBuild.Agent
             {
                 var fs = new FileSystem();
                 var serializer = new Serializer(fs);
-                var converters = modules.GetJsonConverters();
+                var converters = modules.Registry.GetJsonConverters();
                 projectConfig = serializer.Deserialize<ProjectConfig>(opts.ProjectConfigPath, converters);
             }
             catch (Exception e)

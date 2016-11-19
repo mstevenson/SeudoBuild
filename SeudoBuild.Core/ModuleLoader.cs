@@ -11,31 +11,31 @@ namespace SeudoBuild
 
     public class ModuleLoader
     {
-        class ModuleCategory
-        {
-            public readonly Type moduleType;
-            public readonly Type moduleStepType;
-            public readonly Type stepConfigType;
-            public readonly List<IModule> loadedModules = new List<IModule>();
-
-            public ModuleCategory(Type moduleType, Type moduleStepType, Type stepConfigType)
-            {
-                this.moduleType = moduleType;
-                this.moduleStepType = moduleStepType;
-                this.stepConfigType = stepConfigType;
-            }
-        }
-
-        class ModuleCategory<T, U, V> : ModuleCategory
-            where T : IModule
-            where U : IPipelineStep
-            where V : StepConfig
-        {
-            public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) {}
-        }
-
         public class ModuleRegistry
         {
+            class ModuleCategory
+            {
+                public readonly Type moduleBaseType;
+                public readonly Type moduleStepBaseType;
+                public readonly Type stepConfigBaseType;
+                public readonly List<IModule> loadedModules = new List<IModule>();
+
+                public ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
+                {
+                    this.moduleBaseType = moduleBaseType;
+                    this.moduleStepBaseType = moduleStepBaseType;
+                    this.stepConfigBaseType = stepConfigBaseType;
+                }
+            }
+
+            class ModuleCategory<T, U, V> : ModuleCategory
+                where T : IModule
+                where U : IPipelineStep
+                where V : StepConfig
+            {
+                public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) { }
+            }
+
             readonly List<ModuleCategory> moduleCategories = new List<ModuleCategory>
             {
                 new ModuleCategory<ISourceModule, ISourceStep, SourceStepConfig>(),
@@ -55,7 +55,7 @@ namespace SeudoBuild
             {
                 try
                 {
-                    var category = moduleCategories.First(cat => cat.moduleType == typeof(T));
+                    var category = moduleCategories.First(cat => cat.moduleBaseType == typeof(T));
                     return category.loadedModules.Cast<T>();
                 }
                 catch
@@ -67,7 +67,7 @@ namespace SeudoBuild
             public IEnumerable<IModule> GetModulesForStepType<T>()
                 where T : IPipelineStep
             {
-                var category = moduleCategories.First(cat => cat.moduleStepType == typeof(T));
+                var category = moduleCategories.First(cat => cat.moduleStepBaseType == typeof(T));
                 return category.loadedModules;
             }
 
@@ -75,11 +75,36 @@ namespace SeudoBuild
             {
                 foreach (var category in moduleCategories)
                 {
-                    if (category.moduleType.IsAssignableFrom(module.GetType()))
+                    if (category.moduleBaseType.IsAssignableFrom(module.GetType()))
                     {
                         category.loadedModules.Add(module);
                     }
                 }
+            }
+
+            public JsonConverter[] GetJsonConverters()
+            {
+                var converters = new Dictionary<Type, StepConfigConverter>();
+                foreach (var category in moduleCategories)
+                {
+                    converters.Add(category.stepConfigBaseType, new StepConfigConverter(category.stepConfigBaseType));
+                }
+
+                var allModules = GetAllModules();
+
+                foreach (var kvp in converters)
+                {
+                    foreach (var module in allModules)
+                    {
+                        Type configBaseType = kvp.Key;
+                        if (configBaseType.IsAssignableFrom(module.StepConfigType))
+                        {
+                            converters[configBaseType].RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                        }
+                    }
+                }
+
+                return converters.Values.ToArray();
             }
         }
 
@@ -175,32 +200,6 @@ namespace SeudoBuild
                 }
             }
             return default(T);
-        }
-
-        public JsonConverter[] GetJsonConverters()
-        {
-            Dictionary<Type, StepConfigConverter> converters = new Dictionary<Type, StepConfigConverter>()
-            {
-                { typeof(SourceStepConfig), new StepConfigConverter<SourceStepConfig>() },
-                { typeof(BuildStepConfig), new StepConfigConverter<BuildStepConfig>() },
-                { typeof(ArchiveStepConfig), new StepConfigConverter<ArchiveStepConfig>() },
-                { typeof(DistributeStepConfig), new StepConfigConverter<DistributeStepConfig>() },
-                { typeof(NotifyStepConfig), new StepConfigConverter<NotifyStepConfig>() }
-            };
-
-            foreach (var kvp in converters)
-            {
-                foreach (var module in Registry.GetAllModules())
-                {
-                    Type configBaseType = kvp.Key;
-                    if (configBaseType.IsAssignableFrom(module.StepConfigType))
-                    {
-                        converters[configBaseType].RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                    }
-                }
-            }
-
-            return converters.Values.ToArray();
         }
     }
 }
