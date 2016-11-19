@@ -5,14 +5,19 @@ using System.Collections.Generic;
 
 namespace SeudoBuild
 {
+    public abstract class StepConfigConverter : JsonConverter
+    {
+        public abstract void RegisterConfigType(string jsonName, Type type);
+    }
+
     // T should be a base type, like SourceStepConfig,
     // and U is a derived type, like GitSourceStepConfig
-    public class StepConfigConverter<T> : JsonConverter
+    public class StepConfigConverter<T> : StepConfigConverter
         where T : StepConfig
     {
         Dictionary<string, Type> configTypeMap = new Dictionary<string, Type>();
 
-        public void RegisterConfigType(string jsonName, Type type)
+        public override void RegisterConfigType(string jsonName, Type type)
         {
             if (!typeof(T).IsAssignableFrom(type))
             {

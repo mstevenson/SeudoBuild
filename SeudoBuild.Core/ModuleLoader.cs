@@ -85,53 +85,6 @@ namespace SeudoBuild
 
         public ModuleRegistry Registry { get; } = new ModuleRegistry();
 
-        public JsonConverter[] GetJsonConverters ()
-        {
-            // TODO generalize this
-
-            List<JsonConverter> converters = new List<JsonConverter>();
-
-            var sourceConverter = new StepConfigConverter<SourceStepConfig>();
-            var buildConverter = new StepConfigConverter<BuildStepConfig>();
-            var archiveConverter = new StepConfigConverter<ArchiveStepConfig>();
-            var distributeConverter = new StepConfigConverter<DistributeStepConfig>();
-            var notifyConverter = new StepConfigConverter<NotifyStepConfig>();
-
-            foreach (var module in Registry.GetAllModules())
-            {
-                // Build a list of json converters, one for each base sep type (source, build, etc)
-                // add specific step config types to each one as reported by each module
-
-                if (typeof(SourceStepConfig).IsAssignableFrom(module.StepConfigType))
-                {
-                    sourceConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                }
-                if (typeof(BuildStepConfig).IsAssignableFrom(module.StepConfigType))
-                {
-                    buildConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                }
-                if (typeof(ArchiveStepConfig).IsAssignableFrom(module.StepConfigType))
-                {
-                    archiveConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                }
-                if (typeof(DistributeStepConfig).IsAssignableFrom(module.StepConfigType))
-                {
-                    distributeConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                }
-                if (typeof(NotifyStepConfig).IsAssignableFrom(module.StepConfigType))
-                {
-                    notifyConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                }
-            }
-            converters.Add(sourceConverter);
-            converters.Add(buildConverter);
-            converters.Add(archiveConverter);
-            converters.Add(distributeConverter);
-            converters.Add(notifyConverter);
-
-            return converters.ToArray();
-        }
-
         public void LoadAssembly(string file)
         {
             if (!File.Exists(file))
@@ -222,6 +175,32 @@ namespace SeudoBuild
                 }
             }
             return default(T);
+        }
+
+        public JsonConverter[] GetJsonConverters()
+        {
+            Dictionary<Type, StepConfigConverter> converters = new Dictionary<Type, StepConfigConverter>()
+            {
+                { typeof(SourceStepConfig), new StepConfigConverter<SourceStepConfig>() },
+                { typeof(BuildStepConfig), new StepConfigConverter<BuildStepConfig>() },
+                { typeof(ArchiveStepConfig), new StepConfigConverter<ArchiveStepConfig>() },
+                { typeof(DistributeStepConfig), new StepConfigConverter<DistributeStepConfig>() },
+                { typeof(NotifyStepConfig), new StepConfigConverter<NotifyStepConfig>() }
+            };
+
+            foreach (var kvp in converters)
+            {
+                foreach (var module in Registry.GetAllModules())
+                {
+                    Type configBaseType = kvp.Key;
+                    if (configBaseType.IsAssignableFrom(module.StepConfigType))
+                    {
+                        converters[configBaseType].RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                    }
+                }
+            }
+
+            return converters.Values.ToArray();
         }
     }
 }
