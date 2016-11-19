@@ -11,42 +11,84 @@ namespace SeudoBuild
 
     public class ModuleLoader
     {
-        Dictionary<Type, List<IModule>> stepTypeToModulesMap = new Dictionary<Type, List<IModule>>
+        class ModuleCategory
         {
-            { typeof(ISourceStep), new List<IModule>() },
-            { typeof(IBuildStep), new List<IModule>() },
-            { typeof(IArchiveStep), new List<IModule>() },
-            { typeof(IDistributeStep), new List<IModule>() },
-            { typeof(INotifyStep), new List<IModule>() }
-        };
+            public readonly Type moduleType;
+            public readonly Type moduleStepType;
+            public readonly Type stepConfigType;
+            public readonly List<IModule> loadedModules = new List<IModule>();
 
-        public IEnumerable<ISourceModule> SourceModules
-        {
-            get { return stepTypeToModulesMap[typeof(ISourceStep)].Cast<ISourceModule>(); }
+            public ModuleCategory(Type moduleType, Type moduleStepType, Type stepConfigType)
+            {
+                this.moduleType = moduleType;
+                this.moduleStepType = moduleStepType;
+                this.stepConfigType = stepConfigType;
+            }
         }
 
-        public IEnumerable<IBuildModule> BuildModules
+        class ModuleCategory<T, U, V> : ModuleCategory
+            where T : IModule
+            where U : IPipelineStep
+            where V : StepConfig
         {
-            get { return stepTypeToModulesMap[typeof(IBuildStep)].Cast<IBuildModule>(); }
+            public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) {}
         }
 
-        public IEnumerable<IArchiveModule> ArchiveModules
+        public class ModuleRegistry
         {
-            get { return stepTypeToModulesMap[typeof(IArchiveStep)].Cast<IArchiveModule>(); }
+            readonly List<ModuleCategory> moduleCategories = new List<ModuleCategory>
+            {
+                new ModuleCategory<ISourceModule, ISourceStep, SourceStepConfig>(),
+                new ModuleCategory<IBuildModule, IBuildStep, BuildStepConfig>(),
+                new ModuleCategory<IArchiveModule, IArchiveStep, ArchiveStepConfig>(),
+                new ModuleCategory<IDistributeModule, IDistributeStep, DistributeStepConfig>(),
+                new ModuleCategory<INotifyModule, INotifyStep, NotifyStepConfig>()
+            };
+
+            public IEnumerable<IModule> GetAllModules()
+            {
+                return moduleCategories.Select(cat => cat.loadedModules).SelectMany(m => m);
+            }
+
+            public IEnumerable<T> GetModules<T>()
+                where T : IModule
+            {
+                try
+                {
+                    var category = moduleCategories.First(cat => cat.moduleType == typeof(T));
+                    return category.loadedModules.Cast<T>();
+                }
+                catch
+                {
+                    throw new Exception($"Could not find modules of type {typeof(T)}");
+                }
+            }
+
+            public IEnumerable<IModule> GetModulesForStepType<T>()
+                where T : IPipelineStep
+            {
+                var category = moduleCategories.First(cat => cat.moduleStepType == typeof(T));
+                return category.loadedModules;
+            }
+
+            public void RegisterModule(IModule module)
+            {
+                foreach (var category in moduleCategories)
+                {
+                    if (category.moduleType.IsAssignableFrom(module.GetType()))
+                    {
+                        category.loadedModules.Add(module);
+                    }
+                }
+            }
         }
 
-        public IEnumerable<IDistributeModule> DistributeModules
-        {
-            get { return stepTypeToModulesMap[typeof(IDistributeStep)].Cast<IDistributeModule>(); }
-        }
-
-        public IEnumerable<INotifyModule> NotifyModules
-        {
-            get { return stepTypeToModulesMap[typeof(INotifyStep)].Cast<INotifyModule>(); }
-        }
+        public ModuleRegistry Registry { get; } = new ModuleRegistry();
 
         public JsonConverter[] GetJsonConverters ()
         {
+            // TODO generalize this
+
             List<JsonConverter> converters = new List<JsonConverter>();
 
             var sourceConverter = new StepConfigConverter<SourceStepConfig>();
@@ -55,35 +97,31 @@ namespace SeudoBuild
             var distributeConverter = new StepConfigConverter<DistributeStepConfig>();
             var notifyConverter = new StepConfigConverter<NotifyStepConfig>();
 
-            foreach (var kvp in stepTypeToModulesMap)
+            foreach (var module in Registry.GetAllModules())
             {
                 // Build a list of json converters, one for each base sep type (source, build, etc)
                 // add specific step config types to each one as reported by each module
 
-                foreach (var module in kvp.Value)
+                if (typeof(SourceStepConfig).IsAssignableFrom(module.StepConfigType))
                 {
-                    if (typeof(SourceStepConfig).IsAssignableFrom(module.StepConfigType))
-                    {
-                        sourceConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                    }
-                    if (typeof(BuildStepConfig).IsAssignableFrom(module.StepConfigType))
-                    {
-                        buildConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                    }
-                    if (typeof(ArchiveStepConfig).IsAssignableFrom(module.StepConfigType))
-                    {
-                        archiveConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                    }
-                    if (typeof(DistributeStepConfig).IsAssignableFrom(module.StepConfigType))
-                    {
-                        distributeConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                    }
-                    if (typeof(NotifyStepConfig).IsAssignableFrom(module.StepConfigType))
-                    {
-                        notifyConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                    }
+                    sourceConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
                 }
-
+                if (typeof(BuildStepConfig).IsAssignableFrom(module.StepConfigType))
+                {
+                    buildConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                }
+                if (typeof(ArchiveStepConfig).IsAssignableFrom(module.StepConfigType))
+                {
+                    archiveConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                }
+                if (typeof(DistributeStepConfig).IsAssignableFrom(module.StepConfigType))
+                {
+                    distributeConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                }
+                if (typeof(NotifyStepConfig).IsAssignableFrom(module.StepConfigType))
+                {
+                    notifyConverter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                }
             }
             converters.Add(sourceConverter);
             converters.Add(buildConverter);
@@ -93,17 +131,6 @@ namespace SeudoBuild
 
             return converters.ToArray();
         }
-
-        //JsonConverter RegisterConverter<T>(IModule module)
-        //    where T : StepConfig
-        //{
-        //    var converter = new StepConfigConverter<SourceStepConfig>();
-        //    if (module.StepConfigType.IsAssignableFrom(typeof(SourceStepConfig)))
-        //    {
-        //        converter.RegisterConfigType(module.StepConfigName, module.StepConfigType);
-        //    }
-        //    return converter;
-        //}
 
         public void LoadAssembly(string file)
         {
@@ -127,53 +154,38 @@ namespace SeudoBuild
                 throw e;
             }
 
-            var moduleTypes = new List<Type>();
+            var moduleTypesInAssembly = new List<Type>();
 
             try
             {
-                foreach (string moduleInterfaceName in new string[] { nameof(ISourceModule), nameof(IBuildModule), nameof(IArchiveModule), nameof(IDistributeModule), nameof(INotifyModule) })
-                {
-                    Type[] types = moduleAssembly.GetTypes();
-                    Assembly core = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals($"SeudoBuild.Core"));
+                string[] moduleCategoryTypeNames = {
+                    nameof(ISourceModule),
+                    nameof(IBuildModule),
+                    nameof(IArchiveModule),
+                    nameof(IDistributeModule),
+                    nameof(INotifyModule)
+                };
 
-                    Type targetType = core.GetType($"SeudoBuild.{moduleInterfaceName}");
-                    foreach (var type in types)
+                // Locate all types in the assembly that inherit from IModule
+                Type[] allTypesInAssembly = moduleAssembly.GetTypes();
+                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals($"SeudoBuild.Core"));
+                foreach (string moduleCategoryTypeName in moduleCategoryTypeNames)
+                {
+                    Type moduleCategoryType = coreAssembly.GetType($"SeudoBuild.{moduleCategoryTypeName}");
+                    foreach (var type in allTypesInAssembly)
                     {
-                        if (targetType.IsAssignableFrom(type))
+                        if (moduleCategoryType.IsAssignableFrom(type))
                         {
-                            moduleTypes.Add(type);
+                            moduleTypesInAssembly.Add(type);
                         }
                     }
                 }
 
-                foreach (Type modType in moduleTypes)
+                // Instantiate each IModule type
+                foreach (Type moduleType in moduleTypesInAssembly)
                 {
-                    object obj = Activator.CreateInstance(modType);
-                    if (typeof(ISourceModule).IsAssignableFrom(modType))
-                    {
-                        ISourceModule moduleInfo = (ISourceModule)obj;
-                        stepTypeToModulesMap[typeof(ISourceStep)].Add(moduleInfo);
-                    }
-                    else if (typeof(IBuildModule).IsAssignableFrom(modType))
-                    {
-                        IBuildModule moduleInfo = (IBuildModule)obj;
-                        stepTypeToModulesMap[typeof(IBuildStep)].Add(moduleInfo);
-                    }
-                    if (typeof(IArchiveModule).IsAssignableFrom(modType))
-                    {
-                        IArchiveModule moduleInfo = (IArchiveModule)obj;
-                        stepTypeToModulesMap[typeof(IArchiveStep)].Add(moduleInfo);
-                    }
-                    if (typeof(IDistributeModule).IsAssignableFrom(modType))
-                    {
-                        IDistributeModule moduleInfo = (IDistributeModule)obj;
-                        stepTypeToModulesMap[typeof(IDistributeStep)].Add(moduleInfo);
-                    }
-                    if (typeof(INotifyModule).IsAssignableFrom(modType))
-                    {
-                        INotifyModule moduleInfo = (INotifyModule)obj;
-                        stepTypeToModulesMap[typeof(INotifyStep)].Add(moduleInfo);
-                    }
+                    object obj = Activator.CreateInstance(moduleType);
+                    Registry.RegisterModule((IModule)obj);
                 }
             }
             catch (Exception e)
@@ -199,8 +211,7 @@ namespace SeudoBuild
         public T CreatePipelineStep<T>(StepConfig config, Workspace workspace)
             where T : IPipelineStep
         {
-            var modulesForStep = stepTypeToModulesMap[typeof(T)];
-            foreach (var module in modulesForStep)
+            foreach (var module in Registry.GetModulesForStepType<T>())
             {
                 if (config.GetType() == module.StepConfigType)
                 {

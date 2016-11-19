@@ -12,12 +12,6 @@ namespace SeudoBuild
     {
         Dictionary<string, Type> configTypeMap = new Dictionary<string, Type>();
 
-        public void RegisterConfigType<U>(string jsonName)
-            where U : T
-        {
-            configTypeMap.Add(jsonName, typeof(U));
-        }
-
         public void RegisterConfigType(string jsonName, Type type)
         {
             if (!typeof(T).IsAssignableFrom(type))

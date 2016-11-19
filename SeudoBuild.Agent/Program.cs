@@ -175,34 +175,34 @@ namespace SeudoBuild.Agent
 
         static ModuleLoader LoadModules()
         {
-            ModuleLoader modules = new ModuleLoader();
-            modules.LoadAllAssemblies("./Modules");
+            ModuleLoader loader = new ModuleLoader();
+            loader.LoadAllAssemblies("./Modules");
 
             BuildConsole.WriteLine("Loading Pipeline Modules");
             BuildConsole.IndentLevel++;
 
             string line = "";
 
-            line = "Source:      " + string.Join(", ", modules.SourceModules.Select(m => m.Name).ToArray());
+            line = "Source:      " + string.Join(", ", loader.Registry.GetModules<ISourceModule>().Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Build:       " + string.Join(", ", modules.BuildModules.Select(m => m.Name).ToArray());
+            line = "Build:       " + string.Join(", ", loader.Registry.GetModules<IBuildModule>().Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Archive:     " + string.Join(", ", modules.ArchiveModules.Select(m => m.Name).ToArray());
+            line = "Archive:     " + string.Join(", ", loader.Registry.GetModules<IArchiveModule>().Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Distribute:  " + string.Join(", ", modules.DistributeModules.Select(m => m.Name).ToArray());
+            line = "Distribute:  " + string.Join(", ", loader.Registry.GetModules<IDistributeModule>().Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
-            line = "Notify:      " + string.Join(", ", modules.NotifyModules.Select(m => m.Name).ToArray());
+            line = "Notify:      " + string.Join(", ", loader.Registry.GetModules<INotifyModule>().Select(m => m.Name).ToArray());
             BuildConsole.WritePlus(line);
 
             BuildConsole.IndentLevel--;
 
             Console.WriteLine("");
 
-            return modules;
+            return loader;
         }
     }
 }
