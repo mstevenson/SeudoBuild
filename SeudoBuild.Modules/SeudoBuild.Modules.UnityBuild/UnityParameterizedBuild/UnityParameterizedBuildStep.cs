@@ -10,21 +10,10 @@ namespace SeudoBuild.Modules.UnityBuild
     {
         public override string Type { get; } = "Unity Parameterized Build";
 
-        public override BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
+        protected override string GetBuildArgs(UnityParameterizedBuildConfig config, Workspace workspace)
         {
-            // TODO
-            return null;
-        }
-
-        Task<ProcessResults> Run(UnityInstallation unity, UnityParameterizedBuildConfig config, Workspace workspace)
-        {
-            if (!workspace.FileSystem.FileExists(unity.ExePath))
-            {
-                throw new System.Exception("Unity executable does not exist at path " + unity.ExePath);
-            }
-
             // FIXME match this to the Unity build script method name
-            string methodName = "Builder.RemoteBuild";
+            const string methodName = "Builder.RemoteBuild";
 
             // Use System.Environment.GetCommandLineArgs in Unity to get custom arguments
             var args = new List<string>();
@@ -86,13 +75,9 @@ namespace SeudoBuild.Modules.UnityBuild
                 args.Add(config.PostExportMethod);
             }
 
-
             var argString = string.Join(" ", args.ToArray());
 
-            var startInfo = new ProcessStartInfo(unity.ExePath, argString);
-
-            var task = ProcessEx.RunAsync(startInfo);
-            return task;
+            return argString;
         }
     }
 }

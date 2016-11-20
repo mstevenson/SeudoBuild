@@ -7,25 +7,7 @@ namespace SeudoBuild.Modules.UnityBuild
     {
         public override string Type { get; } = "Unity Standard Build";
 
-        public override BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
-        {
-            // FIXME don't hard-code
-
-            var version = new VersionNumber { Major = 5, Minor = 4, Patch = 2, Build = "f2" };
-
-            var unityInstallation = new UnityInstallation
-            {
-                Version = version,
-                ExePath = "/Applications/Unity/Unity.app/Contents/MacOS/Unity"
-            };
-
-            var args = GetBuildArgs(config, workspace);
-            var buildResult = ExecuteUnity(unityInstallation, args, workspace, config.SubDirectory);
-
-            return buildResult;
-        }
-
-        string GetBuildArgs(UnityStandardBuildConfig settings, Workspace workspace)
+        protected override string GetBuildArgs(UnityStandardBuildConfig config, Workspace workspace)
         {
             var args = new List<string>();
             args.Add("-quit");
@@ -37,7 +19,7 @@ namespace SeudoBuild.Modules.UnityBuild
 
             string executableExtension = "";
 
-            switch (settings.TargetPlatform)
+            switch (config.TargetPlatform)
             {
                 case UnityPlatform.Mac:
                     args.Add("-buildTarget osx");
@@ -55,7 +37,7 @@ namespace SeudoBuild.Modules.UnityBuild
                     break;
             }
 
-            string exePath = $"{workspace.BuildOutputDirectory}/{settings.OutputName}{executableExtension}";
+            string exePath = $"{workspace.BuildOutputDirectory}/{config.OutputName}{executableExtension}";
             args.Add(exePath);
 
             return string.Join(" ", args.ToArray());

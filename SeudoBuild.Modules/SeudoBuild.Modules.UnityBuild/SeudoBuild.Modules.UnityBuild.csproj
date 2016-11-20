@@ -48,6 +48,7 @@
     <Compile Include="UnityExecuteMethodBuild\UnityExecuteMethodBuildModule.cs" />
     <Compile Include="UnityParameterizedBuild\UnityParameterizedBuildModule.cs" />
     <Compile Include="UnityStandardBuild\UnityStandardBuildModule.cs" />
+    <Compile Include="UnityBuildConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

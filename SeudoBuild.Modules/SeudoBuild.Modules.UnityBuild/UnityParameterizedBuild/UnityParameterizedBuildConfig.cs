@@ -2,12 +2,11 @@
 
 namespace SeudoBuild.Modules.UnityBuild
 {
-    public class UnityParameterizedBuildConfig : BuildStepConfig
+    public class UnityParameterizedBuildConfig : UnityBuildConfig
     {
         public override string Type { get; } = "Unity Parameterized Build";
 
         public UnityPlatform TargetPlatform { get; set; }
-        public VersionNumber UnityVersionNumber { get; set; }
         public string ExecutableName { get; set; }
         public string PreBuildMethod { get; set; }
         public bool DevelopmentBuild { get; set; }
@@ -17,10 +16,5 @@ namespace SeudoBuild.Modules.UnityBuild
         public List<string> SceneList { get; set; } = new List<string>();
         public bool BuildAssetBundles { get; set; }
         public bool CopyAssetBundlesToStreamingAssets { get; set; }
-
-        /// <summary>
-        /// A path relative to the working directory that contains a Unity project.
-        /// </summary>
-        public string SubDirectory { get; set; } = "";
     }
 }

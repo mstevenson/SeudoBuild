@@ -36,7 +36,7 @@ namespace SeudoBuild.Modules.UnityBuild
                 case Workspace.Platform.Mac:
                     // find the installation folder
                     string installationPath = "/Applications/";
-                    string versionString = version.ToString();
+                    string versionString = version != null ? version.ToString() : "";
                     bool foundInstallationFolder = false;
                     foreach (var dir in Directory.GetDirectories(installationPath))
                     {
@@ -59,7 +59,7 @@ namespace SeudoBuild.Modules.UnityBuild
                     foreach (var dir in Directory.GetDirectories(installationPath))
                     {
                         string filename = Path.GetFileName(dir);
-                        if (filename.StartsWith("Unity") && filename.EndsWith(".app"))
+                        if (filename.StartsWith("Unity") && !filename.StartsWith("Unity Bug Reporter") && filename.EndsWith(".app"))
                         {
                             foundAppBundle = true;
                             appBundlePath += "/" + filename;

@@ -5,7 +5,7 @@ namespace SeudoBuild.Modules.UnityBuild
     /// <summary>
     /// Performs a standard Unity build, or executes an arbitrary static method in a Unity editor script.
     /// </summary>
-    public class UnityStandardBuildConfig : BuildStepConfig
+    public class UnityStandardBuildConfig : UnityBuildConfig
     {
         public override string Type { get; } = "Unity Standard Build";
 
@@ -16,12 +16,5 @@ namespace SeudoBuild.Modules.UnityBuild
         /// for this TargetPlatform.
         /// </summary>
         public UnityPlatform TargetPlatform { get; set; }
-
-        /// <summary>
-        /// The installed Unity executable to build with.
-        /// </summary>
-        public VersionNumber UnityVersionNumber { get; set; }
-
-        public string SubDirectory { get; set; } = "";
     }
 }

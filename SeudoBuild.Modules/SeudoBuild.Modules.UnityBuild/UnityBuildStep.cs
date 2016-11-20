@@ -6,7 +6,7 @@ using System.Linq;
 namespace SeudoBuild.Modules.UnityBuild
 {
     public abstract class UnityBuildStep<T> : IBuildStep<T>
-        where T : BuildStepConfig
+        where T : UnityBuildConfig
     {
         protected T config;
         protected Workspace workspace;
@@ -19,10 +19,33 @@ namespace SeudoBuild.Modules.UnityBuild
 
         public abstract string Type { get; }
 
-        public abstract BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace);
+        protected abstract string GetBuildArgs(T config, Workspace workspace);
+
+        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
+        {
+            var unityVersion = config.UnityVersionNumber;
+            string unityDirName = "Unity";
+            if (unityVersion != null && unityVersion.IsValid)
+            {
+                unityDirName = $"{unityDirName} {unityVersion.ToString()}";
+            }
+
+            var fileSystem = new FileSystem();
+            var unityInstallation = UnityInstallation.FindUnityInstallation(unityVersion, fileSystem);
+
+            var args = GetBuildArgs(config, workspace);
+            var buildResult = ExecuteUnity(unityInstallation, args, workspace, config.SubDirectory);
+
+            return buildResult;
+        }
 
         protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace, string relativeUnityProjectFolder)
         {
+            if (!workspace.FileSystem.FileExists(unityInstallation.ExePath))
+            {
+                throw new Exception("Unity executable does not exist at path " + unityInstallation.ExePath);
+            }
+
             BuildConsole.WriteLine($"Building with Unity {unityInstallation.Version}");
 
             string projectFolderPath = Path.Combine(workspace.WorkingDirectory, relativeUnityProjectFolder);
