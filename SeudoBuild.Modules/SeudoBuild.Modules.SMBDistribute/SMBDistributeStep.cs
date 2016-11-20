@@ -4,11 +4,11 @@ using System.Diagnostics;
 
 namespace SeudoBuild.Modules.SMBDistribute
 {
-    public class SMBDistributeStep : IDistributeStep
+    public class SMBDistributeStep : IDistributeStep<SMBDistributeConfig>
     {
         SMBDistributeConfig config;
 
-        public SMBDistributeStep(SMBDistributeConfig config, Workspace workspace)
+        public void Initialize(SMBDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }

@@ -191,12 +191,23 @@ namespace SeudoBuild
         {
             foreach (var module in Registry.GetModulesForStepType<T>())
             {
-                if (config.GetType() == module.StepConfigType)
+                Type configType = config.GetType();
+                
+                if (configType == module.StepConfigType)
                 {
-                    // FIXME fragile, this requires each IModule to implement a constructor with an identical signature.
-                    // Constructor args can't be enforced by the interface so this is a runtime error.
-                    object obj = Activator.CreateInstance(module.StepType, config, workspace);
-                    return (T)obj;
+                    // Construct a pipeline step type with a generic parameter for our config type
+                    // Example:  IPipelineStepWithConfig<ZipArchiveConfig>
+                    Type pipelineStepWithConfigType = typeof(IInitializable<>).MakeGenericType(configType);
+
+                    // Instantiate a IPipelineStep object
+                    object pipelineStepObj = Activator.CreateInstance(module.StepType);
+
+                    // Initialize the pipeline step with the config object
+                    var method = pipelineStepWithConfigType.GetMethod("Initialize");
+                    method.Invoke(pipelineStepObj, new object[] { config, workspace });
+
+                    T step = (T)pipelineStepObj;
+                    return step;
                 }
             }
             return default(T);

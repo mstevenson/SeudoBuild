@@ -2,11 +2,11 @@
 
 namespace SeudoBuild.Modules.SteamDistribute
 {
-    public class SteamDistributeStep : IDistributeStep
+    public class SteamDistributeStep : IDistributeStep<SteamDistributeConfig>
     {
         SteamDistributeConfig config;
 
-        public SteamDistributeStep(SteamDistributeConfig config, Workspace workspace)
+        public void Initialize(SteamDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }

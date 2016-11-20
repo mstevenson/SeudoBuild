@@ -7,14 +7,14 @@ using System.Diagnostics;
 
 namespace SeudoBuild.Modules.GitSource
 {
-    public class GitSourceStep : ISourceStep
+    public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
         GitSourceConfig config;
         Workspace workspace;
 
         public string Type { get; } = "Git";
 
-        public GitSourceStep(GitSourceConfig config, Workspace workspace)
+        public void Initialize(GitSourceConfig config, Workspace workspace)
         {
             this.config = config;
             this.workspace = workspace;

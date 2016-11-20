@@ -2,17 +2,8 @@
 
 namespace SeudoBuild.Modules.UnityBuild
 {
-    public class UnityExecuteMethodBuildStep : UnityBuildStep
+    public class UnityExecuteMethodBuildStep : UnityBuildStep<UnityExecuteMethodBuildConfig>
     {
-        UnityExecuteMethodBuildConfig config;
-        Workspace workspace;
-
-        public UnityExecuteMethodBuildStep(UnityExecuteMethodBuildConfig config, Workspace workspace)
-        {
-            this.config = config;
-            this.workspace = workspace;
-        }
-
         public override string Type { get; } = "Unity Execute Method";
 
         public override BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)

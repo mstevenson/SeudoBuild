@@ -6,17 +6,8 @@ using Path = System.IO.Path;
 
 namespace SeudoBuild.Modules.UnityBuild
 {
-    public class UnityParameterizedBuildStep : UnityBuildStep
+    public class UnityParameterizedBuildStep : UnityBuildStep<UnityParameterizedBuildConfig>
     {
-        UnityParameterizedBuildConfig config;
-        Workspace workspace;
-
-        public UnityParameterizedBuildStep(UnityParameterizedBuildConfig config, Workspace workspace)
-        {
-            this.config = config;
-            this.workspace = workspace;
-        }
-
         public override string Type { get; } = "Unity Parameterized Build";
 
         public override BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)

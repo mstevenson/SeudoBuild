@@ -46,39 +46,66 @@ namespace SeudoBuild
         IReadOnlyCollection<T> CreatePipelineSteps<T>(ModuleLoader loader, Workspace workspace)
             where T : class, IPipelineStep
         {
-            IEnumerable<StepConfig> allStepConfigs = null;
+            //IEnumerable<StepConfig> allStepConfigs = null;
 
             List<T> pipelineSteps = new List<T>();
 
             if (typeof(T) == typeof(ISourceStep))
             {
-                allStepConfigs = TargetConfig.SourceSteps;
+                foreach (var stepConfig in TargetConfig.SourceSteps)
+                {
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    if (step != null)
+                    {
+                        pipelineSteps.Add(step);
+                    }
+                }
             }
             else if (typeof(T) == typeof(IBuildStep))
             {
-                allStepConfigs = TargetConfig.BuildSteps;
+                foreach (var stepConfig in TargetConfig.BuildSteps)
+                {
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    if (step != null)
+                    {
+                        pipelineSteps.Add(step);
+                    }
+                }
             }
             else if (typeof(T) == typeof(IArchiveStep))
             {
-                allStepConfigs = TargetConfig.ArchiveSteps;
+                foreach (var stepConfig in TargetConfig.ArchiveSteps)
+                {
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    if (step != null)
+                    {
+                        pipelineSteps.Add(step);
+                    }
+                }
             }
             else if (typeof(T) == typeof(IDistributeStep))
             {
-                allStepConfigs = TargetConfig.DistributeSteps;
+                foreach (var stepConfig in TargetConfig.DistributeSteps)
+                {
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    if (step != null)
+                    {
+                        pipelineSteps.Add(step);
+                    }
+                }
             }
             else if (typeof(T) == typeof(INotifyStep))
             {
-                allStepConfigs = TargetConfig.NotifySteps;
-            }
-
-            foreach (var stepConfig in allStepConfigs)
-            {
-                T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
-                if (step != null)
+                foreach (var stepConfig in TargetConfig.NotifySteps)
                 {
-                    pipelineSteps.Add(step);
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    if (step != null)
+                    {
+                        pipelineSteps.Add(step);
+                    }
                 }
             }
+
             return pipelineSteps.AsReadOnly();
         }
     }

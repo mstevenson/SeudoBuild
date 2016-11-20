@@ -7,4 +7,9 @@
         void Download();
         void Update();
     }
+
+    public interface ISourceStep<T> : ISourceStep, IPipelineStepWithConfig<SourceSequenceResults, SourceStepResults, T>
+        where T : SourceStepConfig
+    {
+    }
 }

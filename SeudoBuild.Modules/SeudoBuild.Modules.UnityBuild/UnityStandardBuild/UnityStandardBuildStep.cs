@@ -3,17 +3,8 @@ using Path = System.IO.Path;
 
 namespace SeudoBuild.Modules.UnityBuild
 {
-    public class UnityStandardBuildStep : UnityBuildStep
+    public class UnityStandardBuildStep : UnityBuildStep<UnityStandardBuildConfig>
     {
-        UnityStandardBuildConfig config;
-        Workspace workspace;
-
-        public UnityStandardBuildStep(UnityStandardBuildConfig config, Workspace workspace)
-        {
-            this.config = config;
-            this.workspace = workspace;
-        }
-
         public override string Type { get; } = "Unity Standard Build";
 
         public override BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)

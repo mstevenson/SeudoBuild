@@ -5,11 +5,11 @@ using Renci.SshNet.Common;
 
 namespace SeudoBuild.Modules.SFTPDistribute
 {
-    public class SFTPDistributeStep : IDistributeStep
+    public class SFTPDistributeStep : IDistributeStep<SFTPDistributeConfig>
     {
         SFTPDistributeConfig config;
 
-        public SFTPDistributeStep(SFTPDistributeConfig config, Workspace workspace)
+        public void Initialize(SFTPDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }

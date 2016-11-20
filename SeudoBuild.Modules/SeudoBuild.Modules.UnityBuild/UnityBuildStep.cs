@@ -5,8 +5,18 @@ using System.Linq;
 
 namespace SeudoBuild.Modules.UnityBuild
 {
-    public abstract class UnityBuildStep : IBuildStep
+    public abstract class UnityBuildStep<T> : IBuildStep<T>
+        where T : BuildStepConfig
     {
+        protected T config;
+        protected Workspace workspace;
+
+        public void Initialize(T config, Workspace workspace)
+        {
+            this.config = config;
+            this.workspace = workspace;
+        }
+
         public abstract string Type { get; }
 
         public abstract BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace);

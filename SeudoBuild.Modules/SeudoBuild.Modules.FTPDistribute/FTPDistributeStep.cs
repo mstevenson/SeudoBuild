@@ -4,11 +4,11 @@ using System.Net;
 
 namespace SeudoBuild.Modules.FTPDistribute
 {
-    public class FTPDistributeStep : IDistributeStep
+    public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
     {
         FTPDistributeConfig config;
 
-        public FTPDistributeStep(FTPDistributeConfig config, Workspace workspace)
+        public void Initialize(FTPDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }

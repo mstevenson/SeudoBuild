@@ -2,7 +2,7 @@
 
 namespace SeudoBuild
 {
-    public class FolderArchiveStep : IArchiveStep
+    public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
     {
         FolderArchiveConfig config;
 
@@ -12,6 +12,10 @@ namespace SeudoBuild
         }
 
         public string Type { get; } = "Folder";
+
+        public void Initialize(FolderArchiveConfig config, Workspace workspace)
+        {
+        }
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
         {

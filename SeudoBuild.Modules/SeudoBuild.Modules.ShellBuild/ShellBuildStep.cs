@@ -11,12 +11,12 @@ namespace SeudoBuild.Modules.ShellBuild
     /// %build_output_directory% -- the directory containing build products
     /// %archives_directory% -- the directory in which build products will be archived during a later step
     /// </summary>
-    public class ShellBuildStep : IBuildStep
+    public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
     {
         ShellBuildStepConfig config;
         Workspace workspace;
 
-        public ShellBuildStep(ShellBuildStepConfig config, Workspace workspace)
+        public void Initialize(ShellBuildStepConfig config, Workspace workspace)
         {
             this.config = config;
             this.workspace = workspace;

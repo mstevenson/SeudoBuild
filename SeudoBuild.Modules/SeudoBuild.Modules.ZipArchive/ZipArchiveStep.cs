@@ -4,14 +4,14 @@ using Path = System.IO.Path;
 
 namespace SeudoBuild.Modules.ZipArchive
 {
-    public class ZipArchiveStep : IArchiveStep
+    public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
     {
         ZipArchiveConfig config;
         Workspace workspace;
 
         public string Type { get; } = "Zip File";
 
-        public ZipArchiveStep(ZipArchiveConfig config, Workspace workspace)
+        public void Initialize(ZipArchiveConfig config, Workspace workspace)
         {
             this.config = config;
             this.workspace = workspace;

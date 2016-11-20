@@ -4,11 +4,11 @@ using System.Net.Mail;
 
 namespace SeudoBuild.Modules.EmailNotify
 {
-    public class EmailNotifyStep : INotifyStep
+    public class EmailNotifyStep : INotifyStep<EmailNotifyConfig>
     {
         EmailNotifyConfig config;
 
-        public EmailNotifyStep(EmailNotifyConfig config, Workspace workspace)
+        public void Initialize(EmailNotifyConfig config, Workspace workspace)
         {
             this.config = config;
         }
