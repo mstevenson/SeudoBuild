@@ -1,20 +1,18 @@
-﻿using System.IO;
+﻿using Path = System.IO.Path;
 
 namespace SeudoBuild
 {
     public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
     {
         FolderArchiveConfig config;
-
-        public FolderArchiveStep(FolderArchiveConfig config, Workspace workspace)
-        {
-            this.config = config;
-        }
+        Workspace workspace;
 
         public string Type { get; } = "Folder";
 
         public void Initialize(FolderArchiveConfig config, Workspace workspace)
         {
+            this.config = config;
+            this.workspace = workspace;
         }
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
@@ -42,37 +40,38 @@ namespace SeudoBuild
             }
         }
 
-        void CopyDirectory(string source, string dest)
+        void CopyDirectory(string sourceDir, string destDir)
         {
-            // FIXME abstract using IFileSystem
+            IFileSystem fs = workspace.FileSystem;
 
-            // Get the subdirectories for the specified directory.
-            DirectoryInfo sourceDir = new DirectoryInfo(source);
-
-            if (!sourceDir.Exists)
+            if (!fs.DirectoryExists(sourceDir))
             {
-                throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + source);
+                throw new System.IO.DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDir);
             }
 
-            DirectoryInfo[] dirs = sourceDir.GetDirectories();
-            if (!Directory.Exists(dest))
+            if (!fs.DirectoryExists(destDir))
             {
-                Directory.CreateDirectory(dest);
+                fs.CreateDirectory(destDir);
+            }
+            else
+            {
+                throw new System.Exception("Destination path already exists: " + destDir);
             }
 
             // Get the files in the directory and copy them to the new location.
-            FileInfo[] files = sourceDir.GetFiles();
-            foreach (FileInfo file in files)
+            var sourceFiles = fs.GetFiles(sourceDir);
+            foreach (string sourceFile in sourceFiles)
             {
-                string tempPath = Path.Combine(dest, file.Name);
-                file.CopyTo(tempPath, false);
+                string destFile = Path.Combine(destDir, Path.GetFileName(sourceFile));
+                fs.CopyFile(sourceFile, destFile);
             }
 
             // Copy subdirectories and their contents to new location.
-            foreach (DirectoryInfo subdir in dirs)
+            var subDirectories = fs.GetDirectories(sourceDir);
+            foreach (string subDirectory in subDirectories)
             {
-                string temppath = Path.Combine(dest, subdir.Name);
-                CopyDirectory(subdir.FullName, temppath);
+                string destPath = Path.Combine(destDir, Path.GetFileName(subDirectory));
+                CopyDirectory(subDirectory, destPath);
             }
         }
     }

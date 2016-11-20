@@ -6,7 +6,7 @@ namespace SeudoBuild
     {
         string DocumentsPath { get; }
 
-        List<string> GetFiles(string directoryPath, string searchPattern);
+        List<string> GetFiles(string directoryPath, string searchPattern = null);
 
         bool FileExists(string path);
 
@@ -17,6 +17,8 @@ namespace SeudoBuild
         void DeleteFile(string path);
 
         void ReplaceFile(string source, string destination, string backupDestination);
+
+        List<string> GetDirectories(string directoryPath, string searchPattern = null);
 
         bool DirectoryExists(string path);
 

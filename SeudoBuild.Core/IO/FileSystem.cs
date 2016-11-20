@@ -68,6 +68,29 @@ namespace SeudoBuild
             System.IO.File.Replace(source, destination, backupDestination);
         }
 
+        public List<string> GetDirectories(string directoryPath, string searchPattern = null)
+        {
+            // Handle missing directory
+            if (!System.IO.Directory.Exists(directoryPath))
+            {
+                return new List<string>();
+            }
+
+            // Collect directory paths
+            string[] dirPaths;
+            if (searchPattern != null)
+            {
+                dirPaths = System.IO.Directory.GetDirectories(directoryPath, searchPattern);
+            }
+            else
+            {
+                dirPaths = System.IO.Directory.GetDirectories(directoryPath);
+            }
+
+            List<string> dirs = new List<string>(dirPaths);
+            return dirs;
+        }
+
         public bool DirectoryExists(string path)
         {
             return System.IO.Directory.Exists(path);

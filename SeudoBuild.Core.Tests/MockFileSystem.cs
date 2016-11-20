@@ -171,6 +171,11 @@ namespace SeudoBuild.Core.Tests
             allFiles[destination] = allFiles[source];
         }
 
+        public List<string> GetDirectories(string directoryPath, string searchPattern = null)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public bool DirectoryExists(string directoryPath)
         {
             throw new System.NotImplementedException();
