@@ -178,10 +178,9 @@ namespace SeudoBuild
             foreach (var dir in moduleDirs)
             {
                 string[] files = Directory.GetFiles(dir, "*.dll");
-                foreach (var s in files)
+                foreach (var file in files)
                 {
-                    string path = Path.Combine(Environment.CurrentDirectory, s);
-                    LoadAssembly(path);
+                    LoadAssembly(file);
                 }
             }
         }

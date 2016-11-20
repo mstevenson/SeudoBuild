@@ -176,7 +176,8 @@ namespace SeudoBuild.Agent
         static ModuleLoader LoadModules()
         {
             ModuleLoader loader = new ModuleLoader();
-            loader.LoadAllAssemblies("./Modules");
+            string modulesDirectory = Path.Combine(Environment.CurrentDirectory, "Modules");
+            loader.LoadAllAssemblies(modulesDirectory);
 
             BuildConsole.WriteLine("Loading Pipeline Modules");
             BuildConsole.IndentLevel++;
