@@ -66,60 +66,59 @@ namespace SeudoBuild.Modules.UnityBuild
                 FileName = unityInstallation.ExePath,
                 Arguments = arguments,
                 WorkingDirectory = workspace.WorkingDirectory,
-                //RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
-            var unityProcess = new Process { StartInfo = startInfo };
 
-            var logParser = new UnityLogParser();
-
-            // FIXME is this all being disposed correctly?
-
-            string logPath = GetBuildLogPath(workspace);
-            var writer = new StreamWriter(logPath);
-            try
+            using (var unityProcess = new Process { StartInfo = startInfo })
             {
-                unityProcess.OutputDataReceived += (sender, e) =>
+                var logParser = new UnityLogParser();
+                
+                string logPath = GetBuildLogPath(workspace);
+                var writer = new StreamWriter(logPath);
+                try
                 {
-                    //Console.WriteLine(e.Data);
-                    writer.WriteLine(e.Data);
-                    writer.Flush();
-                    string logOutput = logParser.ProcessLogLine(e.Data);
-                    if (logOutput != null)
+                    unityProcess.OutputDataReceived += (sender, e) =>
                     {
-                        BuildConsole.WriteLine(logOutput);
-                    }
-                    // TODO examine log for errors and other pertinent info
-                };
+                        //Console.WriteLine(e.Data);
+                        writer.WriteLine(e.Data);
+                        writer.Flush();
+                        string logOutput = logParser.ProcessLogLine(e.Data);
+                        if (logOutput != null)
+                        {
+                            BuildConsole.WriteLine(logOutput);
+                        }
+                    };
+                    
+                    //unityProcess.ErrorDataReceived += (sender, e) =>
+                    //{
+                    //    // TODO return error
+                    //};
+                    
+                    unityProcess.Start();
+                    unityProcess.BeginOutputReadLine();
+                    unityProcess.WaitForExit();
+                }
+                finally
+                {
+                    writer.Close();
+                }
 
-                //unityProcess.ErrorDataReceived += (sender, e) =>
-                //{
-                //    // TODO return error
-                //};
+                var results = new BuildStepResults();
 
-                unityProcess.Start();
-                unityProcess.BeginOutputReadLine();
-                unityProcess.WaitForExit();
-            }
-            finally
-            {
-                writer.Close();
-            }
+                if (unityProcess.ExitCode == 0)
+                {
+                    results.IsSuccess = true;
+                }
+                else
+                {
+                    results.IsSuccess = false;
+                    results.Exception = new Exception("Build process exited abnormally");
+                }
 
-            var results = new BuildStepResults();
-            if (unityProcess.ExitCode == 0)
-            {
-                results.IsSuccess = true;
+                return results;
             }
-            else
-            {
-                results.IsSuccess = false;
-                results.Exception = new Exception("Build process exited abnormally");
-            }
-
-            return results;
         }
 
         protected string GetBuildLogPath(Workspace workspace)
