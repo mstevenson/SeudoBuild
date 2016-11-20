@@ -8,12 +8,12 @@ namespace SeudoBuild.Modules.FTPDistribute
     {
         FTPDistributeConfig config;
 
+        public string Type { get; } = "FTP Upload";
+
         public void Initialize(FTPDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }
-
-        public string Type { get; } = "FTP Upload";
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {

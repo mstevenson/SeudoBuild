@@ -8,12 +8,12 @@ namespace SeudoBuild.Modules.EmailNotify
     {
         EmailNotifyConfig config;
 
+        public string Type { get; } = "Email Notification";
+
         public void Initialize(EmailNotifyConfig config, Workspace workspace)
         {
             this.config = config;
         }
-
-        public string Type { get; } = "Email Notification";
 
         public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, Workspace workspace)
         {

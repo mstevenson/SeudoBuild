@@ -16,16 +16,13 @@ namespace SeudoBuild.Modules.ShellBuild
         ShellBuildStepConfig config;
         Workspace workspace;
 
+        public string Type { get; } = "Shell Script";
+
         public void Initialize(ShellBuildStepConfig config, Workspace workspace)
         {
             this.config = config;
             this.workspace = workspace;
         }
-
-        public string Type { get; } = "Shell Script";
-
-
-        // FIXME change from BuildResult to BuildStepResults
 
         public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
         {

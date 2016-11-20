@@ -8,12 +8,12 @@ namespace SeudoBuild.Modules.SMBDistribute
     {
         SMBDistributeConfig config;
 
+        public string Type { get; } = "SMB Transfer";
+
         public void Initialize(SMBDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }
-
-        public string Type { get; } = "SMB Transfer";
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {

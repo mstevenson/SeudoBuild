@@ -9,12 +9,12 @@ namespace SeudoBuild.Modules.SFTPDistribute
     {
         SFTPDistributeConfig config;
 
+        public string Type { get; } = "SFTP Upload";
+
         public void Initialize(SFTPDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }
-
-        public string Type { get; } = "SFTP Upload";
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {

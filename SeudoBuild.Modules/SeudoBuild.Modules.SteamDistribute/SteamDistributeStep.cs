@@ -6,12 +6,12 @@ namespace SeudoBuild.Modules.SteamDistribute
     {
         SteamDistributeConfig config;
 
+        public string Type { get; } = "Steam Upload";
+
         public void Initialize(SteamDistributeConfig config, Workspace workspace)
         {
             this.config = config;
         }
-
-        public string Type { get; } = "Steam Upload";
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {
