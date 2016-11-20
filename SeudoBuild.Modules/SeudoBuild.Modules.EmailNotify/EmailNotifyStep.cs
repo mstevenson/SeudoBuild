@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
+using MimeKit;
 
 namespace SeudoBuild.Modules.EmailNotify
 {
@@ -28,25 +28,31 @@ namespace SeudoBuild.Modules.EmailNotify
             }
         }
 
-        void SendMessage(string from, string to, string subject, string body)
+        void SendMessage(string fromAddress, string toAddress, string subject, string body)
         {
-            SmtpClient client = new SmtpClient
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("SeudoBuild", fromAddress));
+            message.To.Add(new MailboxAddress(toAddress));
+            message.Subject = subject;
+            message.Body = new TextPart("plain")
             {
-                Host = config.Host,
-                Port = config.Port,
-                EnableSsl = config.UseSSL,
-                Timeout = 10000,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(config.SMTPUser, config.SMTPPassword)
+                Text = body
             };
 
-            BuildConsole.WriteLine($"Sending email notification to {to}");
+            BuildConsole.WriteLine($"Sending email notification to {toAddress}");
 
-            MailMessage message = new MailMessage(from, to);
-            message.Subject = subject;
-            message.Body = body;
-            client.Send(message);
+            using (var client = new SmtpClient())
+            {
+                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                client.Connect(config.Host, config.Port, false);
+                // Note: since we don't have an OAuth2 token, disable
+                // the XOAUTH2 authentication mechanism.
+                client.AuthenticationMechanisms.Remove("XOAUTH2");
+                client.Authenticate(config.SMTPUser, config.SMTPPassword);
+                client.Send(message);
+                client.Disconnect(true);
+                client.Timeout = 10000;
+            }
 
             BuildConsole.WriteLine("Email notification sent");
         }
