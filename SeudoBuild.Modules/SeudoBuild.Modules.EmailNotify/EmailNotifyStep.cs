@@ -19,7 +19,9 @@ namespace SeudoBuild.Modules.EmailNotify
         {
             try
             {
-                SendMessage(config.FromAddress, config.ToAddress, "Build Completed", "finished a build");
+                string subject = "Build Completed • %project_name% • %build_target_name%";
+                subject = workspace.Macros.ReplaceVariablesInText(subject);
+                SendMessage(config.FromAddress, config.ToAddress, subject, $"Build completed in {distributeResults.Duration} seconds.");
                 return new NotifyStepResults { IsSuccess = true };
             }
             catch (Exception e)
