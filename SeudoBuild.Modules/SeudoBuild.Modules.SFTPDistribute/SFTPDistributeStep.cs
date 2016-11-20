@@ -18,17 +18,36 @@ namespace SeudoBuild.Modules.SFTPDistribute
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
         {
+            var results = new DistributeStepResults();
+
             try
             {
+                // Upload all archived files
                 foreach (var archiveInfo in archiveResults.StepResults)
                 {
-                    Upload(archiveInfo, workspace);
+                    var stepResult = new DistributeStepResults.FileResult { ArchiveInfo = archiveInfo };
+                    try
+                    {
+                        Upload(archiveInfo, workspace);
+                        stepResult.Success = true;
+                        results.FileResults.Add(stepResult);
+                    }
+                    catch (Exception e)
+                    {
+                        stepResult.Success = false;
+                        stepResult.Message = e.Message;
+                        results.FileResults.Add(stepResult);
+                        throw new Exception("File upload failed");
+                    }
                 }
                 return new DistributeStepResults { IsSuccess = true };
             }
+            // One or more archived files failed to upload
             catch (Exception e)
             {
-                return new DistributeStepResults { IsSuccess = false, Exception = e };
+                results.IsSuccess = false;
+                results.Exception = e;
+                return results;
             }
         }
 
@@ -36,7 +55,7 @@ namespace SeudoBuild.Modules.SFTPDistribute
         {
             // Supply the password via fake keyboard input
             var keyboardAuthMethod = new KeyboardInteractiveAuthenticationMethod(config.Username);
-            keyboardAuthMethod.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>((sender, args) => {
+            keyboardAuthMethod.AuthenticationPrompt += (sender, args) => {
                 foreach (AuthenticationPrompt prompt in args.Prompts)
                 {
                     if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
@@ -44,7 +63,7 @@ namespace SeudoBuild.Modules.SFTPDistribute
                         prompt.Response = config.Password;
                     }
                 }
-            });
+            };
                                                                                            
             ConnectionInfo connectionInfo = new ConnectionInfo(config.Host, config.Port, config.Username, keyboardAuthMethod);
 
