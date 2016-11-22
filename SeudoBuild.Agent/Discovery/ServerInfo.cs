@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 
-namespace BridgeSim.Net
+namespace SeudoBuild.Net
 {
 	public class ServerInfo
 	{

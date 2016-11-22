@@ -3,9 +3,8 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
-using System.Linq;
 
-namespace BridgeSim.Net.Discovery
+namespace SeudoBuild.Net
 {
 	/// <summary>
 	/// Listens for UDP beacon packets from UdpDiscoveryServer.
