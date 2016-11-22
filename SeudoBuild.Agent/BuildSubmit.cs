@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NetMQ;
-using NetMQ.Sockets;
-using SeudoBuild.Agent.Net;
 
 namespace SeudoBuild.Agent
 {

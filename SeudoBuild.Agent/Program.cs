@@ -145,7 +145,7 @@ namespace SeudoBuild.Agent
                 port = opts.Port.Value;
             }
 
-            var server = new BuildQueue(agentName, port);
+            var server = new BuildServer(agentName, port);
             server.Start();
 
             return 0;

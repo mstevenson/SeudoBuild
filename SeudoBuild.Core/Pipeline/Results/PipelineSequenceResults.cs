@@ -5,8 +5,23 @@ namespace SeudoBuild
 {
     public abstract class PipelineSequenceResults
     {
+        /// <summary>
+        /// If false, the pipeline sequence catastrophically failed during one of its steps.
+        /// </summary>
         public bool IsSuccess { get; set; }
+
+        /// <summary>
+        /// If true, the pipeilne sequence was skipped, likely due to containing no steps.
+        /// </summary>
+        public bool IsSkipped{ get; set; }
+
+        /// <summary>
+        /// If true, step must not be skipped. IsSuccess will be set to false if IsSkipped is true.
+        /// </summary>
+        public bool IsMandatory { get; set; }
+
         public Exception Exception { get; set; }
+
         public TimeSpan Duration { get; set; }
     }
 

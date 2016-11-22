@@ -80,7 +80,11 @@ namespace SeudoBuild
             if (sequenceSteps.Count == 0)
             {
                 BuildConsole.WriteAlert($"No {sequenceName} steps.");
-                return new TOutSeq { IsSuccess = false, Exception = new Exception($"No {sequenceName} steps.") };
+                return new TOutSeq {
+                    IsSuccess = true,
+                    IsSkipped = true,
+                    Exception = new Exception($"No {sequenceName} steps.")
+                };
             }
             return new TOutSeq { IsSuccess = true };
         }
