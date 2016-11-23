@@ -18,6 +18,11 @@ namespace SeudoBuild.Agent
             var fs = new FileSystem();
             container.Register<IFileSystem>(fs);
 
+            var queue = new BuildQueue();
+            container.Register<IBuildQueue>(queue);
+            var builder = new Builder();
+            queue.StartQueue(builder);
+
             try
             {
                 var serverInfo = new ServerInfo();

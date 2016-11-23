@@ -24,7 +24,7 @@ namespace SeudoBuild.Agent
         {
             this.builder = builder;
             tokenSource = new CancellationTokenSource();
-            Task.Factory.StartNew(TaskQueuePump, tokenSource.Token, TaskCreationOptions.LongRunning, null);
+            Task.Factory.StartNew(TaskQueuePump, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         void TaskQueuePump()
@@ -35,18 +35,18 @@ namespace SeudoBuild.Agent
                 {
                     return;
                 }
-                if (builder.IsRunning)
-                {
-                    Thread.Sleep(100);
-                }
-                else if (QueuedBuilds.Count > 0)
+                if (!builder.IsRunning && QueuedBuilds.Count > 0)
                 {
                     BuildRequest request = null;
-                    QueuedBuilds.TryDequeue(out request);
-                    ActiveBuild = request;
-                    // TODO execute build
-                    //builder.Build(
+                    if (QueuedBuilds.TryDequeue(out request))
+                    {
+                        ActiveBuild = request;
+                        Console.WriteLine($"Building #{request.Id}: project {request.ProjectConfiguration.ProjectName}, target {request.TargetName}");
+                        // FIXME build
+                        //builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, 
+                    }
                 }
+                Thread.Sleep(200);
             }
         }
 
