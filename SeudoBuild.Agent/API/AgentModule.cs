@@ -29,7 +29,7 @@ namespace SeudoBuild.Agent
                 BuildConsole.WriteLine("Received build request for project: " + config.ProjectName);
 
                 var buildRequest = buildQueue.Build(config, parameters.value);
-                return buildRequest.Guid;
+                return buildRequest.Id.ToString();
             };
 
             // Build a specific target within a given project configuration
@@ -38,7 +38,7 @@ namespace SeudoBuild.Agent
                 var projectConfig = this.Bind<ProjectConfig>();
                 string target = parameters.value;
                 var buildRequest = buildQueue.Build(projectConfig, target);
-                return buildRequest.Id;
+                return buildRequest.Id.ToString();
             };
 
             // Get info for a specific build task
