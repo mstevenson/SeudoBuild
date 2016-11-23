@@ -11,7 +11,7 @@ namespace SeudoBuild.Agent
             Cancelled
         }
 
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string ProjectName { get; set; }
         public string TargetName { get; set; }
         public Status BuildStatus { get; set; }

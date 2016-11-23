@@ -25,7 +25,7 @@ namespace SeudoBuild.Agent
                 try
                 {
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, null, moduleLoader, filesystem);
-                    BuildConsole.WriteLine($"Received build request for project '{config.ProjectName}' with default target from host {Request.UserHostAddress}");
+                    BuildConsole.WriteLine($"Received build request: project '{config.ProjectName}', default target, host {Request.UserHostAddress}");
                     var buildRequest = buildQueue.Build(config);
                     return buildRequest.Id.ToString();
                 }
@@ -41,9 +41,9 @@ namespace SeudoBuild.Agent
             {
                 try
                 {
-                    string target = parameters.value;
+                    string target = parameters.target;
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, target, moduleLoader, filesystem);
-                    BuildConsole.WriteLine($"Queuing build request for project '{config.ProjectName}' with target '{target}' from host {Request.UserHostAddress}");
+                    BuildConsole.WriteLine($"Queuing build request: project '{config.ProjectName}', target '{target}', host {Request.UserHostAddress}");
                     var buildRequest = buildQueue.Build(config, target);
                     return buildRequest.Id.ToString();
                 }
@@ -55,12 +55,26 @@ namespace SeudoBuild.Agent
             };
 
             // Get info for a specific build task
-            Post["/queue/{id:guid}"] = parameters =>
+            Get["/queue"] = parameters =>
             {
                 try
                 {
-                    Guid guid = Guid.Parse(parameters.value);
-                    var result = buildQueue.GetBuildResult(guid);
+                    var result = buildQueue.GetAllBuildResults();
+                    return Response.AsJson(result);
+                }
+                catch
+                {
+                    return HttpStatusCode.BadRequest;
+                }
+            };
+
+            // Get info for a specific build task
+            Get["/queue/{id:int}"] = parameters =>
+            {
+                try
+                {
+                    int id = parameters.id;
+                    var result = buildQueue.GetBuildResult(id);
                     return Response.AsJson(result);
                 }
                 catch
@@ -70,12 +84,12 @@ namespace SeudoBuild.Agent
             };
 
             // Cancel a build task
-            Post["/queue/{id:guid}/cancel"] = parameters =>
+            Post["/queue/{id:int}/cancel"] = parameters =>
             {
                 try
                 {
-                    Guid guid = Guid.Parse(parameters.value);
-                    buildQueue.CancelBuild(guid);
+                    int id = parameters.id;
+                    buildQueue.CancelBuild(id);
                     return HttpStatusCode.OK;
                 }
                 catch

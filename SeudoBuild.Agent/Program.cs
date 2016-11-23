@@ -133,6 +133,7 @@ namespace SeudoBuild.Agent
             using (var host = new NancyHost(uri))
             {
                 Console.WriteLine("Starting build server: " + uri);
+                Console.WriteLine("Press any key to exit.");
                 Console.WriteLine();
 
                 try
@@ -141,7 +142,7 @@ namespace SeudoBuild.Agent
                 }
                 catch
                 {
-                    Console.WriteLine("Could not start build server, exiting");
+                    Console.WriteLine("Could not start build server, exiting.");
                     return 1;
                 }
                 Console.ReadKey();

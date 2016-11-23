@@ -9,8 +9,10 @@ namespace SeudoBuild.Agent
 
         BuildRequest Build(ProjectConfig config, string target = null);
 
-        BuildResult GetBuildResult(Guid buildId);
+        List<BuildResult> GetAllBuildResults();
 
-        void CancelBuild(Guid buildId);
+        BuildResult GetBuildResult(int buildId);
+
+        void CancelBuild(int buildId);
     }
 }

@@ -26,7 +26,7 @@ namespace SeudoBuild.Agent
             }
             catch
             {
-                BuildConsole.WriteFailure("Could not initialize build agent discovery beacon");
+                BuildConsole.WriteAlert("Could not initialize build agent discovery beacon");
             }
         }
     }

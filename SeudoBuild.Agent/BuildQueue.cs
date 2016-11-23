@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,11 +12,13 @@ namespace SeudoBuild.Agent
         public BuildRequest ActiveBuild { get; private set; }
 
         ConcurrentQueue<BuildRequest> QueuedBuilds { get; } = new ConcurrentQueue<BuildRequest>();
-        ConcurrentDictionary<Guid, BuildResult> Builds { get; } = new ConcurrentDictionary<Guid, BuildResult>();
+        ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
 
         CancellationTokenSource tokenSource;
 
         Builder builder;
+
+        int buildIndex;
 
         public void StartQueue(Builder builder)
         {
@@ -48,7 +52,8 @@ namespace SeudoBuild.Agent
 
         public BuildRequest Build(ProjectConfig config, string target = null)
         {
-            var request = new BuildRequest { ProjectConfiguration = config, TargetName = target };
+            buildIndex++;
+            var request = new BuildRequest (buildIndex) { ProjectConfiguration = config, TargetName = target };
             var result = new BuildResult
             {
                 BuildStatus = BuildResult.Status.Queued,
@@ -63,14 +68,19 @@ namespace SeudoBuild.Agent
             return request;
         }
 
-        public BuildResult GetBuildResult(Guid buildId)
+        public List<BuildResult> GetAllBuildResults()
+        {
+            return Builds.Values.ToList();
+        }
+
+        public BuildResult GetBuildResult(int buildId)
         {
             BuildResult result = null;
             Builds.TryGetValue(buildId, out result);
             return result;
         }
 
-        public void CancelBuild(Guid buildId)
+        public void CancelBuild(int buildId)
         {
             if (ActiveBuild != null && ActiveBuild.Id == buildId)
             {
