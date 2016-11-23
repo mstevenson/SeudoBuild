@@ -2,16 +2,19 @@ using System;
 using System.Net.Http;
 using Nancy;
 using Nancy.ModelBinding;
+using System.IO;
 
 namespace SeudoBuild.Agent
 {
     public class AgentModule : NancyModule
     {
-        public AgentModule(IBuildQueue buildQueue)
+        public AgentModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem)
         {
             // Build agent info
             Get["/"] = parameters =>
             {
+                //moduleLoader.Registry.
+
                 var proj = new Agent { AgentName = AgentName.GetUniqueAgentName() };
                 return Response.AsJson(proj);
             };
@@ -19,28 +22,36 @@ namespace SeudoBuild.Agent
             // Build the default target in a project configuration
             Post["/build"] = parameters =>
             {
-                // FIXME can't use Bind, we need to use our custom JSON.net converters
-                var config = this.Bind<ProjectConfig>();
-                if (string.IsNullOrEmpty(config.ProjectName))
+                try
                 {
-                    BuildConsole.WriteFailure($"Received invalid project configuration from {Request.UserHostAddress}");
+                    ProjectConfig config = ProcessReceivedBuildRequest(Request, null, moduleLoader, filesystem);
+                    BuildConsole.WriteLine($"Received build request for project '{config.ProjectName}' with default target from host {Request.UserHostAddress}");
+                    var buildRequest = buildQueue.Build(config);
+                    return buildRequest.Id.ToString();
+                }
+                catch (Exception e)
+                {
+                    BuildConsole.WriteFailure(e.Message);
                     return HttpStatusCode.BadRequest;
                 }
-
-                BuildConsole.WriteLine("Received build request for project: " + config.ProjectName);
-
-                var buildRequest = buildQueue.Build(config, parameters.value);
-                return buildRequest.Id.ToString();
             };
 
             // Build a specific target within a given project configuration
             Post["/build/{target}"] = parameters =>
             {
-                // FIXME can't use Bind, we need to use our custom JSON.net converters
-                var projectConfig = this.Bind<ProjectConfig>();
-                string target = parameters.value;
-                var buildRequest = buildQueue.Build(projectConfig, target);
-                return buildRequest.Id.ToString();
+                try
+                {
+                    string target = parameters.value;
+                    ProjectConfig config = ProcessReceivedBuildRequest(Request, target, moduleLoader, filesystem);
+                    BuildConsole.WriteLine($"Queuing build request for project '{config.ProjectName}' with target '{target}' from host {Request.UserHostAddress}");
+                    var buildRequest = buildQueue.Build(config, target);
+                    return buildRequest.Id.ToString();
+                }
+                catch (Exception e)
+                {
+                    BuildConsole.WriteFailure(e.Message);
+                    return HttpStatusCode.BadRequest;
+                }
             };
 
             // Get info for a specific build task
@@ -72,6 +83,35 @@ namespace SeudoBuild.Agent
                     return HttpStatusCode.BadRequest;
                 }
             };
+        }
+
+        ProjectConfig ProcessReceivedBuildRequest(Request request, string target, IModuleLoader moduleLoader, IFileSystem filesystem)
+        {
+            // We'd ordinarily use Nancy's Bind method, but we need to use custom
+            // JSON converters to propertly deserialize the ProjectConfig object
+            string json = "";
+            using (var sr = new StreamReader(request.Body))
+            {
+                json = sr.ReadToEnd();
+            }
+            var converters = moduleLoader.Registry.GetJsonConverters();
+            var serializer = new Serializer(filesystem);
+            var config = serializer.Deserialize<ProjectConfig>(json, converters);
+
+            if (!string.IsNullOrEmpty(target))
+            {
+                if (!config.BuildTargets.Exists(t => t.TargetName == target))
+                {
+                    throw new Exception($"Received project configuration from {request.UserHostAddress} but could not find a build target named '{target}'");
+                }
+            }
+
+            if (string.IsNullOrEmpty(config.ProjectName))
+            {
+                throw new Exception($"Received invalid project configuration from {request.UserHostAddress}");
+            }
+
+            return config;
         }
     }
 }

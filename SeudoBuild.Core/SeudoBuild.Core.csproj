@@ -75,6 +75,8 @@
     <Compile Include="Modules\ISourceModule.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="StepConfigConverter.cs" />
+    <Compile Include="IModuleLoader.cs" />
+    <Compile Include="ModuleLoaderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />

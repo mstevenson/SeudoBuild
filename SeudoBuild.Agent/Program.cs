@@ -1,12 +1,14 @@
 ﻿using System;
 using CommandLine;
-using CommandLine.Text;
 using System.IO;
 using System.Linq;
+using Nancy;
+using Nancy.Hosting.Self;
+using SeudoBuild.Net;
 
 namespace SeudoBuild.Agent
 {
-    class MainClass
+    class Program
     {
         [Verb("build", HelpText = "Create a local build.")]
         class BuildSubOptions
@@ -77,7 +79,8 @@ namespace SeudoBuild.Agent
             Console.Title = "SeudoBuild • Build";
 
             // Load pipeline modules
-            ModuleLoader modules = LoadModules();
+            var factory = new ModuleLoaderFactory();
+            ModuleLoader modules = factory.Create();
 
             // Load project config
             ProjectConfig projectConfig = null;
@@ -86,7 +89,7 @@ namespace SeudoBuild.Agent
                 var fs = new FileSystem();
                 var serializer = new Serializer(fs);
                 var converters = modules.Registry.GetJsonConverters();
-                projectConfig = serializer.Deserialize<ProjectConfig>(opts.ProjectConfigPath, converters);
+                projectConfig = serializer.DeserializeFromFile<ProjectConfig>(opts.ProjectConfigPath, converters);
             }
             catch (Exception e)
             {
@@ -118,17 +121,31 @@ namespace SeudoBuild.Agent
         {
             Console.Title = "SeudoBuild • Queue";
 
-            var modules = LoadModules();
-
-            string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
+            //string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
             int port = 5555;
             if (opts.Port.HasValue)
             {
                 port = opts.Port.Value;
             }
 
-            var server = new BuildServer(agentName, port, modules);
-            server.Start();
+            // Starting the Nancy server will automatically execute the Bootstrapper class
+            var uri = new Uri($"http://localhost:{port}");
+            using (var host = new NancyHost(uri))
+            {
+                Console.WriteLine("Starting build server: " + uri);
+                Console.WriteLine();
+
+                try
+                {
+                    host.Start();
+                }
+                catch
+                {
+                    Console.WriteLine("Could not start build server, exiting");
+                    return 1;
+                }
+                Console.ReadKey();
+            }
 
             return 0;
         }
@@ -153,39 +170,6 @@ namespace SeudoBuild.Agent
             Console.WriteLine(name);
             Console.WriteLine();
             return 0;
-        }
-
-        static ModuleLoader LoadModules()
-        {
-            ModuleLoader loader = new ModuleLoader();
-            string modulesDirectory = Path.Combine(Environment.CurrentDirectory, "Modules");
-            loader.LoadAllAssemblies(modulesDirectory);
-
-            BuildConsole.WriteLine("Loading Pipeline Modules");
-            BuildConsole.IndentLevel++;
-
-            string line = "";
-
-            line = "Source:      " + string.Join(", ", loader.Registry.GetModules<ISourceModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
-
-            line = "Build:       " + string.Join(", ", loader.Registry.GetModules<IBuildModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
-
-            line = "Archive:     " + string.Join(", ", loader.Registry.GetModules<IArchiveModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
-
-            line = "Distribute:  " + string.Join(", ", loader.Registry.GetModules<IDistributeModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
-
-            line = "Notify:      " + string.Join(", ", loader.Registry.GetModules<INotifyModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
-
-            BuildConsole.IndentLevel--;
-
-            Console.WriteLine("");
-
-            return loader;
         }
     }
 }

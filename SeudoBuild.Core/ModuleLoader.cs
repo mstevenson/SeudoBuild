@@ -9,34 +9,32 @@ namespace SeudoBuild
 {
     // Based on http://stackoverflow.com/questions/1070787/writing-c-sharp-plugin-system
 
-    public class ModuleLoader
+    public class ModuleRegistry
     {
-        public class ModuleRegistry
+        class ModuleCategory
         {
-            class ModuleCategory
+            public readonly Type moduleBaseType;
+            public readonly Type moduleStepBaseType;
+            public readonly Type stepConfigBaseType;
+            public readonly List<IModule> loadedModules = new List<IModule>();
+
+            public ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
             {
-                public readonly Type moduleBaseType;
-                public readonly Type moduleStepBaseType;
-                public readonly Type stepConfigBaseType;
-                public readonly List<IModule> loadedModules = new List<IModule>();
-
-                public ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
-                {
-                    this.moduleBaseType = moduleBaseType;
-                    this.moduleStepBaseType = moduleStepBaseType;
-                    this.stepConfigBaseType = stepConfigBaseType;
-                }
+                this.moduleBaseType = moduleBaseType;
+                this.moduleStepBaseType = moduleStepBaseType;
+                this.stepConfigBaseType = stepConfigBaseType;
             }
+        }
 
-            class ModuleCategory<T, U, V> : ModuleCategory
-                where T : IModule
-                where U : IPipelineStep
-                where V : StepConfig
-            {
-                public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) { }
-            }
+        class ModuleCategory<T, U, V> : ModuleCategory
+            where T : IModule
+            where U : IPipelineStep
+            where V : StepConfig
+        {
+            public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) { }
+        }
 
-            readonly List<ModuleCategory> moduleCategories = new List<ModuleCategory>
+        readonly List<ModuleCategory> moduleCategories = new List<ModuleCategory>
             {
                 new ModuleCategory<ISourceModule, ISourceStep, SourceStepConfig>(),
                 new ModuleCategory<IBuildModule, IBuildStep, BuildStepConfig>(),
@@ -45,69 +43,71 @@ namespace SeudoBuild
                 new ModuleCategory<INotifyModule, INotifyStep, NotifyStepConfig>()
             };
 
-            public IEnumerable<IModule> GetAllModules()
+        public IEnumerable<IModule> GetAllModules()
+        {
+            return moduleCategories.Select(cat => cat.loadedModules).SelectMany(m => m);
+        }
+
+        public IEnumerable<T> GetModules<T>()
+            where T : IModule
+        {
+            try
             {
-                return moduleCategories.Select(cat => cat.loadedModules).SelectMany(m => m);
+                var category = moduleCategories.First(cat => cat.moduleBaseType == typeof(T));
+                return category.loadedModules.Cast<T>();
             }
-
-            public IEnumerable<T> GetModules<T>()
-                where T : IModule
+            catch
             {
-                try
-                {
-                    var category = moduleCategories.First(cat => cat.moduleBaseType == typeof(T));
-                    return category.loadedModules.Cast<T>();
-                }
-                catch
-                {
-                    throw new Exception($"Could not find modules of type {typeof(T)}");
-                }
-            }
-
-            public IEnumerable<IModule> GetModulesForStepType<T>()
-                where T : IPipelineStep
-            {
-                var category = moduleCategories.First(cat => cat.moduleStepBaseType == typeof(T));
-                return category.loadedModules;
-            }
-
-            public void RegisterModule(IModule module)
-            {
-                foreach (var category in moduleCategories)
-                {
-                    if (category.moduleBaseType.IsAssignableFrom(module.GetType()))
-                    {
-                        category.loadedModules.Add(module);
-                    }
-                }
-            }
-
-            public JsonConverter[] GetJsonConverters()
-            {
-                var converters = new Dictionary<Type, StepConfigConverter>();
-                foreach (var category in moduleCategories)
-                {
-                    converters.Add(category.stepConfigBaseType, new StepConfigConverter(category.stepConfigBaseType));
-                }
-
-                var allModules = GetAllModules();
-
-                foreach (var kvp in converters)
-                {
-                    foreach (var module in allModules)
-                    {
-                        Type configBaseType = kvp.Key;
-                        if (configBaseType.IsAssignableFrom(module.StepConfigType))
-                        {
-                            converters[configBaseType].RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                        }
-                    }
-                }
-
-                return converters.Values.ToArray();
+                throw new Exception($"Could not find modules of type {typeof(T)}");
             }
         }
 
+        public IEnumerable<IModule> GetModulesForStepType<T>()
+            where T : IPipelineStep
+        {
+            var category = moduleCategories.First(cat => cat.moduleStepBaseType == typeof(T));
+            return category.loadedModules;
+        }
+
+        public void RegisterModule(IModule module)
+        {
+            foreach (var category in moduleCategories)
+            {
+                if (category.moduleBaseType.IsAssignableFrom(module.GetType()))
+                {
+                    category.loadedModules.Add(module);
+                }
+            }
+        }
+
+        public JsonConverter[] GetJsonConverters()
+        {
+            var converters = new Dictionary<Type, StepConfigConverter>();
+            foreach (var category in moduleCategories)
+            {
+                converters.Add(category.stepConfigBaseType, new StepConfigConverter(category.stepConfigBaseType));
+            }
+
+            var allModules = GetAllModules();
+
+            foreach (var kvp in converters)
+            {
+                foreach (var module in allModules)
+                {
+                    Type configBaseType = kvp.Key;
+                    if (configBaseType.IsAssignableFrom(module.StepConfigType))
+                    {
+                        converters[configBaseType].RegisterConfigType(module.StepConfigName, module.StepConfigType);
+                    }
+                }
+            }
+
+            return converters.Values.ToArray();
+        }
+    }
+
+    public class ModuleLoader : IModuleLoader
+    {
         public ModuleRegistry Registry { get; } = new ModuleRegistry();
 
         public void LoadAssembly(string file)

@@ -68,6 +68,7 @@
     <Compile Include="BuildQueue.cs" />
     <Compile Include="API\BuildResult.cs" />
     <Compile Include="Builder.cs" />
+    <Compile Include="API\Bootstrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">
