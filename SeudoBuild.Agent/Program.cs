@@ -79,8 +79,8 @@ namespace SeudoBuild.Agent
             // Load pipeline modules
             ModuleLoader modules = LoadModules();
 
+            // Load project config
             ProjectConfig projectConfig = null;
-
             try
             {
                 var fs = new FileSystem();
@@ -95,29 +95,11 @@ namespace SeudoBuild.Agent
                 return 1;
             }
 
-            if (projectConfig != null)
-            {
-                string outputPath = opts.OutputPath;
-                if (string.IsNullOrEmpty(outputPath))
-                {
-                    // Config file's directory
-                    outputPath = new FileInfo(opts.ProjectConfigPath).Directory.FullName;
-                }
+            // Execute build
+            Builder builder = new Builder();
+            bool success = builder.Build(projectConfig, opts.BuildTarget, opts.ProjectConfigPath, opts.OutputPath, modules);
 
-                // Find valid target
-                string target = opts.BuildTarget;
-                if (string.IsNullOrEmpty(target))
-                {
-                    // FIXME check to see if a target exists
-                    target = projectConfig.BuildTargets[0].TargetName;
-                }
-
-                PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
-                PipelineRunner builder = new PipelineRunner(builderConfig);
-                builder.ExecutePipeline(projectConfig, target, modules);
-            }
-
-            return 0;
+            return success ? 0 : 1;
         }
 
         // Submit job to the network
@@ -145,7 +127,7 @@ namespace SeudoBuild.Agent
                 port = opts.Port.Value;
             }
 
-            var server = new BuildServer(agentName, port);
+            var server = new BuildServer(agentName, port, modules);
             server.Start();
 
             return 0;

@@ -10,8 +10,9 @@ namespace SeudoBuild.Agent
     {
         string agentName;
         int port;
+        ModuleLoader modules;
 
-        public BuildServer(string agentName, int port)
+        public BuildServer(string agentName, int port, ModuleLoader modules)
         {
             this.agentName = agentName;
             this.port = port;

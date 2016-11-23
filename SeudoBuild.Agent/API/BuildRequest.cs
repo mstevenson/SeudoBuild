@@ -5,13 +5,13 @@ namespace SeudoBuild.Agent
 {
     public class BuildRequest
     {
-        public readonly Guid Guid;
+        public readonly Guid Id;
         public ProjectConfig ProjectConfiguration { get; set; }
         public string TargetName { get; set; }
 
         public BuildRequest()
         {
-            Guid = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
     }
 }

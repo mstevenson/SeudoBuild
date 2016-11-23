@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using Nancy;
 using Nancy.ModelBinding;
@@ -38,11 +38,11 @@ namespace SeudoBuild.Agent
                 var projectConfig = this.Bind<ProjectConfig>();
                 string target = parameters.value;
                 var buildRequest = buildQueue.Build(projectConfig, target);
-                return buildRequest.Guid;
+                return buildRequest.Id;
             };
 
             // Get info for a specific build task
-            Post["/queue/{guid}"] = parameters =>
+            Post["/queue/{id:guid}"] = parameters =>
             {
                 try
                 {
@@ -57,7 +57,7 @@ namespace SeudoBuild.Agent
             };
 
             // Cancel a build task
-            Post["/queue/{guid}/cancel"] = parameters =>
+            Post["/queue/{id:guid}/cancel"] = parameters =>
             {
                 try
                 {
