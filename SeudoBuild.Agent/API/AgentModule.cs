@@ -19,6 +19,7 @@ namespace SeudoBuild.Agent
             // Build the default target in a project configuration
             Post["/build"] = parameters =>
             {
+                // FIXME can't use Bind, we need to use our custom JSON.net converters
                 var config = this.Bind<ProjectConfig>();
                 if (string.IsNullOrEmpty(config.ProjectName))
                 {
@@ -35,6 +36,7 @@ namespace SeudoBuild.Agent
             // Build a specific target within a given project configuration
             Post["/build/{target}"] = parameters =>
             {
+                // FIXME can't use Bind, we need to use our custom JSON.net converters
                 var projectConfig = this.Bind<ProjectConfig>();
                 string target = parameters.value;
                 var buildRequest = buildQueue.Build(projectConfig, target);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace SeudoBuild.Agent
 {
@@ -24,13 +25,17 @@ namespace SeudoBuild.Agent
                     target = projectConfig.BuildTargets[0].TargetName;
                 }
 
-                IsRunning = true;
-
-                PipelineConfig builderConfig = new PipelineConfig { ProjectsPath = outputPath };
-                PipelineRunner builder = new PipelineRunner(builderConfig);
-                builder.ExecutePipeline(projectConfig, target, modules);
+                Task.Factory.StartNew(() =>
+                {
+                    IsRunning = true;
+                    PipelineConfig pipelineConfig = new PipelineConfig { ProjectsPath = outputPath };
+                    PipelineRunner pipelineBuilder = new PipelineRunner(pipelineConfig);
+                    pipelineBuilder.ExecutePipeline(projectConfig, target, modules);
+                    IsRunning = false;
+                });
             }
 
+            IsRunning = false;
             return true;
         }
     }
