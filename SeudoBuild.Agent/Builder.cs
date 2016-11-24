@@ -8,16 +8,10 @@ namespace SeudoBuild.Agent
     {
         public bool IsRunning { get; private set; }
 
-        public bool Build(ProjectConfig projectConfig, string target, string projectConfigPath, string outputPath, ModuleLoader modules)
+        public bool Build(ProjectConfig projectConfig, string target, string parentDirectory, ModuleLoader modules)
         {
             if (projectConfig != null)
             {
-                if (string.IsNullOrEmpty(outputPath))
-                {
-                    // Config file's directory
-                    outputPath = new FileInfo(projectConfigPath).Directory.FullName;
-                }
-
                 // Find valid target
                 if (string.IsNullOrEmpty(target))
                 {
@@ -28,7 +22,7 @@ namespace SeudoBuild.Agent
                 Task.Factory.StartNew(() =>
                 {
                     IsRunning = true;
-                    PipelineConfig pipelineConfig = new PipelineConfig { ProjectsPath = outputPath };
+                    PipelineConfig pipelineConfig = new PipelineConfig { ProjectsPath = parentDirectory };
                     PipelineRunner pipelineBuilder = new PipelineRunner(pipelineConfig);
                     pipelineBuilder.ExecutePipeline(projectConfig, target, modules);
                     IsRunning = false;

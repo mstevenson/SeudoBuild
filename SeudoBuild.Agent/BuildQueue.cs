@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SeudoBuild.Agent
 {
@@ -15,19 +16,40 @@ namespace SeudoBuild.Agent
         ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
 
         CancellationTokenSource tokenSource;
-
         Builder builder;
-
         int buildIndex;
 
-        public void StartQueue(Builder builder)
+        public void StartQueue(Builder builder, ModuleLoader moduleLoader)
         {
             this.builder = builder;
             tokenSource = new CancellationTokenSource();
-            Task.Factory.StartNew(TaskQueuePump, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+            // Create output folder in user's documents folder
+            string outputPath = CreateOutputFolder();
+
+            Task.Factory.StartNew(() => TaskQueuePump(outputPath, moduleLoader), tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
-        void TaskQueuePump()
+        string CreateOutputFolder()
+        {
+            string directory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (Workspace.RunningPlatform == Workspace.Platform.Mac)
+            {
+                directory = Path.Combine(directory, "Documents");
+            }
+            if (!Directory.Exists(directory))
+            {
+                throw new DirectoryNotFoundException("User documents folder not found");
+            }
+            directory = Path.Combine(directory, "SeudoBuild");
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            return directory;
+        }
+
+        void TaskQueuePump(string outputPath, ModuleLoader moduleLoader)
         {
             while (true)
             {
@@ -41,9 +63,10 @@ namespace SeudoBuild.Agent
                     if (QueuedBuilds.TryDequeue(out request))
                     {
                         ActiveBuild = request;
-                        Console.WriteLine($"Building #{request.Id}: project {request.ProjectConfiguration.ProjectName}, target {request.TargetName}");
-                        // FIXME build
-                        //builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, 
+                        string target = string.IsNullOrEmpty(request.TargetName) ? "default target" : $"target '{request.TargetName}'";
+                        BuildConsole.WriteLine($"Building project '{request.ProjectConfiguration.ProjectName}', {target}");
+
+                        builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath, moduleLoader);
                     }
                 }
                 Thread.Sleep(200);

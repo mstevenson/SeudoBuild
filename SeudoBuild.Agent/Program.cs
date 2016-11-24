@@ -100,7 +100,15 @@ namespace SeudoBuild.Agent
 
             // Execute build
             Builder builder = new Builder();
-            bool success = builder.Build(projectConfig, opts.BuildTarget, opts.ProjectConfigPath, opts.OutputPath, modules);
+
+            string parentDirectory = opts.OutputPath;
+            if (string.IsNullOrEmpty(parentDirectory))
+            {
+                // Config file's directory
+                parentDirectory = new FileInfo(opts.ProjectConfigPath).Directory.FullName;
+            }
+
+            bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory, modules);
 
             return success ? 0 : 1;
         }

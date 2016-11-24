@@ -13,7 +13,8 @@ namespace SeudoBuild.Agent
             StaticConfiguration.DisableErrorTraces = false;
 
             base.ConfigureApplicationContainer(container);
-            container.Register<IModuleLoader>(new ModuleLoaderFactory().Create());
+            var moduleLoader = new ModuleLoaderFactory().Create();
+            container.Register<IModuleLoader>(moduleLoader);
 
             var fs = new FileSystem();
             container.Register<IFileSystem>(fs);
@@ -21,7 +22,7 @@ namespace SeudoBuild.Agent
             var queue = new BuildQueue();
             container.Register<IBuildQueue>(queue);
             var builder = new Builder();
-            queue.StartQueue(builder);
+            queue.StartQueue(builder, moduleLoader);
 
             try
             {
