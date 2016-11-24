@@ -66,5 +66,12 @@ namespace SeudoBuild
             Console.WriteLine($"{indentString}! {value}");
             Console.ResetColor();
         }
+
+        public static void QueueNotification(string value)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"\n{value}\n");
+            Console.ResetColor();
+        }
     }
 }

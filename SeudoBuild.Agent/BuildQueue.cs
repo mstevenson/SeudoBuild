@@ -64,7 +64,7 @@ namespace SeudoBuild.Agent
                     {
                         ActiveBuild = request;
                         string target = string.IsNullOrEmpty(request.TargetName) ? "default target" : $"target '{request.TargetName}'";
-                        BuildConsole.WriteLine($"Building project '{request.ProjectConfiguration.ProjectName}', {target}");
+                        BuildConsole.QueueNotification($"Building project '{request.ProjectConfiguration.ProjectName}', {target}");
 
                         builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath, moduleLoader);
                     }

@@ -25,7 +25,7 @@ namespace SeudoBuild.Agent
                 try
                 {
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, null, moduleLoader, filesystem);
-                    BuildConsole.WriteLine($"Received build request: project '{config.ProjectName}', default target, host {Request.UserHostAddress}");
+                    BuildConsole.QueueNotification($"Received build request: project '{config.ProjectName}', default target, host {Request.UserHostAddress}");
                     var buildRequest = buildQueue.Build(config);
                     return buildRequest.Id.ToString();
                 }
@@ -43,7 +43,7 @@ namespace SeudoBuild.Agent
                 {
                     string target = parameters.target;
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, target, moduleLoader, filesystem);
-                    BuildConsole.WriteLine($"Queuing build request: project '{config.ProjectName}', target '{target}', host {Request.UserHostAddress}");
+                    BuildConsole.QueueNotification($"Queuing build request: project '{config.ProjectName}', target '{target}', host {Request.UserHostAddress}");
                     var buildRequest = buildQueue.Build(config, target);
                     return buildRequest.Id.ToString();
                 }

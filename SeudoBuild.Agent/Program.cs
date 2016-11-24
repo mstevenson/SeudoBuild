@@ -142,7 +142,6 @@ namespace SeudoBuild.Agent
             {
                 Console.WriteLine("Starting build server: " + uri);
                 Console.WriteLine("Press any key to exit.");
-                Console.WriteLine();
 
                 try
                 {
