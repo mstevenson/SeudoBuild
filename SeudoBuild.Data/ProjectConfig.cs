@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SeudoBuild
 {
+    [Serializable]
     public class ProjectConfig
     {
         public string ProjectName { get; set; }

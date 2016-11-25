@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.UnityBui
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.SMBDistribute", "SeudoBuild.Modules\SeudoBuild.Modules.SMBDistribute\SeudoBuild.Modules.SMBDistribute.csproj", "{AEBB808B-8C51-4273-AC7B-FC585D52CC49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Unity", "SeudoBuild.Unity\SeudoBuild.Unity.csproj", "{9BCE9E90-7578-47B6-830A-D98E6801041F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{AEBB808B-8C51-4273-AC7B-FC585D52CC49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEBB808B-8C51-4273-AC7B-FC585D52CC49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEBB808B-8C51-4273-AC7B-FC585D52CC49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BCE9E90-7578-47B6-830A-D98E6801041F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BCE9E90-7578-47B6-830A-D98E6801041F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BCE9E90-7578-47B6-830A-D98E6801041F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BCE9E90-7578-47B6-830A-D98E6801041F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

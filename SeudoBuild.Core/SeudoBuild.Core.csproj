@@ -65,8 +65,6 @@
     <Compile Include="Pipeline\Results\PipelineSequenceResults.cs" />
     <Compile Include="Pipeline\Results\PipelineStepResults.cs" />
     <Compile Include="Pipeline\ProjectPipeline.cs" />
-    <Compile Include="Pipeline\ProjectConfig.cs" />
-    <Compile Include="Pipeline\BuildTargetConfig.cs" />
     <Compile Include="Modules\IArchiveModule.cs" />
     <Compile Include="Modules\IBuildModule.cs" />
     <Compile Include="Modules\IDistributeModule.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace SeudoBuild
 {
+    [Serializable]
     public class BuildTargetConfig
     {
         public string TargetName { get; set; }
