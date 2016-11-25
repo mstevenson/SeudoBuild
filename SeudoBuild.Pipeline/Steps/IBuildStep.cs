@@ -1,5 +1,4 @@
-﻿using System;
-namespace SeudoBuild
+﻿namespace SeudoBuild.Pipeline
 {
     public interface IBuildStep : IPipelineStep<SourceSequenceResults, BuildSequenceResults, BuildStepResults>
     {

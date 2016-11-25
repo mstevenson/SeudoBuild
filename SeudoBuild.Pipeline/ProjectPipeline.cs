@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SeudoBuild
+namespace SeudoBuild.Pipeline
 {
     public class ProjectPipeline
     {

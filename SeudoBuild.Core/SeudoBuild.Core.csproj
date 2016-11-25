@@ -36,58 +36,36 @@
     <Compile Include="RunProcessAsTask\ProcessEx.cs" />
     <Compile Include="RunProcessAsTask\ProcessEx.overloads.cs" />
     <Compile Include="RunProcessAsTask\ProcessResults.cs" />
-    <Compile Include="Workspace.cs" />
-    <Compile Include="Pipeline\PipelineConfig.cs" />
-    <Compile Include="Pipeline\PipelineRunner.cs" />
     <None Include="packages.config" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="Macros.cs" />
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\IFileSystem.cs" />
-    <Compile Include="ModuleLoader.cs" />
-    <Compile Include="Pipeline\Results\ArchiveSequenceResults.cs" />
-    <Compile Include="Pipeline\Results\ArchiveStepResults.cs" />
-    <Compile Include="Pipeline\Results\BuildCompletionStatus.cs" />
-    <Compile Include="Pipeline\Results\BuildSequenceResults.cs" />
-    <Compile Include="Pipeline\Results\BuildStepResults.cs" />
-    <Compile Include="Pipeline\Results\DistributeSequenceResults.cs" />
-    <Compile Include="Pipeline\Results\DistributeStepResults.cs" />
-    <Compile Include="Pipeline\Results\SourceSequenceResults.cs" />
-    <Compile Include="Pipeline\Results\SourceStepResults.cs" />
-    <Compile Include="Pipeline\Results\NotifySequenceResults.cs" />
-    <Compile Include="Pipeline\Results\NotifyStepResults.cs" />
-    <Compile Include="Pipeline\Steps\IArchiveStep.cs" />
-    <Compile Include="Pipeline\Steps\IBuildStep.cs" />
-    <Compile Include="Pipeline\Steps\IDistributeStep.cs" />
-    <Compile Include="Pipeline\Steps\INotifyStep.cs" />
-    <Compile Include="Pipeline\Steps\ISourceStep.cs" />
-    <Compile Include="Pipeline\Steps\IPipelineStep.cs" />
-    <Compile Include="Pipeline\Results\PipelineSequenceResults.cs" />
-    <Compile Include="Pipeline\Results\PipelineStepResults.cs" />
-    <Compile Include="Pipeline\ProjectPipeline.cs" />
+    <Compile Include="Serializer.cs" />
+    <Compile Include="StepConfigConverter.cs" />
     <Compile Include="Modules\IArchiveModule.cs" />
     <Compile Include="Modules\IBuildModule.cs" />
     <Compile Include="Modules\IDistributeModule.cs" />
     <Compile Include="Modules\IModule.cs" />
+    <Compile Include="Modules\IModuleLoader.cs" />
     <Compile Include="Modules\INotifyModule.cs" />
     <Compile Include="Modules\ISourceModule.cs" />
-    <Compile Include="Serializer.cs" />
-    <Compile Include="StepConfigConverter.cs" />
-    <Compile Include="IModuleLoader.cs" />
-    <Compile Include="ModuleLoaderFactory.cs" />
+    <Compile Include="Modules\ModuleLoader.cs" />
+    <Compile Include="Modules\ModuleLoaderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />
-    <Folder Include="Pipeline\" />
     <Folder Include="IO\" />
-    <Folder Include="Pipeline\Results\" />
-    <Folder Include="Pipeline\Steps\" />
     <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
       <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
       <Name>SeudoBuild.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
+      <Name>SeudoBuild.Pipeline.Data</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

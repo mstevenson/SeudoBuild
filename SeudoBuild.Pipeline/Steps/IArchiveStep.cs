@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild
+﻿namespace SeudoBuild.Pipeline
 {
     public interface IArchiveStep : IPipelineStep<BuildSequenceResults, BuildStepResults, ArchiveSequenceResults, ArchiveStepResults>
     {

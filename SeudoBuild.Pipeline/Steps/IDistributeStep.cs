@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SeudoBuild
+﻿namespace SeudoBuild.Pipeline
 {
     public interface IDistributeStep : IPipelineStep<ArchiveSequenceResults, ArchiveStepResults, DistributeSequenceResults, DistributeStepResults>
     {

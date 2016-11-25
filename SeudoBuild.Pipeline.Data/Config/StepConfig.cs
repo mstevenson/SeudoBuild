@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SeudoBuild
+﻿namespace SeudoBuild
 {
     public abstract class StepConfig
     {

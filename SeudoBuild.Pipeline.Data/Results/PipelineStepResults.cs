@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SeudoBuild
+namespace SeudoBuild.Pipeline
 {
     public abstract class PipelineStepResults
     {

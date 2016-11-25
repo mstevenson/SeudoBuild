@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SeudoBuild.Pipeline.Data</RootNamespace>
+    <AssemblyName>SeudoBuild.Pipeline.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Results\ArchiveSequenceResults.cs" />
+    <Compile Include="Results\ArchiveStepResults.cs" />
+    <Compile Include="Results\BuildCompletionStatus.cs" />
+    <Compile Include="Results\BuildSequenceResults.cs" />
+    <Compile Include="Results\BuildStepResults.cs" />
+    <Compile Include="Results\DistributeSequenceResults.cs" />
+    <Compile Include="Results\DistributeStepResults.cs" />
+    <Compile Include="Results\NotifySequenceResults.cs" />
+    <Compile Include="Results\NotifyStepResults.cs" />
+    <Compile Include="Results\PipelineSequenceResults.cs" />
+    <Compile Include="Results\PipelineStepResults.cs" />
+    <Compile Include="Results\SourceSequenceResults.cs" />
+    <Compile Include="Results\SourceStepResults.cs" />
+    <Compile Include="Config\ArchiveStepConfig.cs" />
+    <Compile Include="Config\BuildTargetConfig.cs" />
+    <Compile Include="Config\PipelineConfig.cs" />
+    <Compile Include="Config\BuildStepConfig.cs" />
+    <Compile Include="Config\DistributeStepConfig.cs" />
+    <Compile Include="Config\NotifyStepConfig.cs" />
+    <Compile Include="Config\ProjectConfig.cs" />
+    <Compile Include="Config\SourceStepConfig.cs" />
+    <Compile Include="Config\StepConfig.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Results\" />
+    <Folder Include="Config\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
+      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
+      <Name>SeudoBuild.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

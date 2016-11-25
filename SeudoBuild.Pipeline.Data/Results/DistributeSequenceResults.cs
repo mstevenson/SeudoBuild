@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SeudoBuild
+﻿namespace SeudoBuild.Pipeline
 {
     public class DistributeSequenceResults : PipelineSequenceResults<DistributeStepResults>
     {

@@ -1,5 +1,4 @@
-﻿using System;
-namespace SeudoBuild
+﻿namespace SeudoBuild.Pipeline
 {
     public enum BuildCompletionStatus
     {

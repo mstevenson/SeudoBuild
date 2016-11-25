@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SeudoBuild.Modules;
 
-namespace SeudoBuild
+namespace SeudoBuild.Pipeline
 {
     /// <summary>
     /// 

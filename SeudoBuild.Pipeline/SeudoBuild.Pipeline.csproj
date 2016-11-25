@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{01882F9A-84F7-494D-9604-633BAA622209}</ProjectGuid>
+    <ProjectGuid>{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Data</RootNamespace>
-    <AssemblyName>SeudoBuild.Data</AssemblyName>
+    <RootNamespace>SeudoBuild.Pipeline</RootNamespace>
+    <AssemblyName>SeudoBuild.Pipeline</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -31,7 +31,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VersionNumber.cs" />
+    <Compile Include="Workspace.cs" />
+    <Compile Include="PipelineRunner.cs" />
+    <Compile Include="ProjectPipeline.cs" />
+    <Compile Include="Steps\IArchiveStep.cs" />
+    <Compile Include="Steps\IBuildStep.cs" />
+    <Compile Include="Steps\IDistributeStep.cs" />
+    <Compile Include="Steps\INotifyStep.cs" />
+    <Compile Include="Steps\IPipelineStep.cs" />
+    <Compile Include="Steps\ISourceStep.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
+      <Name>SeudoBuild.Pipeline.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Steps\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

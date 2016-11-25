@@ -1,5 +1,4 @@
-﻿using System;
-namespace SeudoBuild
+﻿namespace SeudoBuild.Pipeline
 {
     public interface IInitializable<T>
         where T : StepConfig

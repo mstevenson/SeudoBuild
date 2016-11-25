@@ -63,6 +63,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.EmailNot
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Modules.GitSource.Data", "SeudoBuild.Modules\SeudoBuild.Modules.GitSource\SeudoBuild.Modules.GitSource.Data\SeudoBuild.Modules.GitSource.Data.csproj", "{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline", "SeudoBuild.Pipeline\SeudoBuild.Pipeline.csproj", "{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Data", "SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj", "{CE7E1B76-B604-455A-BA80-5CB54DAC389C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -169,6 +173,14 @@ Global
 		{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE7E1B76-B604-455A-BA80-5CB54DAC389C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE7E1B76-B604-455A-BA80-5CB54DAC389C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE7E1B76-B604-455A-BA80-5CB54DAC389C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE7E1B76-B604-455A-BA80-5CB54DAC389C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
