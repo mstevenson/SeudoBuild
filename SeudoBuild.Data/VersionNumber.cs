@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace SeudoBuild
+﻿namespace SeudoBuild
 {
-    [Serializable]
     public class VersionNumber
     {
         public int Major { get; set; }
