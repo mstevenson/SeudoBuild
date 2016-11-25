@@ -130,7 +130,8 @@ namespace SeudoBuild.Agent
             Console.Title = "SeudoBuild • Queue";
 
             //string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
-            int port = 5555;
+            // FIXME pull port from command line argument
+            int port = 5511;
             if (opts.Port.HasValue)
             {
                 port = opts.Port.Value;
@@ -141,17 +142,18 @@ namespace SeudoBuild.Agent
             using (var host = new NancyHost(uri))
             {
                 Console.WriteLine("Starting build server: " + uri);
-                Console.WriteLine("Press any key to exit.");
-
                 try
                 {
                     host.Start();
                 }
-                catch
+                catch (Exception e)
                 {
-                    Console.WriteLine("Could not start build server, exiting.");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Could not start build server: " + e.Message);
+                    Console.ResetColor();
                     return 1;
                 }
+                Console.WriteLine("Press any key to exit.");
                 Console.ReadKey();
             }
 
