@@ -3,17 +3,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{60677416-FC65-4780-84DC-A1B77DF2DFC1}</ProjectGuid>
+    <ProjectGuid>{238B7129-83B4-4252-B3F7-90EEC88938A0}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.ShellBuild</RootNamespace>
-    <AssemblyName>SeudoBuild.Modules.ShellBuild</AssemblyName>
+    <RootNamespace>SeudoBuild.Modules.SFTPDistribute.Data</RootNamespace>
+    <AssemblyName>SeudoBuild.Modules.SFTPDistribute.Data</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Debug\Modules\ShellBuild</OutputPath>
+    <OutputPath>..\..\bin\Debug\Modules\SFTPDistribute</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -21,41 +21,22 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Release\Modules\ShellBuild</OutputPath>
+    <OutputPath>..\..\bin\Release\Modules\SFTPDistribute</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShellBuildStepConfig.cs" />
-    <Compile Include="ShellBuildStep.cs" />
-    <Compile Include="ShellBuildModule.cs" />
+    <Compile Include="SFTPDistributeConfig.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
-      <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
-      <Name>SeudoBuild.Core</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
       <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
       <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Modules.ShellBuild.Data\SeudoBuild.Modules.ShellBuild.Data.csproj">
-      <Project>{A83AE4DF-7C67-4B2C-BB57-F66EB562ECED}</Project>
-      <Name>SeudoBuild.Modules.ShellBuild.Data</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
