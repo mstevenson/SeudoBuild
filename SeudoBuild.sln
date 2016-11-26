@@ -39,7 +39,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.SMBDistribute", "SeudoBuild.Modules\SeudoBuild.Modules.SMBDistribute\SeudoBuild.Pipeline.Modules.SMBDistribute.csproj", "{AEBB808B-8C51-4273-AC7B-FC585D52CC49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Unity", "SeudoBuild.Unity\SeudoBuild.Unity.csproj", "{9BCE9E90-7578-47B6-830A-D98E6801041F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Unity", "SeudoBuild.Client.Unity\SeudoBuild.Client.Unity.csproj", "{9BCE9E90-7578-47B6-830A-D98E6801041F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.FolderArchive.Data", "SeudoBuild.Modules\SeudoBuild.Modules.FolderArchive.Data\SeudoBuild.Pipeline.Modules.FolderArchive.Data.csproj", "{F7145A5A-980B-424A-8178-B0FF3988410C}"
 EndProject
@@ -251,5 +251,6 @@ Global
 		{FB9D0644-FFDC-4C77-90BA-15EC44A333F5} = {900780D6-2BCF-45B8-AA48-C03CF745621E}
 		{4A9529A8-F773-4827-BCF4-60B524E6CA52} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
 		{CE4F204A-4638-4C04-A1BB-EFB0E00E9B67} = {269F0074-8DDA-403B-811E-A8C9727AA5A5}
+		{9BCE9E90-7578-47B6-830A-D98E6801041F} = {269F0074-8DDA-403B-811E-A8C9727AA5A5}
 	EndGlobalSection
 EndGlobal
