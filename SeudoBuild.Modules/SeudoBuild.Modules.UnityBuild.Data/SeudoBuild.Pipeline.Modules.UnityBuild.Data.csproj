@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3D5D25F2-9C3D-4052-9CE9-89C6F2D839AB}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.UnityBuild.Data</RootNamespace>
+    <RootNamespace>SeudoBuild.Modules.UnityBuild</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.UnityBuild.Data</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>

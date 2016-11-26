@@ -38,6 +38,7 @@
     <Compile Include="ProjectPipeline.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Modules\ModuleLoaderFactory.cs" />
+    <Compile Include="Modules\ModuleRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">

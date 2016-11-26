@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEngine.Networking;
 using System.IO;
 using Newtonsoft.Json;
 using SeudoBuild.Pipeline;
@@ -96,5 +97,10 @@ namespace SeudoBuild.Unity
                 Save(config, Filepath);
             }
         }
+
+        //void SubmitJob(ProjectConfig config, string address)
+        //{
+        //    //UnityWebRequest request = UnityWebRequest.Post(address, )
+        //}
     }
 }

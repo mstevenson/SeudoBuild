@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Pipeline.Data</RootNamespace>
+    <RootNamespace>SeudoBuild.Pipeline</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Data</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -72,12 +72,14 @@
     <Compile Include="Modules\INotifyModule.cs" />
     <Compile Include="Modules\ISourceModule.cs" />
     <Compile Include="Modules\IModuleRegistry.cs" />
+    <Compile Include="Exceptions\ModuleLoadException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Results\" />
     <Folder Include="Config\" />
     <Folder Include="Steps\" />
     <Folder Include="Modules\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3C40B876-8BD2-4057-A073-254E6F25E32F}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.EmailNotify.Data</RootNamespace>
+    <RootNamespace>SeudoBuild.Modules.EmailNotify</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.EmailNotify.Data</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>

@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F7145A5A-980B-424A-8178-B0FF3988410C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.FolderArchive.Data</RootNamespace>
+    <RootNamespace>SeudoBuild.Modules.FolderArchive</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.FolderArchive.Data</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>

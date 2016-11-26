@@ -56,9 +56,6 @@
     <Compile Include="IReceiver.cs" />
     <Compile Include="API\AgentModule.cs" />
     <Compile Include="API\Agent.cs" />
-    <Compile Include="Discovery\UdpDiscoveryClient.cs" />
-    <Compile Include="Discovery\UdpDiscoveryServer.cs" />
-    <Compile Include="Discovery\ServerInfo.cs" />
     <Compile Include="IBuildQueue.cs" />
     <Compile Include="API\BuildRequest.cs" />
     <Compile Include="BuildQueue.cs" />
@@ -83,13 +80,16 @@
       <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
       <Name>SeudoBuild.Core.Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Net\SeudoBuild.Net.csproj">
+      <Project>{8195BBFF-470D-42DF-B46F-C8C97B35CED4}</Project>
+      <Name>SeudoBuild.Net</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="API\" />
-    <Folder Include="Discovery\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

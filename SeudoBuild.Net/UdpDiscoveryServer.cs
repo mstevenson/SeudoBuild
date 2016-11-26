@@ -60,7 +60,7 @@ namespace SeudoBuild.Net
             if (udpClient != null)
             {
                 udpClient.Close();
-                udpClient.Dispose();
+                //udpClient.Dispose();
             }
         }
 
