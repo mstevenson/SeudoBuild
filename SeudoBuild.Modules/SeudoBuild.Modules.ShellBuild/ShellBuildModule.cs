@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace SeudoBuild.Modules.ShellBuild
+namespace SeudoBuild.Pipeline.Modules.ShellBuild
 {
     public class ShellBuildModule : IBuildModule
     {

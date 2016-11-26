@@ -3,17 +3,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D86370C6-FE1E-4677-8D42-9C861C01B47F}</ProjectGuid>
+    <ProjectGuid>{14BCE30B-B04C-4D41-8CBD-5898A5013EAA}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.EmailNotify</RootNamespace>
-    <AssemblyName>SeudoBuild.Modules.EmailNotify</AssemblyName>
+    <RootNamespace>SeudoBuild.Modules.FolderArchive</RootNamespace>
+    <AssemblyName>SeudoBuild.Pipeline.Modules.FolderArchive</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Debug\Modules\EmailNotify</OutputPath>
+    <OutputPath>..\..\bin\Debug\Modules\FolderArchive</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -21,7 +21,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Release\Modules\EmailNotify</OutputPath>
+    <OutputPath>..\..\bin\Release\Modules\FolderArchive</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -32,23 +32,11 @@
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>..\..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="MimeKit">
-      <HintPath>..\..\packages\MimeKit.1.10.0\lib\net451\MimeKit.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Security" />
-    <Reference Include="MailKit">
-      <HintPath>..\..\packages\MailKit.1.10.0\lib\net451\MailKit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EmailNotifyStep.cs" />
-    <Compile Include="EmailNotifyModule.cs" />
+    <Compile Include="FolderArchiveStep.cs" />
+    <Compile Include="FolderArchiveModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -59,9 +47,18 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="SeudoBuild.Modules.EmailNotify.Data\SeudoBuild.Modules.EmailNotify.Data.csproj">
-      <Project>{3C40B876-8BD2-4057-A073-254E6F25E32F}</Project>
-      <Name>SeudoBuild.Modules.EmailNotify.Data</Name>
+    <ProjectReference Include="..\..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+      <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
+      <Name>SeudoBuild.Core.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Modules.FolderArchive.Data\SeudoBuild.Pipeline.Modules.FolderArchive.Data.csproj">
+      <Project>{F7145A5A-980B-424A-8178-B0FF3988410C}</Project>
+      <Name>SeudoBuild.Pipeline.Modules.FolderArchive.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
+      <Name>SeudoBuild.Pipeline.Data</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

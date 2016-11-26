@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace SeudoBuild.Modules.ShellBuild
+namespace SeudoBuild.Pipeline.Modules.ShellBuild
 {
     /// <summary>
     /// Executes an arbitrary shell script as part of a build process.
@@ -14,17 +14,17 @@ namespace SeudoBuild.Modules.ShellBuild
     public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
     {
         ShellBuildStepConfig config;
-        Workspace workspace;
+        IWorkspace workspace;
 
         public string Type { get; } = "Shell Script";
 
-        public void Initialize(ShellBuildStepConfig config, Workspace workspace)
+        public void Initialize(ShellBuildStepConfig config, IWorkspace workspace)
         {
             this.config = config;
             this.workspace = workspace;
         }
 
-        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
+        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, IWorkspace workspace)
         {
             try
             {

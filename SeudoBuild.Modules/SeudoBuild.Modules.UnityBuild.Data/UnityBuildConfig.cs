@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild.Modules.UnityBuild
+﻿namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public abstract class UnityBuildConfig : BuildStepConfig
     {

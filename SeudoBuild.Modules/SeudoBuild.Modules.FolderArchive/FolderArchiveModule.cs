@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace SeudoBuild.Modules.ZipArchive
+namespace SeudoBuild.Pipeline.Modules.FolderArchive
 {
     public class FolderArchiveModule : IArchiveModule
     {

@@ -42,6 +42,10 @@
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
       <Name>SeudoBuild.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+      <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
+      <Name>SeudoBuild.Core.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

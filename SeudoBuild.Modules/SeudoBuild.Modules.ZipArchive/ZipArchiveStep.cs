@@ -2,22 +2,22 @@
 using Ionic.Zip;
 using Path = System.IO.Path;
 
-namespace SeudoBuild.Modules.ZipArchive
+namespace SeudoBuild.Pipeline.Modules.ZipArchive
 {
     public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
     {
         ZipArchiveConfig config;
-        Workspace workspace;
+        IWorkspace workspace;
 
         public string Type { get; } = "Zip File";
 
-        public void Initialize(ZipArchiveConfig config, Workspace workspace)
+        public void Initialize(ZipArchiveConfig config, IWorkspace workspace)
         {
             this.config = config;
             this.workspace = workspace;
         }
 
-        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
+        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, IWorkspace workspace)
         {
             try
             {

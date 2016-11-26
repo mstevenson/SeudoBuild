@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild.Modules.SFTPDistribute
+﻿namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 {
     public class SFTPDistributeConfig : DistributeStepConfig
     {

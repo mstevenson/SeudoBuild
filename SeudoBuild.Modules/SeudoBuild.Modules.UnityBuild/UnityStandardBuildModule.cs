@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public class UnityStandardBuildModule : IBuildModule
     {

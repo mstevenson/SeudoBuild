@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public class UnityParameterizedBuildConfig : UnityBuildConfig
     {

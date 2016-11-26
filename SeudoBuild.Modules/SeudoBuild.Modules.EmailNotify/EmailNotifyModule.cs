@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 
-namespace SeudoBuild.Modules.EmailNotify
+namespace SeudoBuild.Pipeline.Modules.EmailNotify
 {
     public class EmailNotifyModule : INotifyModule
     {

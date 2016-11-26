@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 
-namespace SeudoBuild.Modules.GitSource
+namespace SeudoBuild.Pipeline.Modules.GitSource
 {
     public class GitSourceModule : ISourceModule
     {

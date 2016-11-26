@@ -2,7 +2,7 @@
 using MailKit.Net.Smtp;
 using MimeKit;
 
-namespace SeudoBuild.Modules.EmailNotify
+namespace SeudoBuild.Pipeline.Modules.EmailNotify
 {
     public class EmailNotifyStep : INotifyStep<EmailNotifyConfig>
     {
@@ -10,12 +10,12 @@ namespace SeudoBuild.Modules.EmailNotify
 
         public string Type { get; } = "Email Notification";
 
-        public void Initialize(EmailNotifyConfig config, Workspace workspace)
+        public void Initialize(EmailNotifyConfig config, IWorkspace workspace)
         {
             this.config = config;
         }
 
-        public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, Workspace workspace)
+        public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, IWorkspace workspace)
         {
             try
             {

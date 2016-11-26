@@ -1,21 +1,21 @@
 ﻿using Path = System.IO.Path;
 
-namespace SeudoBuild
+namespace SeudoBuild.Pipeline.Modules.FolderArchive
 {
     public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
     {
         FolderArchiveConfig config;
-        Workspace workspace;
+        IWorkspace workspace;
 
         public string Type { get; } = "Folder";
 
-        public void Initialize(FolderArchiveConfig config, Workspace workspace)
+        public void Initialize(FolderArchiveConfig config, IWorkspace workspace)
         {
             this.config = config;
             this.workspace = workspace;
         }
 
-        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, Workspace workspace)
+        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, IWorkspace workspace)
         {
             try
             {

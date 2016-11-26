@@ -10,7 +10,7 @@ namespace SeudoBuild.Pipeline
 {
     // Based on http://stackoverflow.com/questions/1070787/writing-c-sharp-plugin-system
 
-    public class ModuleRegistry
+    public class ModuleRegistry : IModuleRegistry
     {
         class ModuleCategory
         {
@@ -109,7 +109,7 @@ namespace SeudoBuild.Pipeline
 
     public class ModuleLoader : IModuleLoader
     {
-        public ModuleRegistry Registry { get; } = new ModuleRegistry();
+        public IModuleRegistry Registry { get; } = new ModuleRegistry();
 
         public void LoadAssembly(string file)
         {

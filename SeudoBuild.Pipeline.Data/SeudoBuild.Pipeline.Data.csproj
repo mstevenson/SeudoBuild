@@ -58,13 +58,35 @@
     <Compile Include="Config\StepConfig.cs" />
     <Compile Include="VersionNumber.cs" />
     <Compile Include="StepConfigConverter.cs" />
+    <Compile Include="Steps\IArchiveStep.cs" />
+    <Compile Include="Steps\IBuildStep.cs" />
+    <Compile Include="Steps\IDistributeStep.cs" />
+    <Compile Include="Steps\INotifyStep.cs" />
+    <Compile Include="Steps\IPipelineStep.cs" />
+    <Compile Include="Steps\ISourceStep.cs" />
+    <Compile Include="Modules\IArchiveModule.cs" />
+    <Compile Include="Modules\IBuildModule.cs" />
+    <Compile Include="Modules\IDistributeModule.cs" />
+    <Compile Include="Modules\IModule.cs" />
+    <Compile Include="Modules\IModuleLoader.cs" />
+    <Compile Include="Modules\INotifyModule.cs" />
+    <Compile Include="Modules\ISourceModule.cs" />
+    <Compile Include="Modules\IModuleRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Results\" />
     <Folder Include="Config\" />
+    <Folder Include="Steps\" />
+    <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+      <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
+      <Name>SeudoBuild.Core.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

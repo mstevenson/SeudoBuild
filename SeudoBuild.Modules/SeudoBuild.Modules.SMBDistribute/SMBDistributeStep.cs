@@ -2,7 +2,7 @@
 using Path = System.IO.Path;
 using System.Diagnostics;
 
-namespace SeudoBuild.Modules.SMBDistribute
+namespace SeudoBuild.Pipeline.Modules.SMBDistribute
 {
     public class SMBDistributeStep : IDistributeStep<SMBDistributeConfig>
     {
@@ -10,12 +10,12 @@ namespace SeudoBuild.Modules.SMBDistribute
 
         public string Type { get; } = "SMB Transfer";
 
-        public void Initialize(SMBDistributeConfig config, Workspace workspace)
+        public void Initialize(SMBDistributeConfig config, IWorkspace workspace)
         {
             this.config = config;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace SeudoBuild.Modules.SMBDistribute
 
         void Mount(bool mount, SMBDistributeConfig config)
         {
-            if (Workspace.RunningPlatform == Workspace.Platform.Mac)
+            if (Workspace.RunningPlatform == Platform.Mac)
             {
                 const string mountDir = "SMBDistribute";
                 string serverPath = Path.Combine(config.Host, config.Directory);

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Net;
 
-namespace SeudoBuild.Modules.FTPDistribute
+namespace SeudoBuild.Pipeline.Modules.FTPDistribute
 {
     public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
     {
@@ -10,12 +10,12 @@ namespace SeudoBuild.Modules.FTPDistribute
 
         public string Type { get; } = "FTP Upload";
 
-        public void Initialize(FTPDistributeConfig config, Workspace workspace)
+        public void Initialize(FTPDistributeConfig config, IWorkspace workspace)
         {
             this.config = config;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
         {
             var results = new DistributeStepResults();
 
@@ -50,7 +50,7 @@ namespace SeudoBuild.Modules.FTPDistribute
             }
         }
 
-        void Upload (ArchiveStepResults archiveInfo, Workspace workspace)
+        void Upload (ArchiveStepResults archiveInfo, IWorkspace workspace)
         {
             // Get the object used to communicate with the server.
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{config.URL}:{config.Port}/{config.BasePath}/{archiveInfo.ArchiveFileName}");

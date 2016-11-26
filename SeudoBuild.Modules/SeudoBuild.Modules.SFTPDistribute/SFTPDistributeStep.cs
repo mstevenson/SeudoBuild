@@ -3,7 +3,7 @@ using System.IO;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
-namespace SeudoBuild.Modules.SFTPDistribute
+namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 {
     public class SFTPDistributeStep : IDistributeStep<SFTPDistributeConfig>
     {
@@ -11,12 +11,12 @@ namespace SeudoBuild.Modules.SFTPDistribute
 
         public string Type { get; } = "SFTP Upload";
 
-        public void Initialize(SFTPDistributeConfig config, Workspace workspace)
+        public void Initialize(SFTPDistributeConfig config, IWorkspace workspace)
         {
             this.config = config;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
         {
             var results = new DistributeStepResults();
 
@@ -51,7 +51,7 @@ namespace SeudoBuild.Modules.SFTPDistribute
             }
         }
 
-        public void Upload(ArchiveStepResults archiveInfo, Workspace workspace)
+        public void Upload(ArchiveStepResults archiveInfo, IWorkspace workspace)
         {
             // Supply the password via fake keyboard input
             var keyboardAuthMethod = new KeyboardInteractiveAuthenticationMethod(config.Username);

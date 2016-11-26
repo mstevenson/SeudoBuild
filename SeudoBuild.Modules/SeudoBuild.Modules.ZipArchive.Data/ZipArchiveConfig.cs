@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild.Modules.ZipArchive
+﻿namespace SeudoBuild.Pipeline.Modules.ZipArchive
 {
     public class ZipArchiveConfig : ArchiveStepConfig
     {

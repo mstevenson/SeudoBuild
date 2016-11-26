@@ -3,17 +3,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}</ProjectGuid>
+    <ProjectGuid>{73895975-FD53-407B-9F97-E6622BEB1049}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Pipeline</RootNamespace>
-    <AssemblyName>SeudoBuild.Pipeline</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>SeudoBuild.Modules.ZipArchive</RootNamespace>
+    <AssemblyName>SeudoBuild.Pipeline.Modules.ZipArchive</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>..\..\bin\Debug\Modules\ZipArchive</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -21,40 +21,46 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>..\..\bin\Release\Modules\ZipArchive</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="DotNetZip">
+      <HintPath>..\..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PipelineRunner.cs" />
-    <Compile Include="ProjectPipeline.cs" />
-    <Compile Include="Modules\ModuleLoader.cs" />
-    <Compile Include="Modules\ModuleLoaderFactory.cs" />
+    <Compile Include="ZipArchiveStep.cs" />
+    <Compile Include="ZipArchiveModule.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
-      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
-      <Name>SeudoBuild.Pipeline.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
       <Name>SeudoBuild.Core</Name>
+      <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
+      <Name>SeudoBuild.Pipeline.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Modules.ZipArchive.Data\SeudoBuild.Pipeline.Modules.ZipArchive.Data.csproj">
+      <Project>{BA8156DD-3699-4184-983C-6EE6C32E2C7C}</Project>
+      <Name>SeudoBuild.Pipeline.Modules.ZipArchive.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
       <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
       <Name>SeudoBuild.Core.Data</Name>
+      <Private>False</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

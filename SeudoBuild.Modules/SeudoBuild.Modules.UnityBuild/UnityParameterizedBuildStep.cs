@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using RunProcessAsTask;
 using Path = System.IO.Path;
 
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public class UnityParameterizedBuildStep : UnityBuildStep<UnityParameterizedBuildConfig>
     {
         public override string Type { get; } = "Unity Parameterized Build";
 
-        protected override string GetBuildArgs(UnityParameterizedBuildConfig config, Workspace workspace)
+        protected override string GetBuildArgs(UnityParameterizedBuildConfig config, IWorkspace workspace)
         {
             // FIXME match this to the Unity build script method name
             const string methodName = "Builder.RemoteBuild";

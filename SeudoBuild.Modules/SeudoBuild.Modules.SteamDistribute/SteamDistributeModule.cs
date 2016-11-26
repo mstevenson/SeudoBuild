@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SeudoBuild.Modules.SteamDistribute
+namespace SeudoBuild.Pipeline.Modules.SteamDistribute
 {
     public class SteamDistributeModule : IDistributeModule
     {

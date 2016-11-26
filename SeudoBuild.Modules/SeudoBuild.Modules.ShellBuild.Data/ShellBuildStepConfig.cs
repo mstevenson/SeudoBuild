@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild.Modules.ShellBuild
+﻿namespace SeudoBuild.Pipeline.Modules.ShellBuild
 {
     public class ShellBuildStepConfig : BuildStepConfig
     {

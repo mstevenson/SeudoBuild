@@ -83,6 +83,10 @@
       <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
       <Name>SeudoBuild.Pipeline.Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+      <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
+      <Name>SeudoBuild.Core.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

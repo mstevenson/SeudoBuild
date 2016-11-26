@@ -40,7 +40,6 @@
     <Compile Include="BuildConsole.cs" />
     <Compile Include="Macros.cs" />
     <Compile Include="IO\FileSystem.cs" />
-    <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Workspace.cs" />
   </ItemGroup>
@@ -49,5 +48,11 @@
     <Folder Include="IO\" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+      <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
+      <Name>SeudoBuild.Core.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

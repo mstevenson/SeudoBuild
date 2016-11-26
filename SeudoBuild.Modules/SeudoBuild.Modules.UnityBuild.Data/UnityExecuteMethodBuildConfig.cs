@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     /// <summary>
     /// Executes an arbitrary static method in a Unity editor script.

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using SeudoBuild;
 using System.IO;
 using Newtonsoft.Json;
+using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Unity
 {

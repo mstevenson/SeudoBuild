@@ -4,17 +4,16 @@ using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using System.Diagnostics;
 
-
-namespace SeudoBuild.Modules.GitSource
+namespace SeudoBuild.Pipeline.Modules.GitSource
 {
     public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
         GitSourceConfig config;
-        Workspace workspace;
+        IWorkspace workspace;
 
         public string Type { get; } = "Git";
 
-        public void Initialize(GitSourceConfig config, Workspace workspace)
+        public void Initialize(GitSourceConfig config, IWorkspace workspace)
         {
             this.config = config;
             this.workspace = workspace;
@@ -33,7 +32,7 @@ namespace SeudoBuild.Modules.GitSource
             //lfsFilter = GlobalSettings.RegisterFilter(filter);
         }
 
-        public SourceStepResults ExecuteStep(Workspace workspace)
+        public SourceStepResults ExecuteStep(IWorkspace workspace)
         {
             BuildConsole.IndentLevel++;
 

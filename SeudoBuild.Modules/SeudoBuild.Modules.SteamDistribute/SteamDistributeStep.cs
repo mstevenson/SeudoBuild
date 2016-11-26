@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SeudoBuild.Modules.SteamDistribute
+﻿namespace SeudoBuild.Pipeline.Modules.SteamDistribute
 {
     public class SteamDistributeStep : IDistributeStep<SteamDistributeConfig>
     {
@@ -8,12 +6,12 @@ namespace SeudoBuild.Modules.SteamDistribute
 
         public string Type { get; } = "Steam Upload";
 
-        public void Initialize(SteamDistributeConfig config, Workspace workspace)
+        public void Initialize(SteamDistributeConfig config, IWorkspace workspace)
         {
             this.config = config;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, Workspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
         {
             // TODO
 

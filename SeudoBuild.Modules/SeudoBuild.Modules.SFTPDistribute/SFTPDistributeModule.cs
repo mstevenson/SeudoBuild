@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace SeudoBuild.Modules.SFTPDistribute
+namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 {
     public class SFTPDistributeModule : IDistributeModule
     {

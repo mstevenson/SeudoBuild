@@ -13,7 +13,7 @@ namespace SeudoBuild
             get
             {
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                if (Workspace.RunningPlatform == Workspace.Platform.Mac)
+                if (Workspace.RunningPlatform == Platform.Mac)
                 {
                     path += "/Documents";
                 }

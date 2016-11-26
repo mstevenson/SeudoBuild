@@ -3,7 +3,7 @@
     public interface IInitializable<T>
         where T : StepConfig
     {
-        void Initialize(T config, Workspace workspace);
+        void Initialize(T config, IWorkspace workspace);
     }
 
     public interface IPipelineStep
@@ -14,14 +14,14 @@
     public interface IPipelineStepWithConfig<T> : IPipelineStep
     where T : StepConfig
     {
-        void Initialize(T config, Workspace workspace);
+        void Initialize(T config, IWorkspace workspace);
     }
 
     public interface IPipelineStep<TOutSeq, TOutStep> : IPipelineStep
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
     {
-        TOutStep ExecuteStep(Workspace workspace);
+        TOutStep ExecuteStep(IWorkspace workspace);
     }
 
     public interface IPipelineStepWithConfig<TOutSeq, TOutStep, TConfig> : IInitializable<TConfig>, IPipelineStep<TOutSeq, TOutStep>
@@ -36,7 +36,7 @@
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
     {
-        TOutStep ExecuteStep(TInSeq previousSequence, Workspace workspace);
+        TOutStep ExecuteStep(TInSeq previousSequence, IWorkspace workspace);
     }
 
     public interface IPipelineStepWithConfig<TInSeq, TOutSeq, TOutStep, TConfig> : IInitializable<TConfig>, IPipelineStep<TInSeq, TOutSeq, TOutStep>

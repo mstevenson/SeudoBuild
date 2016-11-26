@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public class UnityLogParser
     {

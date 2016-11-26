@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SeudoBuild.Modules.FTPDistribute
+namespace SeudoBuild.Pipeline.Modules.FTPDistribute
 {
     public class FTPDistributeModule : IDistributeModule
     {

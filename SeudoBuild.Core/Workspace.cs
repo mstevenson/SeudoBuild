@@ -11,15 +11,8 @@ namespace SeudoBuild
     // %build_date% -- the date that the build was completed
     // %commit_identifier% -- the current commit number or hash
 
-    public class Workspace
+    public class Workspace : IWorkspace
     {
-        public enum Platform
-        {
-            Mac,
-            Windows,
-            Linux
-        }
-
         public static Platform RunningPlatform
         {
             get
@@ -123,7 +116,7 @@ namespace SeudoBuild
         }
         string logsDirectory = "";
 
-        public Macros Macros { get; } = new Macros();
+        public IMacros Macros { get; } = new Macros();
 
         public IFileSystem FileSystem { get; private set; }
 

@@ -4,6 +4,6 @@ namespace SeudoBuild.Pipeline
 {
     public interface IModuleLoader
     {
-        ModuleRegistry Registry { get; }
+        IModuleRegistry Registry { get; }
     }
 }

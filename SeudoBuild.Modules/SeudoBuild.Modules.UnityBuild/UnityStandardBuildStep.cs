@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using Path = System.IO.Path;
 
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public class UnityStandardBuildStep : UnityBuildStep<UnityStandardBuildConfig>
     {
         public override string Type { get; } = "Unity Standard Build";
 
-        protected override string GetBuildArgs(UnityStandardBuildConfig config, Workspace workspace)
+        protected override string GetBuildArgs(UnityStandardBuildConfig config, IWorkspace workspace)
         {
             var args = new List<string>();
             args.Add("-quit");

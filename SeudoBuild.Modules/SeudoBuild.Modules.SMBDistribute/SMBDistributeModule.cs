@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace SeudoBuild.Modules.SMBDistribute
+namespace SeudoBuild.Pipeline.Modules.SMBDistribute
 {
     public class SMBDistributeModule : IDistributeModule
     {

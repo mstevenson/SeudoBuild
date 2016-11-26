@@ -3,17 +3,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3D5D25F2-9C3D-4052-9CE9-89C6F2D839AB}</ProjectGuid>
+    <ProjectGuid>{6096B113-5817-4CE8-843C-CF5CBA64D655}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.UnityBuild.Data</RootNamespace>
-    <AssemblyName>SeudoBuild.Modules.UnityBuild.Data</AssemblyName>
+    <RootNamespace>SeudoBuild.Modules.SteamDistribute</RootNamespace>
+    <AssemblyName>SeudoBuild.Pipeline.Modules.SteamDistribute</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Debug\Modules\UnityBuild</OutputPath>
+    <OutputPath>..\..\bin\Debug\Modules\SteamDistribute</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -21,7 +21,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Release\Modules\UnityBuild</OutputPath>
+    <OutputPath>..\..\bin\Release\Modules\SteamDistribute</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -35,14 +35,32 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnityBuildConfig.cs" />
-    <Compile Include="UnityExecuteMethodBuildConfig.cs" />
-    <Compile Include="UnityParameterizedBuildConfig.cs" />
-    <Compile Include="UnityStandardBuildConfig.cs" />
-    <Compile Include="UnityPlatform.cs" />
+    <Compile Include="SteamDistributeStep.cs" />
+    <Compile Include="SteamDistributeModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
+      <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
+      <Name>SeudoBuild.Core</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
+      <Name>SeudoBuild.Pipeline.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Modules.SteamDistribute.Data\SeudoBuild.Pipeline.Modules.SteamDistribute.Data.csproj">
+      <Project>{24C0EB80-9E8D-4045-B7F5-13D4CC4A4C9E}</Project>
+      <Name>SeudoBuild.Pipeline.Modules.SteamDistribute.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+      <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
+      <Name>SeudoBuild.Core.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

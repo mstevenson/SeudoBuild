@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public class UnityInstallation
     {
@@ -29,11 +29,11 @@ namespace SeudoBuild.Modules.UnityBuild
         /// </summary>
         public static UnityInstallation FindUnityInstallation (VersionNumber version, IFileSystem fileSystem)
         {
-            Workspace.Platform platform = Workspace.RunningPlatform;
+            Platform platform = Workspace.RunningPlatform;
 
             switch (platform)
             {
-                case Workspace.Platform.Mac:
+                case Platform.Mac:
                     // find the installation folder
                     string installationPath = "/Applications/";
                     string versionString = version != null ? version.ToString() : "";

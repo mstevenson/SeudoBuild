@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using LibGit2Sharp;
 
-namespace SeudoBuild.Modules.GitSource
+namespace SeudoBuild.Pipeline.Modules.GitSource
 {
     public class LFSFilter : Filter
     {

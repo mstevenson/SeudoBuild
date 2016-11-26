@@ -1,5 +1,4 @@
-﻿using System;
-namespace SeudoBuild.Modules.SteamDistribute
+﻿namespace SeudoBuild.Pipeline.Modules.SteamDistribute
 {
     public class SteamDistributeConfig : DistributeStepConfig
     {

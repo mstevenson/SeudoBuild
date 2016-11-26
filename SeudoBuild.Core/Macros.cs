@@ -8,7 +8,7 @@ namespace SeudoBuild
     /// Macro variables begin and end with the % character.
     /// Example: %project_name% variable could be replaced with the string MyProject.
     /// </summary>
-    public class Macros : Dictionary<string, string>
+    public class Macros : Dictionary<string, string>, IMacros
     {
         public string ReplaceVariablesInText(string source)
         {

@@ -3,15 +3,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace SeudoBuild.Modules.UnityBuild
+namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     public abstract class UnityBuildStep<T> : IBuildStep<T>
         where T : UnityBuildConfig
     {
         protected T config;
-        protected Workspace workspace;
+        protected IWorkspace workspace;
 
-        public void Initialize(T config, Workspace workspace)
+        public void Initialize(T config, IWorkspace workspace)
         {
             this.config = config;
             this.workspace = workspace;
@@ -19,9 +19,9 @@ namespace SeudoBuild.Modules.UnityBuild
 
         public abstract string Type { get; }
 
-        protected abstract string GetBuildArgs(T config, Workspace workspace);
+        protected abstract string GetBuildArgs(T config, IWorkspace workspace);
 
-        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, Workspace workspace)
+        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, IWorkspace workspace)
         {
             var unityVersion = config.UnityVersionNumber;
             string unityDirName = "Unity";
@@ -39,7 +39,7 @@ namespace SeudoBuild.Modules.UnityBuild
             return buildResult;
         }
 
-        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, Workspace workspace, string relativeUnityProjectFolder)
+        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, IWorkspace workspace, string relativeUnityProjectFolder)
         {
             if (!workspace.FileSystem.FileExists(unityInstallation.ExePath))
             {
@@ -121,7 +121,7 @@ namespace SeudoBuild.Modules.UnityBuild
             }
         }
 
-        protected string GetBuildLogPath(Workspace workspace)
+        protected string GetBuildLogPath(IWorkspace workspace)
         {
             string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
             return $"{workspace.LogsDirectory}/Unity_Build_Log_{now}.txt";

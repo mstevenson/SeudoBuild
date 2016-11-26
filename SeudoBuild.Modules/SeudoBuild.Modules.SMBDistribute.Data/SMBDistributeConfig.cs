@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild.Modules.SMBDistribute
+﻿namespace SeudoBuild.Pipeline.Modules.SMBDistribute
 {
     public class SMBDistributeConfig : DistributeStepConfig
     {

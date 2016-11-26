@@ -1,4 +1,6 @@
-﻿namespace SeudoBuild.Modules.GitSource
+﻿using System;
+
+namespace SeudoBuild.Pipeline.Modules.GitSource
 {
     public class GitSourceConfig : SourceStepConfig
     {
