@@ -7,14 +7,12 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
     public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
     {
         ZipArchiveConfig config;
-        IWorkspace workspace;
 
         public string Type { get; } = "Zip File";
 
         public void Initialize(ZipArchiveConfig config, IWorkspace workspace)
         {
             this.config = config;
-            this.workspace = workspace;
         }
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, IWorkspace workspace)

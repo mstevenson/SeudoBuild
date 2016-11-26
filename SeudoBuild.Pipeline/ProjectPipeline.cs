@@ -46,8 +46,6 @@ namespace SeudoBuild.Pipeline
         IReadOnlyCollection<T> CreatePipelineSteps<T>(ModuleLoader loader, Workspace workspace)
             where T : class, IPipelineStep
         {
-            //IEnumerable<StepConfig> allStepConfigs = null;
-
             List<T> pipelineSteps = new List<T>();
 
             if (typeof(T) == typeof(ISourceStep))

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SeudoBuild.Pipeline.Modules.UnityBuild
+﻿namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     /// <summary>
     /// Performs a standard Unity build, or executes an arbitrary static method in a Unity editor script.

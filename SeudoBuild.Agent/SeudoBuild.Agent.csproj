@@ -52,10 +52,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BuildServer.cs" />
-    <Compile Include="BuildSubmit.cs" />
-    <Compile Include="BuildAgentConfig.cs" />
-    <Compile Include="DeploymentTarget.cs" />
     <Compile Include="AgentName.cs" />
     <Compile Include="IReceiver.cs" />
     <Compile Include="API\AgentModule.cs" />

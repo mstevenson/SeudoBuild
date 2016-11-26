@@ -5,9 +5,6 @@ using System.Linq;
 
 namespace SeudoBuild.Pipeline
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class PipelineRunner
     {
         PipelineConfig builderConfig;

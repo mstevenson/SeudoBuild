@@ -118,8 +118,8 @@ namespace SeudoBuild.Agent
         {
             Console.Title = "SeudoBuild • Submit";
 
-            var submit = new BuildSubmit();
-            submit.Submit(opts.ProjectConfigPath, opts.BuildTarget, opts.AgentName);
+            //var submit = new BuildSubmit();
+            //submit.Submit(opts.ProjectConfigPath, opts.BuildTarget, opts.AgentName);
 
             return 0;
         }

@@ -33,19 +33,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RunProcessAsTask\ProcessEx.cs" />
-    <Compile Include="RunProcessAsTask\ProcessEx.overloads.cs" />
-    <Compile Include="RunProcessAsTask\ProcessResults.cs" />
     <None Include="packages.config" />
     <Compile Include="BuildConsole.cs" />
     <Compile Include="Macros.cs" />
-    <Compile Include="IO\FileSystem.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Workspace.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="RunProcessAsTask\" />
-    <Folder Include="IO\" />
+    <Compile Include="FileSystem.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
