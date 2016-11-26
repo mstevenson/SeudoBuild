@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Nancy;
 using Nancy.Hosting.Self;
-using SeudoBuild.Net;
+using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {

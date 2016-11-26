@@ -59,11 +59,6 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="SeudoBuild.Modules.EmailNotify.Data\SeudoBuild.Modules.EmailNotify.Data.csproj">
       <Project>{3C40B876-8BD2-4057-A073-254E6F25E32F}</Project>
       <Name>SeudoBuild.Modules.EmailNotify.Data</Name>

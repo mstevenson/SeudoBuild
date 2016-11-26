@@ -47,11 +47,6 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\SeudoBuild.Modules.FolderArchive.Data\SeudoBuild.Modules.FolderArchive.Data.csproj">
       <Project>{F7145A5A-980B-424A-8178-B0FF3988410C}</Project>
       <Name>SeudoBuild.Modules.FolderArchive.Data</Name>

@@ -47,11 +47,6 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\SeudoBuild.Modules.SFTPDistribute.Data\SeudoBuild.Modules.SFTPDistribute.Data.csproj">
       <Project>{238B7129-83B4-4252-B3F7-90EEC88938A0}</Project>
       <Name>SeudoBuild.Modules.SFTPDistribute.Data</Name>

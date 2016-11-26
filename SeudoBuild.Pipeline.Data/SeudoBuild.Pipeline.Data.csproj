@@ -28,6 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,17 +56,15 @@
     <Compile Include="Config\ProjectConfig.cs" />
     <Compile Include="Config\SourceStepConfig.cs" />
     <Compile Include="Config\StepConfig.cs" />
+    <Compile Include="VersionNumber.cs" />
+    <Compile Include="StepConfigConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Results\" />
     <Folder Include="Config\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

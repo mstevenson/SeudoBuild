@@ -33,12 +33,5 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FolderArchiveConfig.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

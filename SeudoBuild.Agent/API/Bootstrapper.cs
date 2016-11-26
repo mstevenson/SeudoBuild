@@ -1,6 +1,6 @@
-﻿using System;
-using Nancy;
+﻿using Nancy;
 using SeudoBuild.Net;
+using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {

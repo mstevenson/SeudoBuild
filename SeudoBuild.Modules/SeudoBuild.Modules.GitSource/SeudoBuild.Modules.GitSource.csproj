@@ -61,11 +61,6 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="SeudoBuild.Modules.GitSource.Data\SeudoBuild.Modules.GitSource.Data.csproj">
       <Project>{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}</Project>
       <Name>SeudoBuild.Modules.GitSource.Data</Name>

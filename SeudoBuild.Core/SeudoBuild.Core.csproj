@@ -42,31 +42,11 @@
     <Compile Include="IO\FileSystem.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="Serializer.cs" />
-    <Compile Include="StepConfigConverter.cs" />
-    <Compile Include="Modules\IArchiveModule.cs" />
-    <Compile Include="Modules\IBuildModule.cs" />
-    <Compile Include="Modules\IDistributeModule.cs" />
-    <Compile Include="Modules\IModule.cs" />
-    <Compile Include="Modules\IModuleLoader.cs" />
-    <Compile Include="Modules\INotifyModule.cs" />
-    <Compile Include="Modules\ISourceModule.cs" />
-    <Compile Include="Modules\ModuleLoader.cs" />
-    <Compile Include="Modules\ModuleLoaderFactory.cs" />
+    <Compile Include="Workspace.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RunProcessAsTask\" />
     <Folder Include="IO\" />
-    <Folder Include="Modules\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
-      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
-      <Name>SeudoBuild.Pipeline.Data</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

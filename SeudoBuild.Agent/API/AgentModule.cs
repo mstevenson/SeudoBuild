@@ -3,6 +3,7 @@ using System.Net.Http;
 using Nancy;
 using Nancy.ModelBinding;
 using System.IO;
+using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {

@@ -54,11 +54,6 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\SeudoBuild.Modules.UnityBuild.Data\SeudoBuild.Modules.UnityBuild.Data.csproj">
       <Project>{3D5D25F2-9C3D-4052-9CE9-89C6F2D839AB}</Project>
       <Name>SeudoBuild.Modules.UnityBuild.Data</Name>

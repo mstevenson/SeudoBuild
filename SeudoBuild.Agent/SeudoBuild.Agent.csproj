@@ -75,9 +75,13 @@
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
       <Name>SeudoBuild.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
+    <ProjectReference Include="..\SeudoBuild.Pipeline\SeudoBuild.Pipeline.csproj">
+      <Project>{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}</Project>
+      <Name>SeudoBuild.Pipeline</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+      <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
+      <Name>SeudoBuild.Pipeline.Data</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

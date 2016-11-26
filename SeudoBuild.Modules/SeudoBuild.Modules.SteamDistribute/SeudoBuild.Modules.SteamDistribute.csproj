@@ -42,11 +42,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
       <Name>SeudoBuild.Core</Name>

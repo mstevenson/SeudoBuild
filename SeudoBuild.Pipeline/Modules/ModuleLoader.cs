@@ -4,8 +4,9 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using Newtonsoft.Json;
+using SeudoBuild.Pipeline;
 
-namespace SeudoBuild
+namespace SeudoBuild.Pipeline
 {
     // Based on http://stackoverflow.com/questions/1070787/writing-c-sharp-plugin-system
 

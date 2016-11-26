@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-namespace SeudoBuild
+namespace SeudoBuild.Pipeline
 {
     public class StepConfigConverter : JsonConverter
     {

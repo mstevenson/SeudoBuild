@@ -2,7 +2,7 @@
 using Path = System.IO.Path;
 using System.Linq;
 
-namespace SeudoBuild
+namespace SeudoBuild.Pipeline
 {
     public class ModuleLoaderFactory
     {

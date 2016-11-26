@@ -40,11 +40,6 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Data\SeudoBuild.Data.csproj">
-      <Project>{01882F9A-84F7-494D-9604-633BAA622209}</Project>
-      <Name>SeudoBuild.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\SeudoBuild.Modules.SMBDistribute.Data\SeudoBuild.Modules.SMBDistribute.Data.csproj">
       <Project>{3B3E5B4C-AB0F-48BA-B264-51E8C4E6324D}</Project>
       <Name>SeudoBuild.Modules.SMBDistribute.Data</Name>
