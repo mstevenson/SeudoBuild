@@ -32,42 +32,21 @@ namespace SeudoBuild.Net
                 {
                     return new ServerBeacon[0];
                 }
-                else
-                {
-                    return servers.ToArray();
-                }
+                return servers.ToArray();
             }
-        }
-
-        public void OnServerFound(ServerBeacon server)
-        {
-            if (ServerFound != null)
-            {
-                ServerFound(server);
-            }
-        }
-
-        public void OnServerLost(ServerBeacon server)
-        {
-            if (ServerLost != null)
-            {
-                ServerLost(server);
-            }
-        }
-
-
-        public void Initialize()
-        {
-            udpClient = new UdpClient();
-            var localEndPoint = new IPEndPoint(IPAddress.Any, multicastPort);
-            udpClient.Client.Bind(localEndPoint);
-            var ip = IPAddress.Parse(multicastAddress);
-            udpClient.MulticastLoopback = true;
-            udpClient.JoinMulticastGroup(ip);
         }
 
         public void Start()
         {
+            // Initialize
+            udpClient = new UdpClient();
+            endPoint = new IPEndPoint(IPAddress.Any, multicastPort);
+            udpClient.Client.Bind(endPoint);
+            var ip = IPAddress.Parse(multicastAddress);
+            udpClient.MulticastLoopback = true;
+            udpClient.JoinMulticastGroup(ip);
+
+            // Run
             Console.WriteLine("Server Discovery Started: " + multicastAddress + ":" + multicastPort);
             IsRunning = true;
             networkThread = new Thread(new ThreadStart(NetworkThread));
@@ -107,7 +86,11 @@ namespace SeudoBuild.Net
                     if (!serverExists)
                     {
                         servers.Add(serverInfo);
-                        OnServerFound(serverInfo);
+                        if (ServerFound != null)
+                        {
+                            ServerFound(serverInfo);
+                        }
+                        //OnServerFound(serverInfo);
                     }
                     servers = PruneLostServers(servers);
                 }
@@ -129,7 +112,10 @@ namespace SeudoBuild.Net
                 }
                 else
                 {
-                    OnServerLost(serverInfo);
+                    if (ServerLost != null)
+                    {
+                        ServerLost(serverInfo);
+                    }
                 }
             }
             return pruned;

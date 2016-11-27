@@ -18,8 +18,6 @@ namespace SeudoBuild.Net
         IPEndPoint endPoint;
         Thread networkThread;
 
-        bool isInitialized;
-
         public bool IsRunning { get; protected set; }
 
         public UdpDiscoveryServer(ServerBeacon server)
