@@ -19,15 +19,10 @@ namespace SeudoBuild.Net
         /// </summary>
         public Guid guid;
 
-        ///// <summary>
-        ///// Port for sending reliable bidirectional messages.
-        ///// </summary>
-        //public ushort sendReceivePort = 5125;
-
-        ///// <summary>
-        ///// Port for sending and receiving unreliable broadcasts.
-        ///// </summary>
-        //public ushort broadcastPort = 5126;
+        /// <summary>
+        /// Port for REST API.
+        /// </summary>
+        public ushort port;
 
         public DateTime lastSeen;
 
@@ -66,13 +61,10 @@ namespace SeudoBuild.Net
             s.guid = new Guid(guidBytes);
             index += guidBytes.Length;
 
-            //byte[] sendReceivePortBytes = Slice (data, index, 2);
-            //s.sendReceivePort = BitConverter.ToUInt16 (sendReceivePortBytes, 0);
-            //index += sendReceivePortBytes.Length;
-
-            //byte[] broadcastPortBytes = Slice (data, index, 2);
-            //s.broadcastPort = BitConverter.ToUInt16 (broadcastPortBytes, 0);
-            //index += broadcastPortBytes.Length;
+            // REST API port
+            byte[] portBytes = Slice(data, index, 2);
+            s.port = BitConverter.ToUInt16(portBytes, 0);
+            index += portBytes.Length;
 
             return s;
         }
@@ -86,7 +78,7 @@ namespace SeudoBuild.Net
 
         public static byte[] ToBytes(ServerBeacon config)
         {
-            byte[] output = new byte[22];
+            byte[] output = new byte[24];
             int offset = 0;
 
             // 4 byte ASCII service ID
@@ -102,13 +94,9 @@ namespace SeudoBuild.Net
             byte[] guidBytes = config.guid.ToByteArray();
             offset = AppendBytes(guidBytes, output, offset);
 
-            //// 2 byte send/receive port
-            //byte[] sendReceivePortBytes = BitConverter.GetBytes (config.sendReceivePort);
-            //offset = AppendBytes (sendReceivePortBytes, output, offset);
-
-            //// 2 byte broadcast port
-            //byte[] broadcastPortBytes = BitConverter.GetBytes (config.broadcastPort);
-            //offset = AppendBytes (broadcastPortBytes, output, offset);
+            // 2 byte REST API port
+            byte[] sendReceivePortBytes = BitConverter.GetBytes(config.port);
+            offset = AppendBytes(sendReceivePortBytes, output, offset);
 
             return output;
         }

@@ -19,10 +19,17 @@ namespace SeudoBuild.Net
         Thread networkThread;
         List<ServerBeacon> servers = new List<ServerBeacon>();
 
+        int agentPort;
+
         public event Action<ServerBeacon> ServerFound;
         public event Action<ServerBeacon> ServerLost;
 
         public bool IsRunning { get; protected set; }
+
+        public UdpDiscoveryClient(int agentPort)
+        {
+            this.agentPort = agentPort;
+        }
 
         public ServerBeacon[] AvailableServers
         {

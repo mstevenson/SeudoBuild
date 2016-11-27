@@ -26,7 +26,8 @@ namespace SeudoBuild.Agent
 
             try
             {
-                var serverInfo = new ServerBeacon();
+                // FIXME configure the port from a command line argument
+                var serverInfo = new ServerBeacon { port = 5511 };
                 var discovery = new UdpDiscoveryServer(serverInfo);
                 discovery.Start();
             }

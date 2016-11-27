@@ -4,6 +4,7 @@ using System.IO;
 using Nancy.Hosting.Self;
 using SeudoBuild.Pipeline;
 using SeudoBuild.Net;
+using System.Net;
 using System.Threading;
 
 namespace SeudoBuild.Agent
@@ -122,12 +123,32 @@ namespace SeudoBuild.Agent
         static int Scan(ScanSubOptions opts)
         {
             Console.WriteLine("Looking for build agents. Press any key to exit.");
-            UdpDiscoveryClient client = new UdpDiscoveryClient();
-            client.Start();
+            // FIXME fill in port from command line argument
+            UdpDiscoveryClient client = new UdpDiscoveryClient(5511);
+            try
+            {
+                client.Start();
+            }
+            catch (System.Net.Sockets.SocketException)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Could not start build agent discovery client");
+                Console.ResetColor();
+                return 1;
+            }
             client.ServerFound += (beacon) =>
             {
-                BuildConsole.WriteBullet(beacon.address.ToString());
+                string address = $"http://{beacon.address}:{beacon.port}/info";
+                using (var webClient = new WebClient())
+                {
+                    string json = webClient.DownloadString(address);
+                    var agentInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
+                    BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
+                }
+                //var request = WebRequest.Create(address);
+                //var response = request.GetResponse();
             };
+            Console.WriteLine();
             Console.ReadKey();
             return 0;
         }
@@ -149,7 +170,7 @@ namespace SeudoBuild.Agent
             Console.Title = "SeudoBuild • Queue";
 
             //string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
-            // FIXME pull port from command line argument
+            // FIXME pull port from command line argument, and incorporate into ServerBeacon object
             int port = 5511;
             if (opts.Port.HasValue)
             {

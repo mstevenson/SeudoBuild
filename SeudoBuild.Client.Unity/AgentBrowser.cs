@@ -25,7 +25,8 @@ namespace SeudoBuild.Client.Unity
         {
             if (client == null)
             {
-                client = new UdpDiscoveryClient();
+                // FIXME configure port
+                client = new UdpDiscoveryClient(5511);
             }
             if (!client.IsRunning)
             {

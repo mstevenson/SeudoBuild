@@ -12,7 +12,7 @@ namespace SeudoBuild.Agent
         public AgentModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem)
         {
             // Build agent info
-            Get["/"] = parameters =>
+            Get["/info"] = parameters =>
             {
                 //moduleLoader.Registry.
 
