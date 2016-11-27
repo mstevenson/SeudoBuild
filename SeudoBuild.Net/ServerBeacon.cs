@@ -3,7 +3,7 @@ using System.Net;
 
 namespace SeudoBuild.Net
 {
-    public class ServerInfo
+    public class ServerBeacon
     {
         /// <summary>
         /// String identifier that begins each UDP server discovery message.
@@ -32,26 +32,26 @@ namespace SeudoBuild.Net
         public DateTime lastSeen;
 
 
-        public ServerInfo()
+        public ServerBeacon()
         {
             this.guid = Guid.NewGuid();
             this.lastSeen = DateTime.Now;
             this.address = IPAddress.Parse("127.0.0.1");
         }
 
-        public static ServerInfo FromBytes(byte[] data)
+        public static ServerBeacon FromBytes(byte[] data)
         {
-            var s = new ServerInfo();
+            var s = new ServerBeacon();
             int index = 0;
 
             // ASCII Service ID
             var encoding = new System.Text.ASCIIEncoding();
-            byte[] serviceIdBytes = encoding.GetBytes(ServerInfo.serviceId);
+            byte[] serviceIdBytes = encoding.GetBytes(ServerBeacon.serviceId);
             var id = encoding.GetString(data, 0, serviceIdBytes.Length);
             index += id.Length;
 
             // Bail out if the beacon was not the service we're looking for
-            if (id != ServerInfo.serviceId)
+            if (id != ServerBeacon.serviceId)
             {
                 return null;
             }
@@ -84,14 +84,14 @@ namespace SeudoBuild.Net
             return output;
         }
 
-        public static byte[] ToBytes(ServerInfo config)
+        public static byte[] ToBytes(ServerBeacon config)
         {
             byte[] output = new byte[22];
             int offset = 0;
 
             // 4 byte ASCII service ID
             var encoding = new System.Text.ASCIIEncoding();
-            byte[] serviceIdBytes = encoding.GetBytes(ServerInfo.serviceId);
+            byte[] serviceIdBytes = encoding.GetBytes(ServerBeacon.serviceId);
             offset = AppendBytes(serviceIdBytes, output, offset);
 
             // 2 byte version number
@@ -142,7 +142,7 @@ namespace SeudoBuild.Net
             {
                 return false;
             }
-            ServerInfo s = obj as ServerInfo;
+            ServerBeacon s = obj as ServerBeacon;
             if ((object)s == null)
             {
                 return false;
@@ -150,7 +150,7 @@ namespace SeudoBuild.Net
             return guid == s.guid;
         }
 
-        public bool Equals(ServerInfo s)
+        public bool Equals(ServerBeacon s)
         {
             if ((object)s == null)
             {
@@ -159,7 +159,7 @@ namespace SeudoBuild.Net
             return guid == s.guid;
         }
 
-        public static bool operator ==(ServerInfo a, ServerInfo b)
+        public static bool operator ==(ServerBeacon a, ServerBeacon b)
         {
             if (System.Object.ReferenceEquals(a, b))
             {
@@ -172,7 +172,7 @@ namespace SeudoBuild.Net
             return a.guid == b.guid;
         }
 
-        public static bool operator !=(ServerInfo a, ServerInfo b)
+        public static bool operator !=(ServerBeacon a, ServerBeacon b)
         {
             return !(a == b);
         }

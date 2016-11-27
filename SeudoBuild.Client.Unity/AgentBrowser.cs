@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;
 using SeudoBuild.Net;
@@ -46,7 +46,7 @@ namespace SeudoBuild.Client.Unity
             client.ServerFound -= OnServerLost;
         }
 
-        void OnServerFound(ServerInfo server)
+        void OnServerFound(ServerBeacon server)
         {
             if (!agents.Any(a => a.guid == server.guid))
             {
@@ -56,7 +56,7 @@ namespace SeudoBuild.Client.Unity
             }
         }
 
-        void OnServerLost(ServerInfo server)
+        void OnServerLost(ServerBeacon server)
         {
             var agent = agents.FirstOrDefault(a => a.guid == server.guid);
             if (agent != null)

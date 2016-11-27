@@ -7,7 +7,7 @@ namespace SeudoBuild.Net
 {
     public class UdpDiscoveryServer : IDisposable
     {
-        ServerInfo server;
+        ServerBeacon server;
 
         const int broadcastDelay = 1000; // milliseconds
 
@@ -22,7 +22,7 @@ namespace SeudoBuild.Net
 
         public bool IsRunning { get; protected set; }
 
-        public UdpDiscoveryServer(ServerInfo server)
+        public UdpDiscoveryServer(ServerBeacon server)
         {
             this.server = server;
         }
@@ -70,7 +70,7 @@ namespace SeudoBuild.Net
             while (IsRunning)
             {
                 // Broadcast server beacon to all clients on the local network
-                byte[] message = ServerInfo.ToBytes(server);
+                byte[] message = ServerBeacon.ToBytes(server);
                 udpClient.Send(message, message.Length, endPoint);
                 //				Console.WriteLine ("Broadcasted");
                 Thread.Sleep(broadcastDelay);

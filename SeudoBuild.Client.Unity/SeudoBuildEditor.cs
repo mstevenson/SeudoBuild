@@ -99,16 +99,34 @@ namespace SeudoBuild.Client.Unity
             }
         }
 
+        void GetAgentInfo(string address)
+        {
+            EditorCoroutine.Start(DoGetAgentInfo(address));
+        }
+
+        IEnumerator DoGetAgentInfo(string address)
+        {
+            UnityWebRequest request = UnityWebRequest.Get(address);
+            var asyncOp = request.Send();
+
+            while (!asyncOp.isDone)
+            {
+                yield return null;
+            }
+            // TODO get bytes, convert to string, deserialize
+            Debug.Log("Received agent info");
+        }
+
         void SubmitJob(ProjectConfig config, string address)
+        {
+            EditorCoroutine.Start(DoSubmit(config, address));
+        }
+
+        IEnumerator DoSubmit(ProjectConfig config, string address)
         {
             UnityWebRequest request = UnityWebRequest.Post(address, "asdf");
             var asyncOp = request.Send();
 
-            EditorCoroutine.Start(WaitForSubmit(asyncOp));
-        }
-
-        IEnumerator WaitForSubmit(AsyncOperation asyncOp)
-        {
             while (!asyncOp.isDone)
             {
                 yield return null;

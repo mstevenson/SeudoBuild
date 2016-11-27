@@ -17,20 +17,20 @@ namespace SeudoBuild.Net
         UdpClient udpClient;
         IPEndPoint endPoint;
         Thread networkThread;
-        List<ServerInfo> servers = new List<ServerInfo>();
+        List<ServerBeacon> servers = new List<ServerBeacon>();
 
-        public event Action<ServerInfo> ServerFound;
-        public event Action<ServerInfo> ServerLost;
+        public event Action<ServerBeacon> ServerFound;
+        public event Action<ServerBeacon> ServerLost;
 
         public bool IsRunning { get; protected set; }
 
-        public ServerInfo[] AvailableServers
+        public ServerBeacon[] AvailableServers
         {
             get
             {
                 if (servers.Count == 0)
                 {
-                    return new ServerInfo[0];
+                    return new ServerBeacon[0];
                 }
                 else
                 {
@@ -39,7 +39,7 @@ namespace SeudoBuild.Net
             }
         }
 
-        public void OnServerFound(ServerInfo server)
+        public void OnServerFound(ServerBeacon server)
         {
             if (ServerFound != null)
             {
@@ -47,7 +47,7 @@ namespace SeudoBuild.Net
             }
         }
 
-        public void OnServerLost(ServerInfo server)
+        public void OnServerLost(ServerBeacon server)
         {
             if (ServerLost != null)
             {
@@ -91,7 +91,7 @@ namespace SeudoBuild.Net
             while (IsRunning)
             {
                 byte[] data = udpClient.Receive(ref endPoint);
-                ServerInfo serverInfo = ServerInfo.FromBytes(data);
+                ServerBeacon serverInfo = ServerBeacon.FromBytes(data);
                 serverInfo.address = endPoint.Address;
                 if (serverInfo != null)
                 {
@@ -116,9 +116,9 @@ namespace SeudoBuild.Net
             IsRunning = false;
         }
 
-        List<ServerInfo> PruneLostServers(List<ServerInfo> servers, int timeout = 3500)
+        List<ServerBeacon> PruneLostServers(List<ServerBeacon> servers, int timeout = 3500)
         {
-            List<ServerInfo> pruned = new List<ServerInfo>();
+            List<ServerBeacon> pruned = new List<ServerBeacon>();
             var now = DateTime.Now;
             foreach (var serverInfo in servers)
             {

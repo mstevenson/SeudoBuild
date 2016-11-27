@@ -1,4 +1,4 @@
-﻿using Nancy;
+using Nancy;
 using SeudoBuild.Net;
 using SeudoBuild.Pipeline;
 
@@ -26,7 +26,7 @@ namespace SeudoBuild.Agent
 
             try
             {
-                var serverInfo = new ServerInfo();
+                var serverInfo = new ServerBeacon();
                 var discovery = new UdpDiscoveryServer(serverInfo);
                 discovery.Start();
             }
