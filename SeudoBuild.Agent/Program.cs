@@ -1,10 +1,10 @@
 ﻿using System;
 using CommandLine;
 using System.IO;
-using System.Linq;
-using Nancy;
 using Nancy.Hosting.Self;
 using SeudoBuild.Pipeline;
+using SeudoBuild.Net;
+using System.Threading;
 
 namespace SeudoBuild.Agent
 {
@@ -21,6 +21,11 @@ namespace SeudoBuild.Agent
 
             [Value(0, MetaName = "project", HelpText = "Path to a project configuration file.", Required = true)]
             public string ProjectConfigPath { get; set; }
+        }
+
+        [Verb("scan", HelpText = "List build agents found on the local network.")]
+        class ScanSubOptions
+        {
         }
 
         [Verb("submit", HelpText = "Submit a build request for a remote build agent to fulfill.")]
@@ -62,9 +67,10 @@ namespace SeudoBuild.Agent
         {
             Console.Title = "SeudoBuild";
 
-            Parser.Default.ParseArguments<BuildSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions, NameSubOptions>(args)
+            Parser.Default.ParseArguments<BuildSubOptions, ScanSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions, NameSubOptions>(args)
                 .MapResult(
                     (BuildSubOptions opts) => Build(opts),
+                    (ScanSubOptions opts) => Scan(opts),
                     (SubmitSubOptions opts) => Submit(opts),
                     (QueueSubOptions opts) => Queue(opts),
                     (DeploySubOptions opts) => Deploy(opts),
@@ -111,6 +117,19 @@ namespace SeudoBuild.Agent
             bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory, modules);
 
             return success ? 0 : 1;
+        }
+
+        static int Scan(ScanSubOptions opts)
+        {
+            Console.WriteLine("Looking for build agents. Press any key to exit.");
+            UdpDiscoveryClient client = new UdpDiscoveryClient();
+            client.Start();
+            client.ServerFound += (beacon) =>
+            {
+                BuildConsole.WriteBullet(beacon.address.ToString());
+            };
+            Console.ReadKey();
+            return 0;
         }
 
         // Submit job to the network
