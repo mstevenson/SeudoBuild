@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;
+using System.Collections;
 using System.IO;
 using Newtonsoft.Json;
 using SeudoBuild.Pipeline;
 
-namespace SeudoBuild.Unity
+namespace SeudoBuild.Client.Unity
 {
     public class SeudoBuildEditor : EditorWindow
     {
@@ -98,9 +99,21 @@ namespace SeudoBuild.Unity
             }
         }
 
-        //void SubmitJob(ProjectConfig config, string address)
-        //{
-        //    //UnityWebRequest request = UnityWebRequest.Post(address, )
-        //}
+        void SubmitJob(ProjectConfig config, string address)
+        {
+            UnityWebRequest request = UnityWebRequest.Post(address, "asdf");
+            var asyncOp = request.Send();
+
+            EditorCoroutine.Start(WaitForSubmit(asyncOp));
+        }
+
+        IEnumerator WaitForSubmit(AsyncOperation asyncOp)
+        {
+            while (!asyncOp.isDone)
+            {
+                yield return null;
+            }
+            Debug.Log("Send complete");
+        }
     }
 }
