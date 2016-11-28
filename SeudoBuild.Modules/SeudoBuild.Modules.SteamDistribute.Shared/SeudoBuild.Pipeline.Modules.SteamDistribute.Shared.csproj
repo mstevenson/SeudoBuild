@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6096B113-5817-4CE8-843C-CF5CBA64D655}</ProjectGuid>
+    <ProjectGuid>{24C0EB80-9E8D-4045-B7F5-13D4CC4A4C9E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>SeudoBuild.Modules.SteamDistribute</RootNamespace>
-    <AssemblyName>SeudoBuild.Pipeline.Modules.SteamDistribute</AssemblyName>
+    <AssemblyName>SeudoBuild.Pipeline.Modules.SteamDistribute.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -28,37 +28,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SteamDistributeStep.cs" />
-    <Compile Include="SteamDistributeModule.cs" />
+    <Compile Include="SteamDistributeConfig.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
-      <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
-      <Name>SeudoBuild.Core</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj">
       <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
       <Name>SeudoBuild.Pipeline.Shared</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Modules.SteamDistribute.Shared\SeudoBuild.Pipeline.Modules.SteamDistribute.Shared.csproj">
-      <Project>{24C0EB80-9E8D-4045-B7F5-13D4CC4A4C9E}</Project>
-      <Name>SeudoBuild.Pipeline.Modules.SteamDistribute.Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Core.Shared\SeudoBuild.Core.Shared.csproj">
-      <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
-      <Name>SeudoBuild.Core.Shared</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

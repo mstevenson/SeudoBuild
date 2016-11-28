@@ -46,9 +46,9 @@
     <Compile Include="EditorCoroutine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+    <ProjectReference Include="..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj">
       <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
-      <Name>SeudoBuild.Pipeline.Data</Name>
+      <Name>SeudoBuild.Pipeline.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\SeudoBuild.Net\SeudoBuild.Net.csproj">
       <Project>{8195BBFF-470D-42DF-B46F-C8C97B35CED4}</Project>

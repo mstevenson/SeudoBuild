@@ -47,19 +47,19 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj">
       <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
-      <Name>SeudoBuild.Pipeline.Data</Name>
+      <Name>SeudoBuild.Pipeline.Shared</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Core.Shared\SeudoBuild.Core.Shared.csproj">
       <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
-      <Name>SeudoBuild.Core.Data</Name>
+      <Name>SeudoBuild.Core.Shared</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Modules.ShellBuild.Data\SeudoBuild.Pipeline.Modules.ShellBuild.Data.csproj">
+    <ProjectReference Include="..\SeudoBuild.Modules.ShellBuild.Shared\SeudoBuild.Pipeline.Modules.ShellBuild.Shared.csproj">
       <Project>{A83AE4DF-7C67-4B2C-BB57-F66EB562ECED}</Project>
-      <Name>SeudoBuild.Pipeline.Modules.ShellBuild.Data</Name>
+      <Name>SeudoBuild.Pipeline.Modules.ShellBuild.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

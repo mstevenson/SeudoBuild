@@ -40,18 +40,18 @@
       <Name>SeudoBuild.Core</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj">
       <Project>{CE7E1B76-B604-455A-BA80-5CB54DAC389C}</Project>
-      <Name>SeudoBuild.Pipeline.Data</Name>
+      <Name>SeudoBuild.Pipeline.Shared</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\SeudoBuild.Modules.SMBDistribute.Data\SeudoBuild.Pipeline.Modules.SMBDistribute.Data.csproj">
+    <ProjectReference Include="..\SeudoBuild.Modules.SMBDistribute.Shared\SeudoBuild.Pipeline.Modules.SMBDistribute.Shared.csproj">
       <Project>{3B3E5B4C-AB0F-48BA-B264-51E8C4E6324D}</Project>
-      <Name>SeudoBuild.Pipeline.Modules.SMBDistribute.Data</Name>
+      <Name>SeudoBuild.Pipeline.Modules.SMBDistribute.Shared</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj">
+    <ProjectReference Include="..\..\SeudoBuild.Core.Shared\SeudoBuild.Core.Shared.csproj">
       <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
-      <Name>SeudoBuild.Core.Data</Name>
+      <Name>SeudoBuild.Core.Shared</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

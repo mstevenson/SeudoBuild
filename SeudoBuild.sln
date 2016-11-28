@@ -41,35 +41,33 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Unity", "SeudoBuild.Client.Unity\SeudoBuild.Client.Unity.csproj", "{9BCE9E90-7578-47B6-830A-D98E6801041F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.FolderArchive.Data", "SeudoBuild.Modules\SeudoBuild.Modules.FolderArchive.Data\SeudoBuild.Pipeline.Modules.FolderArchive.Data.csproj", "{F7145A5A-980B-424A-8178-B0FF3988410C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.FolderArchive.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.FolderArchive.Shared\SeudoBuild.Pipeline.Modules.FolderArchive.Shared.csproj", "{F7145A5A-980B-424A-8178-B0FF3988410C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.ZipArchive.Data", "SeudoBuild.Modules\SeudoBuild.Modules.ZipArchive.Data\SeudoBuild.Pipeline.Modules.ZipArchive.Data.csproj", "{BA8156DD-3699-4184-983C-6EE6C32E2C7C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.ZipArchive.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.ZipArchive.Shared\SeudoBuild.Pipeline.Modules.ZipArchive.Shared.csproj", "{BA8156DD-3699-4184-983C-6EE6C32E2C7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.ShellBuild.Data", "SeudoBuild.Modules\SeudoBuild.Modules.ShellBuild.Data\SeudoBuild.Pipeline.Modules.ShellBuild.Data.csproj", "{A83AE4DF-7C67-4B2C-BB57-F66EB562ECED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.ShellBuild.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.ShellBuild.Shared\SeudoBuild.Pipeline.Modules.ShellBuild.Shared.csproj", "{A83AE4DF-7C67-4B2C-BB57-F66EB562ECED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.UnityBuild.Data", "SeudoBuild.Modules\SeudoBuild.Modules.UnityBuild.Data\SeudoBuild.Pipeline.Modules.UnityBuild.Data.csproj", "{3D5D25F2-9C3D-4052-9CE9-89C6F2D839AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.UnityBuild.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.UnityBuild.Shared\SeudoBuild.Pipeline.Modules.UnityBuild.Shared.csproj", "{3D5D25F2-9C3D-4052-9CE9-89C6F2D839AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.FTPDistribute.Data", "SeudoBuild.Modules\SeudoBuild.Modules.FTPDistribute.Data\SeudoBuild.Pipeline.Modules.FTPDistribute.Data.csproj", "{720C67C1-8867-4F66-8F3A-EF6703276DB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.FTPDistribute.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.FTPDistribute.Shared\SeudoBuild.Pipeline.Modules.FTPDistribute.Shared.csproj", "{720C67C1-8867-4F66-8F3A-EF6703276DB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.SFTPDistribute.Data", "SeudoBuild.Modules\SeudoBuild.Modules.SFTPDistribute.Data\SeudoBuild.Pipeline.Modules.SFTPDistribute.Data.csproj", "{238B7129-83B4-4252-B3F7-90EEC88938A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.SFTPDistribute.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.SFTPDistribute.Shared\SeudoBuild.Pipeline.Modules.SFTPDistribute.Shared.csproj", "{238B7129-83B4-4252-B3F7-90EEC88938A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.SMBDistribute.Data", "SeudoBuild.Modules\SeudoBuild.Modules.SMBDistribute.Data\SeudoBuild.Pipeline.Modules.SMBDistribute.Data.csproj", "{3B3E5B4C-AB0F-48BA-B264-51E8C4E6324D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.SMBDistribute.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.SMBDistribute.Shared\SeudoBuild.Pipeline.Modules.SMBDistribute.Shared.csproj", "{3B3E5B4C-AB0F-48BA-B264-51E8C4E6324D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.SteamDistribute.Data", "SeudoBuild.Modules\SeudoBuild.Modules.SteamDistribute.Data\SeudoBuild.Pipeline.Modules.SteamDistribute.Data.csproj", "{24C0EB80-9E8D-4045-B7F5-13D4CC4A4C9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.SteamDistribute.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.SteamDistribute.Shared\SeudoBuild.Pipeline.Modules.SteamDistribute.Shared.csproj", "{24C0EB80-9E8D-4045-B7F5-13D4CC4A4C9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.EmailNotify.Data", "SeudoBuild.Modules\SeudoBuild.Modules.EmailNotify\SeudoBuild.Modules.EmailNotify.Data\SeudoBuild.Pipeline.Modules.EmailNotify.Data.csproj", "{3C40B876-8BD2-4057-A073-254E6F25E32F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.EmailNotify.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.EmailNotify.Shared\SeudoBuild.Pipeline.Modules.EmailNotify.Shared.csproj", "{3C40B876-8BD2-4057-A073-254E6F25E32F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.GitSource.Data", "SeudoBuild.Modules\SeudoBuild.Modules.GitSource\SeudoBuild.Modules.GitSource.Data\SeudoBuild.Pipeline.Modules.GitSource.Data.csproj", "{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.GitSource.Shared", "SeudoBuild.Modules\SeudoBuild.Modules.GitSource.Shared\SeudoBuild.Pipeline.Modules.GitSource.Shared.csproj", "{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline", "SeudoBuild.Pipeline\SeudoBuild.Pipeline.csproj", "{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Data", "SeudoBuild.Pipeline.Data\SeudoBuild.Pipeline.Data.csproj", "{CE7E1B76-B604-455A-BA80-5CB54DAC389C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Shared", "SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj", "{CE7E1B76-B604-455A-BA80-5CB54DAC389C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Core.Data", "SeudoBuild.Core.Data\SeudoBuild.Core.Data.csproj", "{2F239808-F280-4A32-B2BB-437A61304BE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Core.Shared", "SeudoBuild.Core.Shared\SeudoBuild.Core.Shared.csproj", "{2F239808-F280-4A32-B2BB-437A61304BE1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Mac", "SeudoBuild.Client.Mac\SeudoBuild.Client.Mac.csproj", "{CE4F204A-4638-4C04-A1BB-EFB0E00E9B67}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{269F0074-8DDA-403B-811E-A8C9727AA5A5}"
 EndProject
@@ -189,10 +187,6 @@ Global
 		{2F239808-F280-4A32-B2BB-437A61304BE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F239808-F280-4A32-B2BB-437A61304BE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F239808-F280-4A32-B2BB-437A61304BE1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE4F204A-4638-4C04-A1BB-EFB0E00E9B67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE4F204A-4638-4C04-A1BB-EFB0E00E9B67}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE4F204A-4638-4C04-A1BB-EFB0E00E9B67}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE4F204A-4638-4C04-A1BB-EFB0E00E9B67}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8195BBFF-470D-42DF-B46F-C8C97B35CED4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8195BBFF-470D-42DF-B46F-C8C97B35CED4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8195BBFF-470D-42DF-B46F-C8C97B35CED4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -256,7 +250,6 @@ Global
 		{3C40B876-8BD2-4057-A073-254E6F25E32F} = {91192B40-56D1-4F58-BC60-1B41269AFB32}
 		{FB9D0644-FFDC-4C77-90BA-15EC44A333F5} = {900780D6-2BCF-45B8-AA48-C03CF745621E}
 		{4A9529A8-F773-4827-BCF4-60B524E6CA52} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
-		{CE4F204A-4638-4C04-A1BB-EFB0E00E9B67} = {269F0074-8DDA-403B-811E-A8C9727AA5A5}
 		{9BCE9E90-7578-47B6-830A-D98E6801041F} = {269F0074-8DDA-403B-811E-A8C9727AA5A5}
 	EndGlobalSection
 EndGlobal
