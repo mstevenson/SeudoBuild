@@ -77,11 +77,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{9D67
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Desktop", "Clients\SeudoBuild.Client.Desktop\SeudoBuild.Client.Desktop.csproj", "{32C8C1CC-C764-43D0-8BD7-34FD86B5E1AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Desktop.Wpf", "Clients\SeudoBuild.Client.Desktop.Wpf\SeudoBuild.Client.Desktop.Wpf.csproj", "{5F24B6B8-1990-43D9-9B60-EA221FE0B5D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Desktop.Windows", "Clients\SeudoBuild.Client.Desktop.Windows\SeudoBuild.Client.Desktop.Windows.csproj", "{5F24B6B8-1990-43D9-9B60-EA221FE0B5D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Desktop.Mac", "Clients\SeudoBuild.Client.Desktop.Mac\SeudoBuild.Client.Desktop.Mac.csproj", "{85E53ECA-1626-4EA5-98FF-E426FBF1A2D9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Desktop.XamMac2", "Clients\SeudoBuild.Client.Desktop.XamMac2\SeudoBuild.Client.Desktop.XamMac2.csproj", "{14F31FC9-EF42-4278-99D3-4676105AA3C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Client.Desktop.Mac", "Clients\SeudoBuild.Client.Desktop.Mac\SeudoBuild.Client.Desktop.Mac.csproj", "{14F31FC9-EF42-4278-99D3-4676105AA3C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -209,10 +207,6 @@ Global
 		{5F24B6B8-1990-43D9-9B60-EA221FE0B5D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F24B6B8-1990-43D9-9B60-EA221FE0B5D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F24B6B8-1990-43D9-9B60-EA221FE0B5D6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{85E53ECA-1626-4EA5-98FF-E426FBF1A2D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85E53ECA-1626-4EA5-98FF-E426FBF1A2D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85E53ECA-1626-4EA5-98FF-E426FBF1A2D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85E53ECA-1626-4EA5-98FF-E426FBF1A2D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{14F31FC9-EF42-4278-99D3-4676105AA3C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{14F31FC9-EF42-4278-99D3-4676105AA3C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14F31FC9-EF42-4278-99D3-4676105AA3C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -280,7 +274,6 @@ Global
 		{9D67306D-9A30-492B-B54C-764DAAF542BF} = {269F0074-8DDA-403B-811E-A8C9727AA5A5}
 		{32C8C1CC-C764-43D0-8BD7-34FD86B5E1AF} = {9D67306D-9A30-492B-B54C-764DAAF542BF}
 		{5F24B6B8-1990-43D9-9B60-EA221FE0B5D6} = {9D67306D-9A30-492B-B54C-764DAAF542BF}
-		{85E53ECA-1626-4EA5-98FF-E426FBF1A2D9} = {9D67306D-9A30-492B-B54C-764DAAF542BF}
 		{14F31FC9-EF42-4278-99D3-4676105AA3C5} = {9D67306D-9A30-492B-B54C-764DAAF542BF}
 	EndGlobalSection
 EndGlobal

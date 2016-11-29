@@ -5,22 +5,22 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5F24B6B8-1990-43D9-9B60-EA221FE0B5D6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>SeudoBuild.Client.Desktop.Wpf</RootNamespace>
-    <AssemblyName>SeudoBuild.Client.Desktop.Wpf</AssemblyName>
+    <RootNamespace>SeudoBuild.Client.Desktop.Windows</RootNamespace>
+    <AssemblyName>SeudoBuild.Client.Desktop.Windows</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>..\SeudoBuild.Client.Desktop.Windows\bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>..\SeudoBuild.Client.Desktop.Windows\bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
