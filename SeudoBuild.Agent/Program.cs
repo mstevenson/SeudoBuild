@@ -80,7 +80,9 @@ namespace SeudoBuild.Agent
                 );
         }
 
-        // Build locally
+        /// <summary>
+        /// Build a single target, then exit.
+        /// </summary>
         static int Build(BuildSubOptions opts)
         {
             Console.Title = "SeudoBuild • Build";
@@ -120,6 +122,9 @@ namespace SeudoBuild.Agent
             return success ? 0 : 1;
         }
 
+        /// <summary>
+        /// Discover build agents on the network.
+        /// </summary>
         static int Scan(ScanSubOptions opts)
         {
             Console.WriteLine("Looking for build agents. Press any key to exit.");
@@ -153,7 +158,9 @@ namespace SeudoBuild.Agent
             return 0;
         }
 
-        // Submit job to the network
+        /// <summary>
+        /// Submit a build job to another agent.
+        /// </summary>
         static int Submit(SubmitSubOptions opts)
         {
             Console.Title = "SeudoBuild • Submit";
@@ -164,7 +171,10 @@ namespace SeudoBuild.Agent
             return 0;
         }
 
-        // Listen for jobs on the network
+        /// <summary>
+        /// Receive build jobs from other agents or clients, queue them, and execute them.
+        /// Continue listening until user exits.
+        /// </summary>
         static int Queue(QueueSubOptions opts)
         {
             Console.Title = "SeudoBuild • Queue";
@@ -200,11 +210,17 @@ namespace SeudoBuild.Agent
             return 0;
         }
 
+        /// <summary>
+        /// Deploy a build product on the local machine.
+        /// </summary>
         static int Deploy(DeploySubOptions opts)
         {
             return 0;
         }
 
+        /// <summary>
+        /// Display the unique name for this agent.
+        /// </summary>
         static int ShowAgentName(NameSubOptions opts)
         {
             string name = null;
