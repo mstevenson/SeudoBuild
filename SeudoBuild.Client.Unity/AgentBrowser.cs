@@ -4,74 +4,52 @@ using UnityEngine.Networking;
 using SeudoBuild.Net;
 using System.Collections.Generic;
 using SeudoBuild.Pipeline;
-using System.Linq;
 
 namespace SeudoBuild.Client.Unity
 {
     public class AgentBrowser
     {
-        UdpDiscoveryClient client;
+        //AgentLocator locator;
 
-        class AgentInfo
-        {
-            public System.Guid guid;
-            public string name;
-            public string address;
-        }
-
-        List<AgentInfo> agents = new List<AgentInfo>();
+        //List<AgentInfo> agents = new List<AgentInfo>();
 
         public void Start()
         {
-            if (client == null)
-            {
-                // FIXME configure port
-                client = new UdpDiscoveryClient(5511);
-            }
-            if (!client.IsRunning)
-            {
-                client.Start();
-                client.ServerFound += OnServerFound;
-                client.ServerFound += OnServerLost;
-            }
+            // FIXME configure port
+            //locator = new AgentLocator(5511);
+
+            //if (client == null)
+            //{
+            //    client = new UdpDiscoveryClient(5511);
+            //}
+            //if (!client.IsRunning)
+            //{
+            //    client.Start();
+            //    client.ServerFound += OnServerFound;
+            //    client.ServerFound += OnServerLost;
+            //}
         }
 
         public void Stop()
         {
-            if (!client.IsRunning)
-            {
-                return;
-            }
-            client.Stop();
-            client.ServerFound -= OnServerFound;
-            client.ServerFound -= OnServerLost;
+            //locator.Stop();
+
+            //if (!client.IsRunning)
+            //{
+            //    return;
+            //}
+            //client.Stop();
+            //client.ServerFound -= OnServerFound;
+            //client.ServerFound -= OnServerLost;
         }
 
-        void OnServerFound(ServerBeacon server)
-        {
-            if (!agents.Any(a => a.guid == server.guid))
-            {
-                var agent = new AgentInfo { guid = server.guid, address = server.address.ToString() };
-                // TODO async http request to get the agent's name
-                agents.Add(agent);
-            }
-        }
-
-        void OnServerLost(ServerBeacon server)
-        {
-            var agent = agents.FirstOrDefault(a => a.guid == server.guid);
-            if (agent != null)
-            {
-                agents.Remove(agent);
-            }
-        }
 
         public void Draw()
         {
-            foreach (var agent in agents)
-            {
-                GUILayout.Label(agent.name);
-            }
+            //foreach (var agent in locator.Agents)
+            //{
+            //    GUILayout.Label(agent.name);
+            //}
         }
     }
 }

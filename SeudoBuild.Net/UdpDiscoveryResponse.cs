@@ -3,7 +3,7 @@ using System.Net;
 
 namespace SeudoBuild.Net
 {
-    public class ServerBeacon
+    public class UdpDiscoveryResponse
     {
         /// <summary>
         /// String identifier that begins each UDP server discovery message.
@@ -27,26 +27,26 @@ namespace SeudoBuild.Net
         public DateTime lastSeen;
 
 
-        public ServerBeacon()
+        public UdpDiscoveryResponse()
         {
             this.guid = Guid.NewGuid();
             this.lastSeen = DateTime.Now;
             this.address = IPAddress.Parse("127.0.0.1");
         }
 
-        public static ServerBeacon FromBytes(byte[] data)
+        public static UdpDiscoveryResponse FromBytes(byte[] data)
         {
-            var s = new ServerBeacon();
+            var s = new UdpDiscoveryResponse();
             int index = 0;
 
             // ASCII Service ID
             var encoding = new System.Text.ASCIIEncoding();
-            byte[] serviceIdBytes = encoding.GetBytes(ServerBeacon.serviceId);
+            byte[] serviceIdBytes = encoding.GetBytes(UdpDiscoveryResponse.serviceId);
             var id = encoding.GetString(data, 0, serviceIdBytes.Length);
             index += id.Length;
 
             // Bail out if the beacon was not the service we're looking for
-            if (id != ServerBeacon.serviceId)
+            if (id != UdpDiscoveryResponse.serviceId)
             {
                 return null;
             }
@@ -76,14 +76,14 @@ namespace SeudoBuild.Net
             return output;
         }
 
-        public static byte[] ToBytes(ServerBeacon config)
+        public static byte[] ToBytes(UdpDiscoveryResponse config)
         {
             byte[] output = new byte[24];
             int offset = 0;
 
             // 4 byte ASCII service ID
             var encoding = new System.Text.ASCIIEncoding();
-            byte[] serviceIdBytes = encoding.GetBytes(ServerBeacon.serviceId);
+            byte[] serviceIdBytes = encoding.GetBytes(UdpDiscoveryResponse.serviceId);
             offset = AppendBytes(serviceIdBytes, output, offset);
 
             // 2 byte version number
@@ -130,7 +130,7 @@ namespace SeudoBuild.Net
             {
                 return false;
             }
-            ServerBeacon s = obj as ServerBeacon;
+            UdpDiscoveryResponse s = obj as UdpDiscoveryResponse;
             if ((object)s == null)
             {
                 return false;
@@ -138,7 +138,7 @@ namespace SeudoBuild.Net
             return guid == s.guid;
         }
 
-        public bool Equals(ServerBeacon s)
+        public bool Equals(UdpDiscoveryResponse s)
         {
             if ((object)s == null)
             {
@@ -147,7 +147,7 @@ namespace SeudoBuild.Net
             return guid == s.guid;
         }
 
-        public static bool operator ==(ServerBeacon a, ServerBeacon b)
+        public static bool operator ==(UdpDiscoveryResponse a, UdpDiscoveryResponse b)
         {
             if (System.Object.ReferenceEquals(a, b))
             {
@@ -160,7 +160,7 @@ namespace SeudoBuild.Net
             return a.guid == b.guid;
         }
 
-        public static bool operator !=(ServerBeacon a, ServerBeacon b)
+        public static bool operator !=(UdpDiscoveryResponse a, UdpDiscoveryResponse b)
         {
             return !(a == b);
         }

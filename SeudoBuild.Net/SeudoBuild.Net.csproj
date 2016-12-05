@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SeudoBuild.Net</RootNamespace>
     <AssemblyName>SeudoBuild.Net</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,9 +30,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerBeacon.cs" />
+    <Compile Include="UdpDiscoveryResponse.cs" />
     <Compile Include="UdpDiscoveryClient.cs" />
     <Compile Include="UdpDiscoveryServer.cs" />
+    <Compile Include="AgentInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

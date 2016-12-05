@@ -17,12 +17,12 @@ namespace SeudoBuild.Net
         UdpClient udpClient;
         IPEndPoint endPoint;
         Thread networkThread;
-        List<ServerBeacon> servers = new List<ServerBeacon>();
+        List<UdpDiscoveryResponse> servers = new List<UdpDiscoveryResponse>();
 
         int agentPort;
 
-        public event Action<ServerBeacon> ServerFound;
-        public event Action<ServerBeacon> ServerLost;
+        public event Action<UdpDiscoveryResponse> ServerFound;
+        public event Action<UdpDiscoveryResponse> ServerLost;
 
         public bool IsRunning { get; protected set; }
 
@@ -31,13 +31,13 @@ namespace SeudoBuild.Net
             this.agentPort = agentPort;
         }
 
-        public ServerBeacon[] AvailableServers
+        public UdpDiscoveryResponse[] AvailableServers
         {
             get
             {
                 if (servers.Count == 0)
                 {
-                    return new ServerBeacon[0];
+                    return new UdpDiscoveryResponse[0];
                 }
                 return servers.ToArray();
             }
@@ -77,7 +77,7 @@ namespace SeudoBuild.Net
             while (IsRunning)
             {
                 byte[] data = udpClient.Receive(ref endPoint);
-                ServerBeacon serverInfo = ServerBeacon.FromBytes(data);
+                UdpDiscoveryResponse serverInfo = UdpDiscoveryResponse.FromBytes(data);
                 serverInfo.address = endPoint.Address;
                 if (serverInfo != null)
                 {
@@ -106,9 +106,9 @@ namespace SeudoBuild.Net
             IsRunning = false;
         }
 
-        List<ServerBeacon> PruneLostServers(List<ServerBeacon> servers, int timeout = 3500)
+        List<UdpDiscoveryResponse> PruneLostServers(List<UdpDiscoveryResponse> servers, int timeout = 3500)
         {
-            List<ServerBeacon> pruned = new List<ServerBeacon>();
+            List<UdpDiscoveryResponse> pruned = new List<UdpDiscoveryResponse>();
             var now = DateTime.Now;
             foreach (var serverInfo in servers)
             {
