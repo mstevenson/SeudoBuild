@@ -164,9 +164,27 @@ namespace SeudoBuild.Agent
         static int Submit(SubmitSubOptions opts)
         {
             Console.Title = "SeudoBuild • Submit";
+            string configJson = null;
+            try
+            {
+                configJson = File.ReadAllText(opts.ProjectConfigPath);
+            }
+            catch
+            {
+                BuildConsole.WriteFailure("Project could not be read from " + opts.ProjectConfigPath);
+                return 1;
+            }
 
-            //var submit = new BuildSubmit();
-            //submit.Submit(opts.ProjectConfigPath, opts.BuildTarget, opts.AgentName);
+            var submit = new BuildSubmitter();
+            try
+            {
+                submit.Submit(configJson, opts.BuildTarget, opts.AgentName);
+            }
+            catch (Exception e)
+            {
+                BuildConsole.WriteFailure("Could not submit job: " + e.Message);
+                return 1;
+            }
 
             return 0;
         }
