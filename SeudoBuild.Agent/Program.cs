@@ -129,29 +129,23 @@ namespace SeudoBuild.Agent
         {
             Console.WriteLine("Looking for build agents. Press any key to exit.");
             // FIXME fill in port from command line argument
-            UdpDiscoveryClient client = new UdpDiscoveryClient(5511);
+            AgentLocator locator = new AgentLocator(5511);
             try
             {
-                client.Start();
+                locator.Start();
             }
-            catch (System.Net.Sockets.SocketException)
+            catch
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Could not start build agent discovery client");
                 Console.ResetColor();
                 return 1;
             }
-            client.ServerFound += (beacon) =>
+            // FIXME don't hard-code port
+            var client = new AgentLocator(5511);
+            client.AgentFound += (agent) =>
             {
-                string address = $"http://{beacon.address}:{beacon.port}/info";
-                using (var webClient = new WebClient())
-                {
-                    string json = webClient.DownloadString(address);
-                    var agentInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
-                    BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
-                }
-                //var request = WebRequest.Create(address);
-                //var response = request.GetResponse();
+                BuildConsole.WriteBullet($"{agent.AgentName} ({agent.Address})");
             };
             Console.WriteLine();
             Console.ReadKey();
