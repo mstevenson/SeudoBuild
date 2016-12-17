@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Core", "SeudoBui
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Agent", "SeudoBuild.Agent\SeudoBuild.Agent.csproj", "{64E2D8F1-B08C-4B87-A283-252C31693DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Core.Tests", "SeudoBuild.Core.Tests\SeudoBuild.Core.Tests.csproj", "{4A9529A8-F773-4827-BCF4-60B524E6CA52}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Tests", "SeudoBuild.Core.Tests\SeudoBuild.Tests.csproj", "{4A9529A8-F773-4827-BCF4-60B524E6CA52}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipeline Modules", "Pipeline Modules", "{050C779A-572A-4685-B189-D0BABDAE5CD9}"
 EndProject
