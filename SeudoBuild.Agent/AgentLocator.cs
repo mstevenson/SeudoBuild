@@ -98,10 +98,7 @@ namespace SeudoBuild.Agent
 
         async Task RequestAgentInfoAsync(UdpDiscoveryResponse discoveryResponse)
         {
-            Console.WriteLine("requesting...");
             string address = $"http://{discoveryResponse.address}:{discoveryResponse.port}/info";
-
-            Console.WriteLine(address);
 
             // Request the agent's identity
             var req = WebRequest.CreateHttp(address);
@@ -117,14 +114,13 @@ namespace SeudoBuild.Agent
 
             if (requestTask.IsCompleted)
             {
-                
-                Console.WriteLine("done");
-
                 var resultStream = requestTask.Result.GetResponseStream();
                 StreamReader readStream = new StreamReader(resultStream, System.Text.Encoding.UTF8);
                 string json = readStream.ReadToEnd();
 
                 var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
+                // FIXME should the agent have set its own address before responding? Does it even know its own address?
+                agent.Address = discoveryResponse.address.ToString();
                 //BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
 
                 agents[discoveryResponse.guid] = agent;
