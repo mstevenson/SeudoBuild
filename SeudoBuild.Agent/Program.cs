@@ -210,6 +210,18 @@ namespace SeudoBuild.Agent
                 try
                 {
                     host.Start();
+
+                    try
+                    {
+                        // FIXME configure the port from a command line argument
+                        var serverInfo = new UdpDiscoveryResponse { port = 5511 };
+                        var discovery = new UdpDiscoveryServer(serverInfo);
+                        discovery.Start();
+                    }
+                    catch
+                    {
+                        BuildConsole.WriteAlert("Could not initialize build agent discovery beacon");
+                    }
                 }
                 catch (Exception e)
                 {
