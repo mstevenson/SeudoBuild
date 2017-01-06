@@ -33,7 +33,6 @@
     <Compile Include="UdpDiscoveryResponse.cs" />
     <Compile Include="UdpDiscoveryClient.cs" />
     <Compile Include="UdpDiscoveryServer.cs" />
-    <Compile Include="AgentInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

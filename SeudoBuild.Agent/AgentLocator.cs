@@ -1,33 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using SeudoBuild.Net;
+using System.Threading.Tasks;
 
 namespace SeudoBuild.Agent
 {
+    /// <summary>
+    /// Listens for build agents on the local network.
+    /// </summary>
     public class AgentLocator
     {
         int port;
         UdpDiscoveryClient client;
-        List<AgentInfo> agents = new List<AgentInfo>();
+        Dictionary<Guid, Agent> agents = new Dictionary<Guid, Agent>();
 
-        public event Action<Agent> AgentFound;
-        public event Action<Agent> AgentLost;
+        /// <summary>
+        /// Occurs when an agent is found on the local network.
+        /// </summary>
+        public event Action<Agent> AgentFound = delegate { };
 
-        public IEnumerable<AgentInfo> Agents
+        /// <summary>
+        /// Occurs when a known agent is no longer seen on the local network.
+        /// </summary>
+        public event Action<Agent> AgentLost = delegate { };
+
+        /// <summary>
+        /// All agents that are currently visible on the local network.
+        /// </summary>
+        public IEnumerable<Agent> Agents
         {
             get
             {
-                return agents;
+                return agents.Values;
             }
         }
 
+        /// <summary>
+        /// Watches for build agents that broadcast their availability on the given UDP port.
+        /// After construction, call Start() to begin listening for agents.
+        /// </summary>
         public AgentLocator(int port)
         {
             this.port = port;
         }
 
+        /// <summary>
+        /// Begin watching for build agents on the local network.
+        /// </summary>
         public void Start()
         {
             if (client == null)
@@ -50,6 +70,9 @@ namespace SeudoBuild.Agent
             }
         }
 
+        /// <summary>
+        /// Stop watching for build agents on the local network.
+        /// </summary>
         public void Stop()
         {
             if (client.IsRunning)
@@ -62,31 +85,45 @@ namespace SeudoBuild.Agent
             client = null;
         }
 
-        void OnServerFound(UdpDiscoveryResponse server)
+        void OnServerFound(UdpDiscoveryResponse discoveryResponse)
         {
-            if (!agents.Any(a => a.guid == server.guid))
+            // Ignore agents that we already know about
+            if (!agents.ContainsKey (discoveryResponse.guid))
             {
-                var agent = new AgentInfo { guid = server.guid, address = server.address.ToString() };
-                // TODO async http request to get the agent's name
-                agents.Add(agent);
+                RequestAgentInfoAsync(discoveryResponse);
             }
+        }
 
-            string address = $"http://{server.address}:{server.port}/info";
+        async Task RequestAgentInfoAsync(UdpDiscoveryResponse discoveryResponse)
+        {
+            string address = $"http://{discoveryResponse.address}:{discoveryResponse.port}/info";
             using (var webClient = new WebClient())
             {
-                string json = webClient.DownloadString(address);
-                var agentInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
-                //BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
+                // Request the agent's identity
+                Task<string> requestTask = webClient.DownloadStringTaskAsync(address);
+                await requestTask;
+                if (requestTask.IsCompleted)
+                {
+                    string json = requestTask.Result;
+                    var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
+                    //BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
+
+                    agents.Add(discoveryResponse.guid, agent);
+                    AgentFound.Invoke(agent);
+                }
+                else {
+                    throw new Exception("Agent info could not be obtained: " + requestTask.Exception.Message);
+                }
             }
         }
 
         void OnServerLost(UdpDiscoveryResponse server)
         {
-        //    var agent = agents.FirstOrDefault(a => a.guid == server.guid);
-        //    if (agent != null)
-        //    {
-        //        agents.Remove(agent);
-        //    }
+            Agent agent;
+            if (agents.TryGetValue (server.guid, out agent)) {
+                agents.Remove(server.guid);
+                AgentLost.Invoke(agent);
+            }
         }
     }
 }

@@ -3,14 +3,24 @@ using System.Net.NetworkInformation;
 
 namespace SeudoBuild.Agent
 {
+    /// <summary>
+    /// A unique agent identifier.
+    /// </summary>
     public static class AgentName
     {
+        /// <summary>
+        /// Generates a randomized human-readable agent identifier, for debugging purposes.
+        /// </summary>
         public static string GetRandomName()
         {
             var rand = new Random();
             return GetName(rand);
         }
 
+        /// <summary>
+        /// Generates a unique and deterministic human-readable agent identifier.
+        /// The name is based on the MAC addresses of all of the agent's network interfaces.
+        /// </summary>
         public static string GetUniqueAgentName()
         {
             int hash = GetMacAddresses().GetHashCode();
