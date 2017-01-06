@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Net;
 
@@ -16,13 +17,14 @@ namespace SeudoBuild.Net
 
         UdpClient udpClient;
         IPEndPoint endPoint;
-        Thread networkThread;
-        List<UdpDiscoveryResponse> servers = new List<UdpDiscoveryResponse>();
+        Thread receiveThread;
+        Thread pruneThread;
+        ConcurrentDictionary<Guid, UdpDiscoveryResponse> servers = new ConcurrentDictionary<Guid, UdpDiscoveryResponse>();
 
         int agentPort;
 
-        public event Action<UdpDiscoveryResponse> ServerFound;
-        public event Action<UdpDiscoveryResponse> ServerLost;
+        public event Action<UdpDiscoveryResponse> ServerFound = delegate { };
+        public event Action<UdpDiscoveryResponse> ServerLost = delegate { };
 
         public bool IsRunning { get; protected set; }
 
@@ -31,17 +33,17 @@ namespace SeudoBuild.Net
             this.agentPort = agentPort;
         }
 
-        public UdpDiscoveryResponse[] AvailableServers
-        {
-            get
-            {
-                if (servers.Count == 0)
-                {
-                    return new UdpDiscoveryResponse[0];
-                }
-                return servers.ToArray();
-            }
-        }
+        //public UdpDiscoveryResponse[] AvailableServers
+        //{
+        //    get
+        //    {
+        //        if (servers.Count == 0)
+        //        {
+        //            return new UdpDiscoveryResponse[0];
+        //        }
+        //        return servers.Values.ToArray();
+        //    }
+        //}
 
         public void Start()
         {
@@ -56,9 +58,12 @@ namespace SeudoBuild.Net
             // Run
             Console.WriteLine("Server Discovery Started: " + multicastAddress + ":" + multicastPort);
             IsRunning = true;
-            networkThread = new Thread(new ThreadStart(NetworkThread));
-            networkThread.IsBackground = true;
-            networkThread.Start();
+            receiveThread = new Thread(new ThreadStart(ReceiveThread));
+            receiveThread.IsBackground = true;
+            receiveThread.Start();
+            pruneThread = new Thread(new ThreadStart(PruneThread));
+            pruneThread.IsBackground = true;
+            pruneThread.Start();
         }
 
         public void Stop()
@@ -71,61 +76,59 @@ namespace SeudoBuild.Net
             }
         }
 
-        void NetworkThread()
+        void ReceiveThread()
         {
             //			try {
             while (IsRunning)
             {
+                // blocking
                 byte[] data = udpClient.Receive(ref endPoint);
                 UdpDiscoveryResponse serverInfo = UdpDiscoveryResponse.FromBytes(data);
                 serverInfo.address = endPoint.Address;
+
                 if (serverInfo != null)
                 {
-                    bool serverExists = false;
-                    foreach (var s in servers)
+                    UdpDiscoveryResponse response;
+                    if (servers.TryGetValue(serverInfo.guid, out response))
                     {
-                        if (s == serverInfo)
-                        {
-                            s.lastSeen = DateTime.Now;
-                            serverExists = true;
-                        }
+                        response.lastSeen = DateTime.Now;
                     }
-                    if (!serverExists)
+                    else
                     {
-                        servers.Add(serverInfo);
-                        if (ServerFound != null)
+                        if (servers.TryAdd(serverInfo.guid, serverInfo))
                         {
                             ServerFound(serverInfo);
                         }
-                        //OnServerFound(serverInfo);
                     }
-                    servers = PruneLostServers(servers);
                 }
             }
             //			} catch {}
             IsRunning = false;
         }
 
-        List<UdpDiscoveryResponse> PruneLostServers(List<UdpDiscoveryResponse> servers, int timeout = 3500)
+        void PruneThread()
         {
-            List<UdpDiscoveryResponse> pruned = new List<UdpDiscoveryResponse>();
-            var now = DateTime.Now;
-            foreach (var serverInfo in servers)
+            while (IsRunning)
             {
-                var span = serverInfo.lastSeen.Subtract(now);
-                if (span.Milliseconds < timeout)
+                const int timeout = 3500;
+
+                var now = DateTime.Now;
+                foreach (var kvp in servers)
                 {
-                    pruned.Add(serverInfo);
-                }
-                else
-                {
-                    if (ServerLost != null)
+                    var serverInfo = kvp.Value;
+                    var age = now.Subtract(serverInfo.lastSeen);
+                    if (age.TotalMilliseconds >= timeout)
                     {
-                        ServerLost(serverInfo);
+                        UdpDiscoveryResponse removed;
+                        if (servers.TryRemove(kvp.Key, out removed))
+                        {
+                            ServerLost(serverInfo);
+                        }
                     }
                 }
+
+                Thread.Sleep(100);
             }
-            return pruned;
         }
 
         public void Dispose()

@@ -142,10 +142,13 @@ namespace SeudoBuild.Agent
                 return 1;
             }
             // FIXME don't hard-code port
-            var client = new AgentLocator(5511);
-            client.AgentFound += (agent) =>
+            locator.AgentFound += (agent) =>
             {
                 BuildConsole.WriteBullet($"{agent.AgentName} ({agent.Address})");
+            };
+            locator.AgentLost += (agent) =>
+            {
+                BuildConsole.WriteBullet($"Lost agent: {agent.AgentName} ({agent.Address})");
             };
             Console.WriteLine();
             Console.ReadKey();

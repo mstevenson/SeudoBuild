@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using SeudoBuild.Net;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SeudoBuild.Agent
 {
@@ -18,12 +19,12 @@ namespace SeudoBuild.Agent
         /// <summary>
         /// Occurs when an agent is found on the local network.
         /// </summary>
-        public event Action<Agent> AgentFound = delegate { };
+        public event Action<Agent> AgentFound;
 
         /// <summary>
         /// Occurs when a known agent is no longer seen on the local network.
         /// </summary>
-        public event Action<Agent> AgentLost = delegate { };
+        public event Action<Agent> AgentLost;
 
         /// <summary>
         /// All agents that are currently visible on the local network.
@@ -90,39 +91,66 @@ namespace SeudoBuild.Agent
             // Ignore agents that we already know about
             if (!agents.ContainsKey (discoveryResponse.guid))
             {
+                agents[discoveryResponse.guid] = null;
                 RequestAgentInfoAsync(discoveryResponse);
             }
         }
 
         async Task RequestAgentInfoAsync(UdpDiscoveryResponse discoveryResponse)
         {
+            Console.WriteLine("requesting...");
             string address = $"http://{discoveryResponse.address}:{discoveryResponse.port}/info";
-            using (var webClient = new WebClient())
-            {
-                // Request the agent's identity
-                Task<string> requestTask = webClient.DownloadStringTaskAsync(address);
-                await requestTask;
-                if (requestTask.IsCompleted)
-                {
-                    string json = requestTask.Result;
-                    var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
-                    //BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
 
-                    agents.Add(discoveryResponse.guid, agent);
+            Console.WriteLine(address);
+
+            // Request the agent's identity
+            var req = WebRequest.CreateHttp(address);
+            req.Timeout = 2000;
+            var requestTask = req.GetResponseAsync();
+
+
+            // FIXME this never returns in a "scan" mode agent if a remote "queue" mode agent is run
+            // after an the scan agent has already begun.
+            // Is this because the "queue" mode agent sends its initial UDP packet before it's ready to respond to HTTP requests?
+            // Even so, why does the following request task hang when its timeout was set to 2000ms above?
+            await requestTask;
+
+            if (requestTask.IsCompleted)
+            {
+                
+                Console.WriteLine("done");
+
+                var resultStream = requestTask.Result.GetResponseStream();
+                StreamReader readStream = new StreamReader(resultStream, System.Text.Encoding.UTF8);
+                string json = readStream.ReadToEnd();
+
+                var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
+                //BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
+
+                agents[discoveryResponse.guid] = agent;
+                if (AgentFound != null)
+                {
                     AgentFound.Invoke(agent);
                 }
-                else {
-                    throw new Exception("Agent info could not be obtained: " + requestTask.Exception.Message);
-                }
+            }
+            else {
+                Console.WriteLine("error");
+                throw new Exception("Agent info could not be obtained: " + requestTask.Exception.Message);
             }
         }
 
         void OnServerLost(UdpDiscoveryResponse server)
         {
             Agent agent;
-            if (agents.TryGetValue (server.guid, out agent)) {
+            bool haveAgent = agents.TryGetValue(server.guid, out agent);
+            haveAgent = haveAgent && agent != null;
+
+            if (haveAgent) {
                 agents.Remove(server.guid);
-                AgentLost.Invoke(agent);
+                if (AgentLost != null)
+                {
+                    AgentLost.Invoke(agent);
+                }
             }
         }
     }
