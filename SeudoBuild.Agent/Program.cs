@@ -11,6 +11,8 @@ namespace SeudoBuild.Agent
 {
     class Program
     {
+        static ILogger logger;
+
         [Verb("build", HelpText = "Create a local build.")]
         class BuildSubOptions
         {
@@ -66,6 +68,8 @@ namespace SeudoBuild.Agent
 
         public static void Main(string[] args)
         {
+            logger = new BuildConsole();
+
             Console.Title = "SeudoBuild";
 
             Parser.Default.ParseArguments<BuildSubOptions, ScanSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions, NameSubOptions>(args)
@@ -89,7 +93,7 @@ namespace SeudoBuild.Agent
 
             // Load pipeline modules
             var factory = new ModuleLoaderFactory();
-            ModuleLoader modules = factory.Create();
+            ModuleLoader modules = factory.Create(logger);
 
             // Load project config
             ProjectConfig projectConfig = null;
@@ -117,7 +121,7 @@ namespace SeudoBuild.Agent
                 parentDirectory = new FileInfo(opts.ProjectConfigPath).Directory.FullName;
             }
 
-            bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory, modules);
+            bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory, modules, logger);
 
             return success ? 0 : 1;
         }
@@ -144,11 +148,11 @@ namespace SeudoBuild.Agent
             // FIXME don't hard-code port
             locator.AgentFound += (agent) =>
             {
-                BuildConsole.WriteBullet($"{agent.AgentName} ({agent.Address})");
+                logger.WriteBullet($"{agent.AgentName} ({agent.Address})");
             };
             locator.AgentLost += (agent) =>
             {
-                BuildConsole.WriteBullet($"Lost agent: {agent.AgentName} ({agent.Address})");
+                logger.WriteBullet($"Lost agent: {agent.AgentName} ({agent.Address})");
             };
             Console.WriteLine();
             Console.ReadKey();
@@ -168,7 +172,7 @@ namespace SeudoBuild.Agent
             }
             catch
             {
-                BuildConsole.WriteFailure("Project could not be read from " + opts.ProjectConfigPath);
+                logger.WriteFailure("Project could not be read from " + opts.ProjectConfigPath);
                 return 1;
             }
 
@@ -179,7 +183,7 @@ namespace SeudoBuild.Agent
             }
             catch (Exception e)
             {
-                BuildConsole.WriteFailure("Could not submit job: " + e.Message);
+                logger.WriteFailure("Could not submit job: " + e.Message);
                 return 1;
             }
 
@@ -220,7 +224,7 @@ namespace SeudoBuild.Agent
                     }
                     catch
                     {
-                        BuildConsole.WriteAlert("Could not initialize build agent discovery beacon");
+                        logger.WriteAlert("Could not initialize build agent discovery beacon");
                     }
                 }
                 catch (Exception e)

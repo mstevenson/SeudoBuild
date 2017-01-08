@@ -9,9 +9,12 @@ namespace SeudoBuild.Pipeline
     {
         PipelineConfig builderConfig;
 
-        public PipelineRunner(PipelineConfig config)
+        ILogger logger;
+
+        public PipelineRunner(PipelineConfig config, ILogger logger)
         {
             this.builderConfig = config;
+            this.logger = logger;
         }
 
         public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, ModuleLoader modules)
@@ -32,12 +35,12 @@ namespace SeudoBuild.Pipeline
             }
 
             Console.WriteLine("");
-            BuildConsole.WriteLine("Running Pipeline");
-            BuildConsole.IndentLevel++;
-            BuildConsole.WritePlus($"Project:  {projectConfig.ProjectName}");
-            BuildConsole.WritePlus($"Target:   {buildTargetName}");
+            logger.WriteLine("Running Pipeline");
+            logger.IndentLevel++;
+            logger.WritePlus($"Project:  {projectConfig.ProjectName}");
+            logger.WritePlus($"Target:   {buildTargetName}");
             //BuildConsole.WritePlus($"Location: {projectsBaseDirectory}/{projectNameSanitized}"); 
-            BuildConsole.IndentLevel--;
+            logger.IndentLevel--;
             Console.WriteLine("");
 
             // Setup pipeline
@@ -62,21 +65,21 @@ namespace SeudoBuild.Pipeline
             var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, pipeline.Workspace);
 
             // Done
-            BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteLine("");
+            logger.IndentLevel = 0;
+            logger.WriteLine("");
             Console.WriteLine("Build process completed.");
         }
 
         TOutSeq InitializeSequence<TOutSeq>(string sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
             where TOutSeq : PipelineSequenceResults, new()
         {
-            BuildConsole.IndentLevel = 0;
-            BuildConsole.WriteBullet(sequenceName);
-            BuildConsole.IndentLevel++;
+            logger.IndentLevel = 0;
+            logger.WriteBullet(sequenceName);
+            logger.IndentLevel++;
 
             if (sequenceSteps.Count == 0)
             {
-                BuildConsole.WriteAlert($"No {sequenceName} steps.");
+                logger.WriteAlert($"No {sequenceName} steps.");
                 return new TOutSeq {
                     IsSuccess = true,
                     IsSkipped = true,
@@ -122,7 +125,7 @@ namespace SeudoBuild.Pipeline
             // Verify that the pipeline has not previously failed
             if (!previousSequence.IsSuccess)
             {
-                BuildConsole.WriteFailure("Skipping, previous pipeline step failed");
+                logger.WriteFailure("Skipping, previous pipeline step failed");
                 results = new TOutSeq
                 {
                     IsSuccess = false,
@@ -159,7 +162,7 @@ namespace SeudoBuild.Pipeline
                 //stepIndex++;
                 currentStep = step;
 
-                BuildConsole.WriteBullet(step.Type);
+                logger.WriteBullet(step.Type);
 
                 TOutStep stepResult = null;
                 stepResult = stepExecuteCallback.Invoke(step);
@@ -170,7 +173,7 @@ namespace SeudoBuild.Pipeline
                     results.IsSuccess = false;
                     results.Exception = stepResult.Exception;
                     string error = $"{sequenceName} sequence failed on step {currentStep.Type}";
-                    BuildConsole.WriteFailure(error);
+                    logger.WriteFailure(error);
                     break;
                 }
             }

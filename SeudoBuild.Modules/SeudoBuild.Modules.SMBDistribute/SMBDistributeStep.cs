@@ -7,12 +7,14 @@ namespace SeudoBuild.Pipeline.Modules.SMBDistribute
     public class SMBDistributeStep : IDistributeStep<SMBDistributeConfig>
     {
         SMBDistributeConfig config;
+        ILogger logger;
 
         public string Type { get; } = "SMB Transfer";
 
-        public void Initialize(SMBDistributeConfig config, IWorkspace workspace)
+        public void Initialize(SMBDistributeConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
+            this.logger = logger;
         }
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)

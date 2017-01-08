@@ -10,13 +10,15 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
     {
         GitSourceConfig config;
         IWorkspace workspace;
+        ILogger logger;
 
         public string Type { get; } = "Git";
 
-        public void Initialize(GitSourceConfig config, IWorkspace workspace)
+        public void Initialize(GitSourceConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
+            this.logger = logger;
 
             credentials = new UsernamePasswordCredentials
             {
@@ -34,7 +36,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
         public SourceStepResults ExecuteStep(IWorkspace workspace)
         {
-            BuildConsole.IndentLevel++;
+            logger.IndentLevel++;
 
             var results = new SourceStepResults();
 
@@ -123,7 +125,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
             if (config.UseLFS)
             {
-                BuildConsole.WriteLine($"Cloning LFS repository:  {config.RepositoryURL}");
+                logger.WriteLine($"Cloning LFS repository:  {config.RepositoryURL}");
 
                 // FIXME extremely insecure to include password in the URL, but it's the only way I've
                 // found to circumvent the manual password prompt when running git-lfs
@@ -134,7 +136,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             }
             else
             {
-                BuildConsole.WriteLine($"Cloning repository:  {config.RepositoryURL}");
+                logger.WriteLine($"Cloning repository:  {config.RepositoryURL}");
 
                 var cloneOptions = new CloneOptions
                 {
@@ -153,7 +155,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         // Pull
         public void Update()
         {
-            BuildConsole.WriteLine("Cleaning working copy");
+            logger.WriteLine("Cleaning working copy");
 
             // Clean the repo
             using (var repo = new Repository(workspace.WorkingDirectory))
@@ -170,14 +172,14 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
                 if (!IsWorkingCopyInitialized || repo.Head.Remote.Url != config.RepositoryURL)
                 {
-                    BuildConsole.WriteLine($"Repository URL has changed, cloning a new copy:  {config.RepositoryURL}");
+                    logger.WriteLine($"Repository URL has changed, cloning a new copy:  {config.RepositoryURL}");
                     Download();
                     return;
                 }
 
                 // Pull changes
 
-                BuildConsole.WriteLine($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {config.RepositoryURL}");
+                logger.WriteLine($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {config.RepositoryURL}");
 
                 var pullOptions = new PullOptions
                 {
@@ -197,19 +199,19 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
                 if (config.UseLFS)
                 {
-                    BuildConsole.WriteLine("Fetching LFS files");
+                    logger.WriteLine("Fetching LFS files");
                     ExecuteLFSCommand("fetch");
-                    BuildConsole.WriteLine("Checking out LFS files into working copy");
+                    logger.WriteLine("Checking out LFS files into working copy");
                     ExecuteLFSCommand("checkout");
                 }
 
                 if (mergeResult.Status == MergeStatus.UpToDate)
                 {
-                    BuildConsole.WriteLine($"Repository is already up-to-date");
+                    logger.WriteLine($"Repository is already up-to-date");
                 }
                 else
                 {
-                    BuildConsole.WriteLine($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}");
+                    logger.WriteLine($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}");
                 }
             }
         }

@@ -2,11 +2,11 @@
 
 namespace SeudoBuild
 {
-    public static class BuildConsole
+    public class BuildConsole : ILogger
     {
         static string indentString = "";
         static int indentLevel;
-        public static int IndentLevel {
+        public int IndentLevel {
             get {
                 return indentLevel;
             }
@@ -26,24 +26,24 @@ namespace SeudoBuild
             }
         }
 
-        public static void WriteLine(string value)
+        public void WriteLine(string value)
         {
             Console.WriteLine($"{indentString}  {value}");
         }
 
-        public static void WriteBullet(string value)
+        public void WriteBullet(string value)
         {
             Console.ResetColor();
             Console.WriteLine($"{indentString}• {value}");
         }
 
-        public static void WritePlus(string value)
+        public void WritePlus(string value)
         {
             Console.ResetColor();
             Console.WriteLine($"{indentString}+ {value}");
         }
 
-        public static void WriteSuccess(string value)
+        public void WriteSuccess(string value)
         {
             ConsoleColor originalColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Green;
@@ -51,7 +51,7 @@ namespace SeudoBuild
             Console.ResetColor();
         }
 
-        public static void WriteFailure(string value)
+        public void WriteFailure(string value)
         {
             ConsoleColor originalColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
@@ -59,7 +59,7 @@ namespace SeudoBuild
             Console.ResetColor();
         }
 
-        public static void WriteAlert(string value)
+        public void WriteAlert(string value)
         {
             ConsoleColor originalColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -67,7 +67,7 @@ namespace SeudoBuild
             Console.ResetColor();
         }
 
-        public static void QueueNotification(string value)
+        public void QueueNotification(string value)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"\n{value}\n");

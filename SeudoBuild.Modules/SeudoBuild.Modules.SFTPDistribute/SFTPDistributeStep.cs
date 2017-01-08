@@ -8,12 +8,14 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
     public class SFTPDistributeStep : IDistributeStep<SFTPDistributeConfig>
     {
         SFTPDistributeConfig config;
+        ILogger logger;
 
         public string Type { get; } = "SFTP Upload";
 
-        public void Initialize(SFTPDistributeConfig config, IWorkspace workspace)
+        public void Initialize(SFTPDistributeConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
+            this.logger = logger;
         }
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
@@ -69,7 +71,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 
             using (var client = new SftpClient(connectionInfo))
             {
-                BuildConsole.WriteLine($"Uploading {archiveInfo.ArchiveFileName} to {config.Host} {config.WorkingDirectory}");
+                logger.WriteLine($"Uploading {archiveInfo.ArchiveFileName} to {config.Host} {config.WorkingDirectory}");
 
                 client.Connect();
                 client.ChangeDirectory(config.WorkingDirectory);
@@ -83,7 +85,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
                     client.UploadFile(stream, filename);
                 }
 
-                BuildConsole.WriteLine("Upload succeeded");
+                logger.WriteLine("Upload succeeded");
             }
         }
     }

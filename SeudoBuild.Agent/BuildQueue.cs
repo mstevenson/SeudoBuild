@@ -20,6 +20,13 @@ namespace SeudoBuild.Agent
         Builder builder;
         int buildIndex;
 
+        ILogger logger;
+
+        public BuildQueue(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
         public void StartQueue(Builder builder, ModuleLoader moduleLoader)
         {
             this.builder = builder;
@@ -65,9 +72,9 @@ namespace SeudoBuild.Agent
                     {
                         ActiveBuild = request;
                         string target = string.IsNullOrEmpty(request.TargetName) ? "default target" : $"target '{request.TargetName}'";
-                        BuildConsole.QueueNotification($"Building project '{request.ProjectConfiguration.ProjectName}', {target}");
+                        logger.QueueNotification($"Building project '{request.ProjectConfiguration.ProjectName}', {target}");
 
-                        builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath, moduleLoader);
+                        builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath, moduleLoader, logger);
                     }
                 }
                 Thread.Sleep(200);

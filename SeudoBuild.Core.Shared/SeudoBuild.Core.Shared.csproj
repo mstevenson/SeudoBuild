@@ -35,6 +35,7 @@
     <Compile Include="IFileSystem.cs" />
     <Compile Include="IMacros.cs" />
     <Compile Include="Platform.cs" />
+    <Compile Include="ILogger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

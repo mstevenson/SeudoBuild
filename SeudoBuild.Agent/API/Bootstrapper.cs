@@ -13,13 +13,16 @@ namespace SeudoBuild.Agent
             StaticConfiguration.DisableErrorTraces = false;
 
             base.ConfigureApplicationContainer(container);
-            var moduleLoader = new ModuleLoaderFactory().Create();
+            // FIXME the entrypoint method also initializes a logger
+            var logger = new BuildConsole();
+            container.Register<ILogger>(logger);
+            var moduleLoader = new ModuleLoaderFactory().Create(logger);
             container.Register<IModuleLoader>(moduleLoader);
 
             var fs = new FileSystem();
             container.Register<IFileSystem>(fs);
 
-            var queue = new BuildQueue();
+            var queue = new BuildQueue(logger);
             container.Register<IBuildQueue>(queue);
             var builder = new Builder();
             queue.StartQueue(builder, moduleLoader);

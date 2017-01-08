@@ -6,33 +6,33 @@ namespace SeudoBuild.Pipeline
 {
     public class ModuleLoaderFactory
     {
-        public ModuleLoader Create()
+        public ModuleLoader Create(ILogger logger)
         {
             ModuleLoader loader = new ModuleLoader();
             string modulesDirectory = Path.Combine(Environment.CurrentDirectory, "Modules");
             loader.LoadAllAssemblies(modulesDirectory);
 
-            BuildConsole.WriteLine("Loading Pipeline Modules");
-            BuildConsole.IndentLevel++;
+            logger.WriteLine("Loading Pipeline Modules");
+            logger.IndentLevel++;
 
             string line = "";
 
             line = "Source:      " + string.Join(", ", loader.Registry.GetModules<ISourceModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
+            logger.WritePlus(line);
 
             line = "Build:       " + string.Join(", ", loader.Registry.GetModules<IBuildModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
+            logger.WritePlus(line);
 
             line = "Archive:     " + string.Join(", ", loader.Registry.GetModules<IArchiveModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
+            logger.WritePlus(line);
 
             line = "Distribute:  " + string.Join(", ", loader.Registry.GetModules<IDistributeModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
+            logger.WritePlus(line);
 
             line = "Notify:      " + string.Join(", ", loader.Registry.GetModules<INotifyModule>().Select(m => m.Name).ToArray());
-            BuildConsole.WritePlus(line);
+            logger.WritePlus(line);
 
-            BuildConsole.IndentLevel--;
+            logger.IndentLevel--;
 
             Console.WriteLine("");
 

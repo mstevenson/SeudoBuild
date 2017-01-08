@@ -15,13 +15,15 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
     {
         ShellBuildStepConfig config;
         IWorkspace workspace;
+        ILogger logger;
 
         public string Type { get; } = "Shell Script";
 
-        public void Initialize(ShellBuildStepConfig config, IWorkspace workspace)
+        public void Initialize(ShellBuildStepConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
+            this.logger = logger;
         }
 
         public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, IWorkspace workspace)
@@ -51,7 +53,7 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
                 while (!process.StandardOutput.EndOfStream)
                 {
                     string line = process.StandardOutput.ReadLine();
-                    BuildConsole.WriteLine(line);
+                    logger.WriteLine(line);
                 }
 
                 process.WaitForExit();

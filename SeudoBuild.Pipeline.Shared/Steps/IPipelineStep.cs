@@ -3,7 +3,7 @@
     public interface IInitializable<T>
         where T : StepConfig
     {
-        void Initialize(T config, IWorkspace workspace);
+        void Initialize(T config, IWorkspace workspace, ILogger logger);
     }
 
     public interface IPipelineStep
@@ -14,7 +14,7 @@
     public interface IPipelineStepWithConfig<T> : IPipelineStep
     where T : StepConfig
     {
-        void Initialize(T config, IWorkspace workspace);
+        void Initialize(T config, IWorkspace workspace, ILogger logger);
     }
 
     public interface IPipelineStep<TOutSeq, TOutStep> : IPipelineStep

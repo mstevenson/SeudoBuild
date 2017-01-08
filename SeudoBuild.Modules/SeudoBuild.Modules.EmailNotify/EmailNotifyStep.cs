@@ -7,12 +7,14 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
     public class EmailNotifyStep : INotifyStep<EmailNotifyConfig>
     {
         EmailNotifyConfig config;
+        ILogger logger;
 
         public string Type { get; } = "Email Notification";
 
-        public void Initialize(EmailNotifyConfig config, IWorkspace workspace)
+        public void Initialize(EmailNotifyConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
+            this.logger = logger;
         }
 
         public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, IWorkspace workspace)
@@ -41,7 +43,7 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
                 Text = body
             };
 
-            BuildConsole.WriteLine($"Sending email notification to {toAddress}");
+            logger.WriteLine($"Sending email notification to {toAddress}");
 
             using (var client = new SmtpClient())
             {
@@ -56,7 +58,7 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
                 client.Timeout = 10000;
             }
 
-            BuildConsole.WriteLine("Email notification sent");
+            logger.WriteLine("Email notification sent");
         }
     }
 }

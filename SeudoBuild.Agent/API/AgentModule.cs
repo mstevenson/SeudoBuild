@@ -9,7 +9,7 @@ namespace SeudoBuild.Agent
 {
     public class AgentModule : NancyModule
     {
-        public AgentModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem)
+        public AgentModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem, ILogger logger)
         {
             // Build agent info
             Get["/info"] = parameters =>
@@ -26,13 +26,13 @@ namespace SeudoBuild.Agent
                 try
                 {
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, null, moduleLoader, filesystem);
-                    BuildConsole.QueueNotification($"Received build request: project '{config.ProjectName}', default target, host {Request.UserHostAddress}");
+                    logger.QueueNotification($"Received build request: project '{config.ProjectName}', default target, host {Request.UserHostAddress}");
                     var buildRequest = buildQueue.Build(config);
                     return buildRequest.Id.ToString();
                 }
                 catch (Exception e)
                 {
-                    BuildConsole.WriteFailure(e.Message);
+                    logger.WriteFailure(e.Message);
                     return HttpStatusCode.BadRequest;
                 }
             };
@@ -44,13 +44,13 @@ namespace SeudoBuild.Agent
                 {
                     string target = parameters.target;
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, target, moduleLoader, filesystem);
-                    BuildConsole.QueueNotification($"Queuing build request: project '{config.ProjectName}', target '{target}', host {Request.UserHostAddress}");
+                    logger.QueueNotification($"Queuing build request: project '{config.ProjectName}', target '{target}', host {Request.UserHostAddress}");
                     var buildRequest = buildQueue.Build(config, target);
                     return buildRequest.Id.ToString();
                 }
                 catch (Exception e)
                 {
-                    BuildConsole.WriteFailure(e.Message);
+                    logger.WriteFailure(e.Message);
                     return HttpStatusCode.BadRequest;
                 }
             };

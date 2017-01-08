@@ -6,13 +6,15 @@ namespace SeudoBuild.Pipeline.Modules.FolderArchive
     {
         FolderArchiveConfig config;
         IWorkspace workspace;
+        ILogger logger;
 
         public string Type { get; } = "Folder";
 
-        public void Initialize(FolderArchiveConfig config, IWorkspace workspace)
+        public void Initialize(FolderArchiveConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
+            this.logger = logger;
         }
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, IWorkspace workspace)

@@ -7,12 +7,14 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
     public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
     {
         FTPDistributeConfig config;
+        ILogger logger;
 
         public string Type { get; } = "FTP Upload";
 
-        public void Initialize(FTPDistributeConfig config, IWorkspace workspace)
+        public void Initialize(FTPDistributeConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
+            this.logger = logger;
         }
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
@@ -79,7 +81,7 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
             fileStream.Close();
 
             FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-            BuildConsole.WriteLine($"Upload File Complete, status {response.StatusDescription}");
+            logger.WriteLine($"Upload File Complete, status {response.StatusDescription}");
             response.Close();
         }
     }

@@ -10,11 +10,13 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
     {
         protected T config;
         protected IWorkspace workspace;
+        ILogger logger;
 
-        public void Initialize(T config, IWorkspace workspace)
+        public void Initialize(T config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
+            this.logger = logger;
         }
 
         public abstract string Type { get; }
@@ -46,7 +48,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                 throw new Exception("Unity executable does not exist at path " + unityInstallation.ExePath);
             }
 
-            BuildConsole.WriteLine($"Building with Unity {unityInstallation.Version}");
+            logger.WriteLine($"Building with Unity {unityInstallation.Version}");
 
             string projectFolderPath = Path.Combine(workspace.WorkingDirectory, relativeUnityProjectFolder);
 
@@ -87,7 +89,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                         string logOutput = logParser.ProcessLogLine(e.Data);
                         if (logOutput != null)
                         {
-                            BuildConsole.WriteLine(logOutput);
+                            logger.WriteLine(logOutput);
                         }
                     };
                     

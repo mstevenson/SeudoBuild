@@ -7,12 +7,14 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
     public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
     {
         ZipArchiveConfig config;
-
+        ILogger logger;
+        
         public string Type { get; } = "Zip File";
 
-        public void Initialize(ZipArchiveConfig config, IWorkspace workspace)
+        public void Initialize(ZipArchiveConfig config, IWorkspace workspace, ILogger logger)
         {
             this.config = config;
+            this.logger = logger;
         }
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, IWorkspace workspace)
@@ -35,7 +37,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                     fs.DeleteFile(filepath);
                 }
 
-                BuildConsole.WriteLine($"Creating zip file {filename}");
+                logger.WriteLine($"Creating zip file {filename}");
 
                 // Save zip file
                 using (var zipFile = new ZipFile())
@@ -45,7 +47,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                     zipFile.Save(stream);
                 }
 
-                BuildConsole.WriteLine("Zip file saved");
+                logger.WriteLine("Zip file saved");
 
                 var results = new ArchiveStepResults { ArchiveFileName = filename, IsSuccess = true };
                 return results;
