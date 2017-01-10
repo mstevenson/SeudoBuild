@@ -73,6 +73,7 @@
     <Compile Include="Modules\ISourceModule.cs" />
     <Compile Include="Modules\IModuleRegistry.cs" />
     <Compile Include="Exceptions\ModuleLoadException.cs" />
+    <Compile Include="Exceptions\InvalidProjectConfigException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Results\" />

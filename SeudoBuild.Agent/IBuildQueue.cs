@@ -5,14 +5,14 @@ namespace SeudoBuild.Agent
 {
     public interface IBuildQueue
     {
-        BuildRequest ActiveBuild { get; }
+        BuildResult ActiveBuild { get; }
 
-        BuildRequest Build(ProjectConfig config, string target = null);
+        BuildResult EnqueueBuild(ProjectConfig config, string target = null);
 
-        List<BuildResult> GetAllBuildResults();
+        IEnumerable<BuildResult> GetAllBuildResults();
 
         BuildResult GetBuildResult(int buildId);
 
-        void CancelBuild(int buildId);
+        BuildResult CancelBuild(int buildId);
     }
 }

@@ -2,6 +2,6 @@
 {
     public class PipelineConfig
     {
-        public string ProjectsPath { get; set; }
+        public string OutputDirectory { get; set; }
     }
 }

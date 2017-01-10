@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
@@ -9,27 +8,41 @@ using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {
+    /// <summary>
+    /// Queues projects and feeds them sequentially to a builder.
+    /// </summary>
     public class BuildQueue : IBuildQueue
     {
-        public BuildRequest ActiveBuild { get; private set; }
-
-        ConcurrentQueue<BuildRequest> QueuedBuilds { get; } = new ConcurrentQueue<BuildRequest>();
-        ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
-
-        CancellationTokenSource tokenSource;
-        Builder builder;
-        int buildIndex;
-
+        IBuilder builder;
+        IModuleLoader moduleLoader;
         ILogger logger;
 
-        public BuildQueue(ILogger logger)
+        CancellationTokenSource tokenSource;
+        int buildIndex;
+        bool isQueueRunning;
+
+        public BuildResult ActiveBuild { get; private set; }
+        ConcurrentQueue<BuildResult> QueuedBuilds { get; } = new ConcurrentQueue<BuildResult>();
+        ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
+
+        public BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger logger)
         {
+            this.builder = builder;
+            this.moduleLoader = moduleLoader;
             this.logger = logger;
         }
 
-        public void StartQueue(Builder builder, ModuleLoader moduleLoader)
+        /// <summary>
+        /// Begin executing builds in the queue. Builds will continue until the queue has been exhaused.
+        /// </summary>
+        public void StartQueue()
         {
-            this.builder = builder;
+            if (isQueueRunning)
+            {
+                return;
+            }
+            isQueueRunning = true;
+
             tokenSource = new CancellationTokenSource();
 
             // Create output folder in user's documents folder
@@ -57,53 +70,70 @@ namespace SeudoBuild.Agent
             return directory;
         }
 
-        void TaskQueuePump(string outputPath, ModuleLoader moduleLoader)
+        void TaskQueuePump(string outputPath, IModuleLoader moduleLoader)
         {
             while (true)
             {
+                // Clean up and bail out
                 if (tokenSource.IsCancellationRequested)
                 {
+                    ActiveBuild = null;
                     return;
                 }
+
                 if (!builder.IsRunning && QueuedBuilds.Count > 0)
                 {
-                    BuildRequest request = null;
-                    if (QueuedBuilds.TryDequeue(out request))
+                    BuildResult build = null;
+                    if (QueuedBuilds.TryDequeue(out build))
                     {
-                        ActiveBuild = request;
-                        string target = string.IsNullOrEmpty(request.TargetName) ? "default target" : $"target '{request.TargetName}'";
-                        logger.QueueNotification($"Building project '{request.ProjectConfiguration.ProjectName}', {target}");
+                        // Ignore builds that have been cancelled
+                        if (build.BuildStatus != BuildResult.Status.Queued)
+                        {
+                            continue;
+                        }
 
-                        builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath, moduleLoader, logger);
+                        string printableTarget = string.IsNullOrEmpty(build.TargetName) ? "default target" : $"target '{build.TargetName}'";
+                        logger.QueueNotification($"Building project '{build.ProjectConfiguration.ProjectName}', {printableTarget}");
+
+                        ActiveBuild = build;
+                        builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath);
                     }
                 }
                 Thread.Sleep(200);
             }
         }
 
-        public BuildRequest Build(ProjectConfig config, string target = null)
+        /// <summary>
+        /// Queues a project for building.
+        /// If target is null, the default target in the given ProjectConfig will be used.
+        /// </summary>
+        public BuildResult EnqueueBuild(ProjectConfig config, string target = null)
         {
             buildIndex++;
-            var request = new BuildRequest (buildIndex) { ProjectConfiguration = config, TargetName = target };
             var result = new BuildResult
             {
+                Id = buildIndex,
                 BuildStatus = BuildResult.Status.Queued,
-                ProjectName = request.ProjectConfiguration.ProjectName,
-                Id = request.Id,
+                ProjectConfiguration = config,
                 TargetName = target
             };
 
-            QueuedBuilds.Enqueue(request);
+            QueuedBuilds.Enqueue(result);
             Builds.TryAdd(result.Id, result);
-
-            return request;
+            return result;
         }
 
-        public List<BuildResult> GetAllBuildResults()
+        /// <summary>
+        /// Returns results for all known builds, including successful, failed, in-progress, and queued builds.
+        /// </summary>
+        public IEnumerable<BuildResult> GetAllBuildResults()
         {
-            return Builds.Values.ToList();
+            return Builds.Values;
         }
 
+        /// <summary>
+        /// Return the result for a specific build.
+        /// </summary>
         public BuildResult GetBuildResult(int buildId)
         {
             BuildResult result = null;
@@ -111,7 +141,10 @@ namespace SeudoBuild.Agent
             return result;
         }
 
-        public void CancelBuild(int buildId)
+        /// <summary>
+        /// Stop a given build. If the build is in progress it will be halted, otherwise it will be removed from the queue.
+        /// </summary>
+        public BuildResult CancelBuild(int buildId)
         {
             if (ActiveBuild != null && ActiveBuild.Id == buildId)
             {
@@ -124,6 +157,7 @@ namespace SeudoBuild.Agent
             {
                 result.BuildStatus = BuildResult.Status.Cancelled;
             }
+            return result;
         }
     }
 }

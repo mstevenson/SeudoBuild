@@ -34,16 +34,16 @@ namespace SeudoBuild.Pipeline
             Workspace.CreateSubDirectories();
         }
 
-        public void LoadBuildStepModules(ModuleLoader loader)
+        public void LoadBuildStepModules(IModuleLoader moduleLoader)
         {
-            stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(loader, Workspace);
-            stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(loader, Workspace);
-            stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(loader, Workspace);
-            stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(loader, Workspace);
-            stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(loader, Workspace);
+            stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, Workspace);
+            stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, Workspace);
+            stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(moduleLoader, Workspace);
+            stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(moduleLoader, Workspace);
+            stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, Workspace);
         }
 
-        IReadOnlyCollection<T> CreatePipelineSteps<T>(ModuleLoader loader, Workspace workspace)
+        IReadOnlyCollection<T> CreatePipelineSteps<T>(IModuleLoader loader, Workspace workspace)
             where T : class, IPipelineStep
         {
             List<T> pipelineSteps = new List<T>();

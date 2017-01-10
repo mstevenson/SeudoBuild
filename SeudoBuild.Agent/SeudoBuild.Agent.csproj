@@ -54,16 +54,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AgentName.cs" />
     <Compile Include="IReceiver.cs" />
-    <Compile Include="API\AgentModule.cs" />
+    <Compile Include="API\AgentNancyModule.cs" />
     <Compile Include="API\Agent.cs" />
     <Compile Include="IBuildQueue.cs" />
-    <Compile Include="API\BuildRequest.cs" />
     <Compile Include="BuildQueue.cs" />
-    <Compile Include="API\BuildResult.cs" />
     <Compile Include="Builder.cs" />
     <Compile Include="API\Bootstrapper.cs" />
     <Compile Include="AgentLocator.cs" />
     <Compile Include="BuildSubmitter.cs" />
+    <Compile Include="IBuilder.cs" />
+    <Compile Include="BuildResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">

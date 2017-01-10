@@ -4,6 +4,9 @@ using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {
+    /// <summary>
+    /// Entrypoint for Agent's RESTful API.
+    /// </summary>
     public class Bootstrapper : DefaultNancyBootstrapper
     {
         // http://stackoverflow.com/questions/34660245/nancy-create-singleton-with-constructor-parameters
@@ -22,12 +25,10 @@ namespace SeudoBuild.Agent
             var fs = new FileSystem();
             container.Register<IFileSystem>(fs);
 
-            var queue = new BuildQueue(logger);
+            var builder = new Builder(moduleLoader, logger);
+            var queue = new BuildQueue(builder, moduleLoader, logger);
             container.Register<IBuildQueue>(queue);
-            var builder = new Builder();
-            queue.StartQueue(builder, moduleLoader);
-
-
+            queue.StartQueue();
         }
     }
 }

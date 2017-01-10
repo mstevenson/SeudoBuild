@@ -17,7 +17,7 @@ namespace SeudoBuild.Pipeline
             this.logger = logger;
         }
 
-        public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, ModuleLoader modules)
+        public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, IModuleLoader moduleLoader)
         {
             if (projectConfig == null)
             {
@@ -45,8 +45,8 @@ namespace SeudoBuild.Pipeline
 
             // Setup pipeline
             var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
-            pipeline.InitializeWorkspace(builderConfig.ProjectsPath, new FileSystem());
-            pipeline.LoadBuildStepModules(modules);
+            pipeline.InitializeWorkspace(builderConfig.OutputDirectory, new FileSystem());
+            pipeline.LoadBuildStepModules(moduleLoader);
             var macros = pipeline.Workspace.Macros;
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;
             macros["build_target_name"] = pipeline.TargetConfig.TargetName;

@@ -1,34 +1,58 @@
-﻿using System;
-using System.IO;
+﻿using SeudoBuild.Pipeline;
 using System.Threading.Tasks;
-using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {
-    public class Builder
+    /// <summary>
+    /// Executes a build pipeline for a given project and target.
+    /// </summary>
+    public class Builder : IBuilder
     {
+        /// <summary>
+        /// Indicates whether a build is current in-progress.
+        /// </summary>
         public bool IsRunning { get; private set; }
 
-        public bool Build(ProjectConfig projectConfig, string target, string parentDirectory, ModuleLoader modules, ILogger logger)
+        IModuleLoader moduleLoader;
+        ILogger logger;
+
+        public Builder(IModuleLoader moduleLoader, ILogger logger)
         {
-            if (projectConfig != null)
+            this.moduleLoader = moduleLoader;
+            this.logger = logger;
+        }
+
+        /// <summary>
+        /// Execute a build for the given project and target.
+        /// </summary>
+        public bool Build(ProjectConfig projectConfig, string target, string outputDirectory)
+        {
+            if (projectConfig == null)
             {
-                // Find valid target
-                if (string.IsNullOrEmpty(target))
+                throw new System.ArgumentException("Could not execute build, projectConfig is null");
+            }
+
+            // Find a valid target
+            if (string.IsNullOrEmpty(target))
+            {
+                try
                 {
-                    // FIXME check to see if a target exists
                     target = projectConfig.BuildTargets[0].TargetName;
                 }
-
-                Task.Factory.StartNew(() =>
+                catch (System.IndexOutOfRangeException)
                 {
-                    IsRunning = true;
-                    PipelineConfig pipelineConfig = new PipelineConfig { ProjectsPath = parentDirectory };
-                    PipelineRunner pipelineBuilder = new PipelineRunner(pipelineConfig, logger);
-                    pipelineBuilder.ExecutePipeline(projectConfig, target, modules);
-                    IsRunning = false;
-                });
+                    throw new InvalidProjectConfigException("ProjectConfig does not contain a build target.");
+                }
             }
+
+            // Execute build
+            Task.Factory.StartNew(() =>
+            {
+                IsRunning = true;
+                PipelineRunner pipeline = new PipelineRunner(new PipelineConfig { OutputDirectory = outputDirectory }, logger);
+                pipeline.ExecutePipeline(projectConfig, target, moduleLoader);
+                IsRunning = false;
+            });
 
             IsRunning = false;
             return true;

@@ -93,7 +93,7 @@ namespace SeudoBuild.Agent
 
             // Load pipeline modules
             var factory = new ModuleLoaderFactory();
-            ModuleLoader modules = factory.Create(logger);
+            ModuleLoader moduleLoader = factory.Create(logger);
 
             // Load project config
             ProjectConfig projectConfig = null;
@@ -101,7 +101,7 @@ namespace SeudoBuild.Agent
             {
                 var fs = new FileSystem();
                 var serializer = new Serializer(fs);
-                var converters = modules.Registry.GetJsonConverters();
+                var converters = moduleLoader.Registry.GetJsonConverters();
                 projectConfig = serializer.DeserializeFromFile<ProjectConfig>(opts.ProjectConfigPath, converters);
             }
             catch (Exception e)
@@ -112,7 +112,7 @@ namespace SeudoBuild.Agent
             }
 
             // Execute build
-            Builder builder = new Builder();
+            Builder builder = new Builder(moduleLoader, logger);
 
             string parentDirectory = opts.OutputPath;
             if (string.IsNullOrEmpty(parentDirectory))
@@ -121,7 +121,7 @@ namespace SeudoBuild.Agent
                 parentDirectory = new FileInfo(opts.ProjectConfigPath).Directory.FullName;
             }
 
-            bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory, modules, logger);
+            bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory);
 
             return success ? 0 : 1;
         }
@@ -176,7 +176,7 @@ namespace SeudoBuild.Agent
                 return 1;
             }
 
-            var submit = new BuildSubmitter();
+            var submit = new BuildSubmitter(logger);
             try
             {
                 submit.Submit(configJson, opts.BuildTarget, opts.AgentName);

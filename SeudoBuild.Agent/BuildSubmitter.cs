@@ -7,14 +7,24 @@ using System.IO;
 
 namespace SeudoBuild.Agent
 {
+    /// <summary>
+    /// Submit a build process to an agent on the local network.
+    /// </summary>
     public class BuildSubmitter
     {
         // FIXME don't hard-code
         const int port = 5511;
 
+        ILogger logger;
+
+        public BuildSubmitter(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
         public void Submit(string projectJson, string target, string agentName)
         {
-            Console.WriteLine("Submitting build to " + agentName);
+            logger.WriteLine("Submitting build to " + agentName);
 
             // Find agent on the network, with timeout
             var discovery = new UdpDiscoveryClient(port);
@@ -72,7 +82,7 @@ namespace SeudoBuild.Agent
 
                     responseReader.Close();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // TODO handle exception
                 }

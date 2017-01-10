@@ -1,15 +1,16 @@
 using System;
-using System.Net.Http;
 using Nancy;
-using Nancy.ModelBinding;
 using System.IO;
 using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {
-    public class AgentModule : NancyModule
+    /// <summary>
+    /// RESTful API for controlling an Agent via HTTP requests.
+    /// </summary>
+    public class AgentNancyModule : NancyModule
     {
-        public AgentModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem, ILogger logger)
+        public AgentNancyModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem, ILogger logger)
         {
             // Build agent info
             Get["/info"] = parameters =>
@@ -27,7 +28,7 @@ namespace SeudoBuild.Agent
                 {
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, null, moduleLoader, filesystem);
                     logger.QueueNotification($"Received build request: project '{config.ProjectName}', default target, host {Request.UserHostAddress}");
-                    var buildRequest = buildQueue.Build(config);
+                    var buildRequest = buildQueue.EnqueueBuild(config);
                     return buildRequest.Id.ToString();
                 }
                 catch (Exception e)
@@ -45,7 +46,7 @@ namespace SeudoBuild.Agent
                     string target = parameters.target;
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, target, moduleLoader, filesystem);
                     logger.QueueNotification($"Queuing build request: project '{config.ProjectName}', target '{target}', host {Request.UserHostAddress}");
-                    var buildRequest = buildQueue.Build(config, target);
+                    var buildRequest = buildQueue.EnqueueBuild(config, target);
                     return buildRequest.Id.ToString();
                 }
                 catch (Exception e)
