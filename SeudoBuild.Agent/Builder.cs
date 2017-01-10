@@ -9,7 +9,7 @@ namespace SeudoBuild.Agent
     {
         public bool IsRunning { get; private set; }
 
-        public bool Build(ProjectConfig projectConfig, string target, string parentDirectory, ModuleLoader modules)
+        public bool Build(ProjectConfig projectConfig, string target, string parentDirectory, ModuleLoader modules, ILogger logger)
         {
             if (projectConfig != null)
             {
@@ -24,7 +24,7 @@ namespace SeudoBuild.Agent
                 {
                     IsRunning = true;
                     PipelineConfig pipelineConfig = new PipelineConfig { ProjectsPath = parentDirectory };
-                    PipelineRunner pipelineBuilder = new PipelineRunner(pipelineConfig);
+                    PipelineRunner pipelineBuilder = new PipelineRunner(pipelineConfig, logger);
                     pipelineBuilder.ExecutePipeline(projectConfig, target, modules);
                     IsRunning = false;
                 });
