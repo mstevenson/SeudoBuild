@@ -42,10 +42,10 @@ namespace SeudoBuild.Pipeline
             {
                 // Locate all types in the assembly that inherit from IModule
                 Type[] allTypesInAssembly = moduleAssembly.GetTypes();
-                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals($"SeudoBuild.Core"));
+                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals($"SeudoBuild.Pipeline.Shared"));
                 foreach (string moduleCategoryTypeName in moduleCategoryTypeNames)
                 {
-                    Type moduleCategoryType = coreAssembly.GetType($"SeudoBuild.{moduleCategoryTypeName}");
+                    Type moduleCategoryType = coreAssembly.GetType($"SeudoBuild.Pipeline.{moduleCategoryTypeName}");
                     foreach (var type in allTypesInAssembly)
                     {
                         if (moduleCategoryType.IsAssignableFrom(type))
@@ -64,7 +64,7 @@ namespace SeudoBuild.Pipeline
             }
             catch (Exception e)
             {
-                // TODO
+                throw new Exception($"Could not load module {file}: " + e.Message);
             }
         }
 
@@ -104,6 +104,8 @@ namespace SeudoBuild.Pipeline
                     // Construct a pipeline step type with a generic parameter for our config type
                     // Example:  IPipelineStepWithConfig<ZipArchiveConfig>
                     Type pipelineStepWithConfigType = typeof(IInitializable<>).MakeGenericType(configType);
+
+                    Console.WriteLine("fails after this step: " + module.StepType);
 
                     // Instantiate a IPipelineStep object
                     object pipelineStepObj = Activator.CreateInstance(module.StepType);
