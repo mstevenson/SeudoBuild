@@ -10,7 +10,6 @@ namespace SeudoBuild.Pipeline
 
         public ProjectConfig ProjectConfig { get; private set; }
         public BuildTargetConfig TargetConfig { get; private set; }
-        public Workspace Workspace { get; private set; }
 
         public IReadOnlyCollection<T> GetPipelineSteps<T>()
             where T : IPipelineStep
@@ -26,24 +25,16 @@ namespace SeudoBuild.Pipeline
             TargetConfig = ProjectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
         }
 
-        public void InitializeWorkspace(string projectsBaseDirectory, IFileSystem fileSystem)
+        public void LoadBuildStepModules(IModuleLoader moduleLoader, IWorkspace workspace)
         {
-            string projectNameSanitized = ProjectConfig.ProjectName.Replace(' ', '_');
-            string projectDirectory = $"{projectsBaseDirectory}/{projectNameSanitized}";
-            Workspace = new Workspace(projectDirectory, fileSystem);
-            Workspace.CreateSubDirectories();
+            stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, workspace);
+            stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, workspace);
+            stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(moduleLoader, workspace);
+            stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(moduleLoader, workspace);
+            stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, workspace);
         }
 
-        public void LoadBuildStepModules(IModuleLoader moduleLoader)
-        {
-            stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, Workspace);
-            stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, Workspace);
-            stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(moduleLoader, Workspace);
-            stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(moduleLoader, Workspace);
-            stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, Workspace);
-        }
-
-        IReadOnlyCollection<T> CreatePipelineSteps<T>(IModuleLoader loader, Workspace workspace)
+        IReadOnlyCollection<T> CreatePipelineSteps<T>(IModuleLoader loader, IWorkspace workspace)
             where T : class, IPipelineStep
         {
             List<T> pipelineSteps = new List<T>();

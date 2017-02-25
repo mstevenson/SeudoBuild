@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace SeudoBuild.Pipeline
 {
@@ -43,26 +45,34 @@ namespace SeudoBuild.Pipeline
             logger.IndentLevel--;
             Console.WriteLine("");
 
+            // Create workspace
+            string regex = new string(Path.GetInvalidFileNameChars());
+            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regex)));
+            string projectNameSanitized = r.Replace(projectConfig.ProjectName, "").Replace(' ', '_');
+            string projectDirectory = $"{builderConfig.OutputDirectory}/{projectNameSanitized}";
+            var workspace = new Workspace(projectDirectory, new FileSystem());
+            workspace.CreateSubDirectories();
+
             // Setup pipeline
             var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
-            pipeline.InitializeWorkspace(builderConfig.OutputDirectory, new FileSystem());
-            pipeline.LoadBuildStepModules(moduleLoader);
-            var macros = pipeline.Workspace.Macros;
+            pipeline.LoadBuildStepModules(moduleLoader, workspace);
+
+            var macros = workspace.Macros;
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;
             macros["build_target_name"] = pipeline.TargetConfig.TargetName;
             macros["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
             macros["app_version"] = pipeline.TargetConfig.Version.ToString();
 
             // Clean
-            pipeline.Workspace.CleanBuildOutputDirectory();
+            workspace.CleanBuildOutputDirectory();
 
             // Run pipeline
-            var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), pipeline.Workspace);
+            var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), workspace);
             macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier; // fixme don't hard-code index
-            var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, pipeline.Workspace);
-            var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, pipeline.Workspace);
-            var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, pipeline.Workspace);
-            var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, pipeline.Workspace);
+            var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, workspace);
+            var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, workspace);
+            var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, workspace);
+            var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, workspace);
 
             // Done
             logger.IndentLevel = 0;
