@@ -1,5 +1,8 @@
 ﻿namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Pipeline step that takes a completed build product and archives it.
+    /// </summary>
     public interface IArchiveStep : IPipelineStep<BuildSequenceResults, BuildStepResults, ArchiveSequenceResults, ArchiveStepResults>
     {
     }

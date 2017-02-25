@@ -1,8 +1,12 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.SteamDistribute
 {
+    /// <summary>
+    /// Configuration values for a distribute pipeline step that uploads
+    /// a build product to Steam.
+    /// </summary>
     public class SteamDistributeConfig : DistributeStepConfig
     {
-        public override string Type { get; } = "Steam Upload";
+        public override string Name { get; } = "Steam Upload";
         public string PublishToBranch { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }

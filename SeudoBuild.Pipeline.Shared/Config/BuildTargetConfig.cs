@@ -2,6 +2,10 @@
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Configuration values for all pipeline steps associated with
+    /// a specific build target.
+    /// </summary>
     public class BuildTargetConfig
     {
         public string TargetName { get; set; }

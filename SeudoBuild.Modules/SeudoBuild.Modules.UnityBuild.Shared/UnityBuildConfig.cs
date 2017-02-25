@@ -1,5 +1,8 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
+    /// <summary>
+    /// Configuration values for a build pipeline step for a Unity project.
+    /// </summary>
     public abstract class UnityBuildConfig : BuildStepConfig
     {
         /// <summary>

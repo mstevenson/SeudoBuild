@@ -2,6 +2,9 @@
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// The exception that is thrown when a pipeline module DLL can not be loaded.
+    /// </summary>
     public class ModuleLoadException : Exception
     {
         public ModuleLoadException() {}

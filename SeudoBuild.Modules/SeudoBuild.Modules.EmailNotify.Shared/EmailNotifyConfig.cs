@@ -1,8 +1,11 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.EmailNotify
 {
+    /// <summary>
+    /// Configuration values for a notify pipeline step that sends an email.
+    /// </summary>
     public class EmailNotifyConfig : NotifyStepConfig
     {
-        public override string Type { get; } = "Email Notification";
+        public override string Name { get; } = "Email Notification";
         public string FromAddress { get; set; }
         public string ToAddress { get; set; }
         public string Host { get; set; } = "smtp.google.com";

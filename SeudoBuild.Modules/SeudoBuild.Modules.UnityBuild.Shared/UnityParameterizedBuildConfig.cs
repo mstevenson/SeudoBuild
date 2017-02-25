@@ -2,9 +2,13 @@
 
 namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
+    /// <summary>
+    /// Configuration values for a build pipeline step that invokes a
+    /// SeudoBuild-specific editor build script in a Unity project.
+    /// </summary>
     public class UnityParameterizedBuildConfig : UnityBuildConfig
     {
-        public override string Type { get; } = "Unity Parameterized Build";
+        public override string Name { get; } = "Unity Parameterized Build";
 
         public UnityPlatform TargetPlatform { get; set; }
         public string ExecutableName { get; set; }

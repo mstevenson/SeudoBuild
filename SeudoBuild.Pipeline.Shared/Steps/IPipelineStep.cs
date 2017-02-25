@@ -12,7 +12,7 @@
     }
 
     public interface IPipelineStepWithConfig<T> : IPipelineStep
-    where T : StepConfig
+        where T : StepConfig
     {
         void Initialize(T config, IWorkspace workspace, ILogger logger);
     }

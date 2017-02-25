@@ -36,9 +36,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PipelineRunner.cs" />
     <Compile Include="ProjectPipeline.cs" />
-    <Compile Include="Modules\ModuleLoader.cs" />
-    <Compile Include="Modules\ModuleLoaderFactory.cs" />
-    <Compile Include="Modules\ModuleRegistry.cs" />
+    <Compile Include="ModuleLoader.cs" />
+    <Compile Include="ModuleLoaderFactory.cs" />
+    <Compile Include="ModuleRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj">
@@ -53,9 +53,6 @@
       <Project>{2F239808-F280-4A32-B2BB-437A61304BE1}</Project>
       <Name>SeudoBuild.Core.Shared</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

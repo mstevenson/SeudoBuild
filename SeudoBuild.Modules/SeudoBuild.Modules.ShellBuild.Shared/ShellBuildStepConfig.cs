@@ -1,8 +1,11 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.ShellBuild
 {
+    /// <summary>
+    /// Configuration values for a build pipeline step that runs a shell script.
+    /// </summary>
     public class ShellBuildStepConfig : BuildStepConfig
     {
-        public override string Type { get; } = "Shell Script";
+        public override string Name { get; } = "Shell Script";
 
         public string Command { get; set; }
     }

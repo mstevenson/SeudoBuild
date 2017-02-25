@@ -2,6 +2,9 @@
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Results from distributing an archive of a build product.
+    /// </summary>
     public class DistributeStepResults : PipelineStepResults
     {
         public class FileResult

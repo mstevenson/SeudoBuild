@@ -8,7 +8,8 @@ using System.Net;
 namespace SeudoBuild.Net
 {
     /// <summary>
-    /// Listens for UDP beacon packets from UdpDiscoveryServer.
+    /// Listens for UDP beacon packets that are broadcast at regular intervals
+    /// on the local network by a UdpDiscoveryServer.
     /// </summary>
     public class UdpDiscoveryClient : IDisposable
     {
@@ -19,12 +20,12 @@ namespace SeudoBuild.Net
         IPEndPoint endPoint;
         Thread receiveThread;
         Thread pruneThread;
-        ConcurrentDictionary<Guid, UdpDiscoveryResponse> servers = new ConcurrentDictionary<Guid, UdpDiscoveryResponse>();
+        ConcurrentDictionary<Guid, UdpDiscoveryBeacon> servers = new ConcurrentDictionary<Guid, UdpDiscoveryBeacon>();
 
         int agentPort;
 
-        public event Action<UdpDiscoveryResponse> ServerFound = delegate { };
-        public event Action<UdpDiscoveryResponse> ServerLost = delegate { };
+        public event Action<UdpDiscoveryBeacon> ServerFound = delegate { };
+        public event Action<UdpDiscoveryBeacon> ServerLost = delegate { };
 
         public bool IsRunning { get; protected set; }
 
@@ -33,13 +34,13 @@ namespace SeudoBuild.Net
             this.agentPort = agentPort;
         }
 
-        //public UdpDiscoveryResponse[] AvailableServers
+        //public UdpDiscoveryBeacon[] AvailableServers
         //{
         //    get
         //    {
         //        if (servers.Count == 0)
         //        {
-        //            return new UdpDiscoveryResponse[0];
+        //            return new UdpDiscoveryBeacon[0];
         //        }
         //        return servers.Values.ToArray();
         //    }
@@ -83,12 +84,12 @@ namespace SeudoBuild.Net
             {
                 // blocking
                 byte[] data = udpClient.Receive(ref endPoint);
-                UdpDiscoveryResponse serverInfo = UdpDiscoveryResponse.FromBytes(data);
+                UdpDiscoveryBeacon serverInfo = UdpDiscoveryBeacon.FromBytes(data);
                 serverInfo.address = endPoint.Address;
 
                 if (serverInfo != null)
                 {
-                    UdpDiscoveryResponse response;
+                    UdpDiscoveryBeacon response;
                     if (servers.TryGetValue(serverInfo.guid, out response))
                     {
                         response.lastSeen = DateTime.Now;
@@ -119,7 +120,7 @@ namespace SeudoBuild.Net
                     var age = now.Subtract(serverInfo.lastSeen);
                     if (age.TotalMilliseconds >= timeout)
                     {
-                        UdpDiscoveryResponse removed;
+                        UdpDiscoveryBeacon removed;
                         if (servers.TryRemove(kvp.Key, out removed))
                         {
                             ServerLost(serverInfo);

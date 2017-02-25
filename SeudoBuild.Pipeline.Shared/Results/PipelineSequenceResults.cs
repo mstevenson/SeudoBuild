@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Results from an entire sequence of pipeline steps of the same type.
+    /// </summary>
     public abstract class PipelineSequenceResults
     {
         /// <summary>
@@ -25,6 +28,10 @@ namespace SeudoBuild.Pipeline
         public TimeSpan Duration { get; set; }
     }
 
+    /// <summary>
+    /// Results from an entire sequence of pipeline steps of the same type,
+    /// given a specific results object type.
+    /// </summary>
     public abstract class PipelineSequenceResults<T> : PipelineSequenceResults
         where T : PipelineStepResults, new()
     {

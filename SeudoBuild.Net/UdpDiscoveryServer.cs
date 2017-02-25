@@ -5,9 +5,13 @@ using System.Net;
 
 namespace SeudoBuild.Net
 {
+    /// <summary>
+    /// Broadcasts UDP beacon packets at regular intervals that may be used
+    /// by other services to locate the server on the local network.
+    /// </summary>
     public class UdpDiscoveryServer : IDisposable
     {
-        UdpDiscoveryResponse server;
+        UdpDiscoveryBeacon server;
 
         const int broadcastDelay = 1000; // milliseconds
 
@@ -20,7 +24,7 @@ namespace SeudoBuild.Net
 
         public bool IsRunning { get; protected set; }
 
-        public UdpDiscoveryServer(UdpDiscoveryResponse server)
+        public UdpDiscoveryServer(UdpDiscoveryBeacon server)
         {
             this.server = server;
         }
@@ -68,7 +72,7 @@ namespace SeudoBuild.Net
             while (IsRunning)
             {
                 // Broadcast server beacon to all clients on the local network
-                byte[] message = UdpDiscoveryResponse.ToBytes(server);
+                byte[] message = UdpDiscoveryBeacon.ToBytes(server);
                 udpClient.Send(message, message.Length, endPoint);
                 //				Console.WriteLine ("Broadcasted");
                 Thread.Sleep(broadcastDelay);

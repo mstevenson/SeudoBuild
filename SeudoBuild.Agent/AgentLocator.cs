@@ -86,19 +86,19 @@ namespace SeudoBuild.Agent
             client = null;
         }
 
-        void OnServerFound(UdpDiscoveryResponse discoveryResponse)
+        void OnServerFound(UdpDiscoveryBeacon beacon)
         {
             // Ignore agents that we already know about
-            if (!agents.ContainsKey (discoveryResponse.guid))
+            if (!agents.ContainsKey (beacon.guid))
             {
-                agents[discoveryResponse.guid] = null;
-                RequestAgentInfoAsync(discoveryResponse);
+                agents[beacon.guid] = null;
+                RequestAgentInfoAsync(beacon);
             }
         }
 
-        async Task RequestAgentInfoAsync(UdpDiscoveryResponse discoveryResponse)
+        async Task RequestAgentInfoAsync(UdpDiscoveryBeacon beacon)
         {
-            string address = $"http://{discoveryResponse.address}:{discoveryResponse.port}/info";
+            string address = $"http://{beacon.address}:{beacon.port}/info";
 
             // Request the agent's identity
             var req = WebRequest.CreateHttp(address);
@@ -120,10 +120,10 @@ namespace SeudoBuild.Agent
 
                 var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
                 // FIXME should the agent have set its own address before responding? Does it even know its own address?
-                agent.Address = discoveryResponse.address.ToString();
+                agent.Address = beacon.address.ToString();
                 //BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
 
-                agents[discoveryResponse.guid] = agent;
+                agents[beacon.guid] = agent;
                 if (AgentFound != null)
                 {
                     AgentFound.Invoke(agent);
@@ -135,7 +135,7 @@ namespace SeudoBuild.Agent
             }
         }
 
-        void OnServerLost(UdpDiscoveryResponse server)
+        void OnServerLost(UdpDiscoveryBeacon server)
         {
             Agent agent;
             bool haveAgent = agents.TryGetValue(server.guid, out agent);

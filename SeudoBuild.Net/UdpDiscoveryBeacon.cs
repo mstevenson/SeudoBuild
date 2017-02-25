@@ -3,7 +3,12 @@ using System.Net;
 
 namespace SeudoBuild.Net
 {
-    public class UdpDiscoveryResponse
+    /// <summary>
+    /// A beacon packet that is broadcast at regular intervals by a
+    /// UdpDiscoveryServer. A UdpDiscoveryClient listens for beacons, enabling
+    /// automatic service discovery on the local network.
+    /// </summary>
+    public class UdpDiscoveryBeacon
     {
         /// <summary>
         /// String identifier that begins each UDP server discovery message.
@@ -27,26 +32,26 @@ namespace SeudoBuild.Net
         public DateTime lastSeen;
 
 
-        public UdpDiscoveryResponse()
+        public UdpDiscoveryBeacon()
         {
             this.guid = Guid.NewGuid();
             this.lastSeen = DateTime.Now;
             this.address = IPAddress.Parse("127.0.0.1");
         }
 
-        public static UdpDiscoveryResponse FromBytes(byte[] data)
+        public static UdpDiscoveryBeacon FromBytes(byte[] data)
         {
-            var s = new UdpDiscoveryResponse();
+            var s = new UdpDiscoveryBeacon();
             int index = 0;
 
             // ASCII Service ID
             var encoding = new System.Text.ASCIIEncoding();
-            byte[] serviceIdBytes = encoding.GetBytes(UdpDiscoveryResponse.serviceId);
+            byte[] serviceIdBytes = encoding.GetBytes(UdpDiscoveryBeacon.serviceId);
             var id = encoding.GetString(data, 0, serviceIdBytes.Length);
             index += id.Length;
 
             // Bail out if the beacon was not the service we're looking for
-            if (id != UdpDiscoveryResponse.serviceId)
+            if (id != UdpDiscoveryBeacon.serviceId)
             {
                 return null;
             }
@@ -76,14 +81,14 @@ namespace SeudoBuild.Net
             return output;
         }
 
-        public static byte[] ToBytes(UdpDiscoveryResponse config)
+        public static byte[] ToBytes(UdpDiscoveryBeacon config)
         {
             byte[] output = new byte[24];
             int offset = 0;
 
             // 4 byte ASCII service ID
             var encoding = new System.Text.ASCIIEncoding();
-            byte[] serviceIdBytes = encoding.GetBytes(UdpDiscoveryResponse.serviceId);
+            byte[] serviceIdBytes = encoding.GetBytes(UdpDiscoveryBeacon.serviceId);
             offset = AppendBytes(serviceIdBytes, output, offset);
 
             // 2 byte version number
@@ -130,7 +135,7 @@ namespace SeudoBuild.Net
             {
                 return false;
             }
-            UdpDiscoveryResponse s = obj as UdpDiscoveryResponse;
+            UdpDiscoveryBeacon s = obj as UdpDiscoveryBeacon;
             if ((object)s == null)
             {
                 return false;
@@ -138,7 +143,7 @@ namespace SeudoBuild.Net
             return guid == s.guid;
         }
 
-        public bool Equals(UdpDiscoveryResponse s)
+        public bool Equals(UdpDiscoveryBeacon s)
         {
             if ((object)s == null)
             {
@@ -147,7 +152,7 @@ namespace SeudoBuild.Net
             return guid == s.guid;
         }
 
-        public static bool operator ==(UdpDiscoveryResponse a, UdpDiscoveryResponse b)
+        public static bool operator ==(UdpDiscoveryBeacon a, UdpDiscoveryBeacon b)
         {
             if (System.Object.ReferenceEquals(a, b))
             {
@@ -160,7 +165,7 @@ namespace SeudoBuild.Net
             return a.guid == b.guid;
         }
 
-        public static bool operator !=(UdpDiscoveryResponse a, UdpDiscoveryResponse b)
+        public static bool operator !=(UdpDiscoveryBeacon a, UdpDiscoveryBeacon b)
         {
             return !(a == b);
         }

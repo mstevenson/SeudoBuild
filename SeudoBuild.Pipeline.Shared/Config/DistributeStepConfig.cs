@@ -1,5 +1,8 @@
 ﻿namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Configuration values for a Distribute pipeline step.
+    /// </summary>
     public abstract class DistributeStepConfig : StepConfig
     {
         /// <summary>

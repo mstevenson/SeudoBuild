@@ -1,11 +1,12 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
     /// <summary>
-    /// Performs a standard Unity build, or executes an arbitrary static method in a Unity editor script.
+    /// Configuration values for a build pipeline step that performs a
+    /// standard Unity build.
     /// </summary>
     public class UnityStandardBuildConfig : UnityBuildConfig
     {
-        public override string Type { get; } = "Unity Standard Build";
+        public override string Name { get; } = "Unity Standard Build";
 
         public string OutputName { get; set; } = "";
 

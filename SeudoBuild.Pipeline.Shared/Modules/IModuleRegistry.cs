@@ -3,6 +3,10 @@ using Newtonsoft.Json;
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Tracks pipeline modules that have been loaded and are available to be
+    /// used by build scripts.
+    /// </summary>
     public interface IModuleRegistry
     {
         IEnumerable<IModule> GetAllModules();

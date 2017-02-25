@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Converts a StepConfig object to and from a serialized JSON representation.
+    /// </summary>
     public class StepConfigConverter : JsonConverter
     {
         readonly Type configBaseType;
@@ -61,6 +64,10 @@ namespace SeudoBuild.Pipeline
         }
     }
 
+    /// <summary>
+    /// Converts a StepConfig object of the given subtype to and from
+    /// a serialized JSON representation.
+    /// </summary>
     public class StepConfigConverter<T> : StepConfigConverter
         where T : StepConfig
     {
