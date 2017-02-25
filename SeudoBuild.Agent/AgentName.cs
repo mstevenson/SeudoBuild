@@ -4,12 +4,12 @@ using System.Net.NetworkInformation;
 namespace SeudoBuild.Agent
 {
     /// <summary>
-    /// A unique agent identifier.
+    /// A unique build agent identifier. Agent names are human readable.
     /// </summary>
     public static class AgentName
     {
         /// <summary>
-        /// Generates a randomized human-readable agent identifier, for debugging purposes.
+        /// Produces a random human-readable agent identifier, for debugging purposes.
         /// </summary>
         public static string GetRandomName()
         {
@@ -18,8 +18,8 @@ namespace SeudoBuild.Agent
         }
 
         /// <summary>
-        /// Generates a unique and deterministic human-readable agent identifier.
-        /// The name is based on the MAC addresses of all of the agent's network interfaces.
+        /// Produces a deterministic human-readable agent identifier.
+        /// The name is based on the MAC addresses of the agent's network interfaces.
         /// </summary>
         public static string GetUniqueAgentName()
         {
@@ -28,6 +28,9 @@ namespace SeudoBuild.Agent
             return GetName(rand);
         }
 
+        /// <summary>
+        /// Genereates an agent name based on the given random seed.
+        /// </summary>
         static string GetName(Random rand)
         {
             var adjective = adjectives[rand.Next(0, adjectives.Length)];
@@ -37,6 +40,10 @@ namespace SeudoBuild.Agent
             return name.ToLower();
         }
 
+        /// <summary>
+        /// Returns a concatenated string of the MAC addresses of all network
+        /// interfaces.
+        /// </summary>
         static string GetMacAddresses()
         {
             string macAddresses = string.Empty;

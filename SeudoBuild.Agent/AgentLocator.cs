@@ -8,7 +8,7 @@ using System.IO;
 namespace SeudoBuild.Agent
 {
     /// <summary>
-    /// Listens for build agents on the local network.
+    /// Watches for build agents on the local network.
     /// </summary>
     public class AgentLocator
     {
@@ -53,7 +53,7 @@ namespace SeudoBuild.Agent
         {
             if (client == null)
             {
-                client = new UdpDiscoveryClient(port);
+                client = new UdpDiscoveryClient();
             }
             if (!client.IsRunning)
             {
@@ -86,6 +86,9 @@ namespace SeudoBuild.Agent
             client = null;
         }
 
+        /// <summary>
+        /// Occurs when a UdpDiscoveryServer is first seen.
+        /// </summary>
         void OnServerFound(UdpDiscoveryBeacon beacon)
         {
             // Ignore agents that we already know about
@@ -96,6 +99,10 @@ namespace SeudoBuild.Agent
             }
         }
 
+        /// <summary>
+        /// Requests additional information about a build agent's capabilities
+        /// after its discovery beacon is first received.
+        /// </summary>
         async Task RequestAgentInfoAsync(UdpDiscoveryBeacon beacon)
         {
             string address = $"http://{beacon.address}:{beacon.port}/info";
@@ -135,6 +142,9 @@ namespace SeudoBuild.Agent
             }
         }
 
+        /// <summary>
+        /// Occurs when a known UdpDiscoveryServer has not been seen for some time.
+        /// </summary>
         void OnServerLost(UdpDiscoveryBeacon server)
         {
             Agent agent;

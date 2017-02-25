@@ -22,17 +22,22 @@ namespace SeudoBuild.Net
         Thread pruneThread;
         ConcurrentDictionary<Guid, UdpDiscoveryBeacon> servers = new ConcurrentDictionary<Guid, UdpDiscoveryBeacon>();
 
-        int agentPort;
-
+        /// <summary>
+        /// Occurs when a beacon is first received from a UdpDiscoveryServer.
+        /// </summary>
         public event Action<UdpDiscoveryBeacon> ServerFound = delegate { };
+
+        /// <summary>
+        /// Occurs when a beacon has not been received by a known
+        /// UdpDiscoveryServer for some time.
+        /// </summary>
         public event Action<UdpDiscoveryBeacon> ServerLost = delegate { };
 
+        /// <summary>
+        /// Indicates whether the UdpDiscoveryClient is currently listening
+        /// for beacons from UdpDiscoveryServers.
+        /// </summary>
         public bool IsRunning { get; protected set; }
-
-        public UdpDiscoveryClient(int agentPort)
-        {
-            this.agentPort = agentPort;
-        }
 
         //public UdpDiscoveryBeacon[] AvailableServers
         //{
@@ -46,6 +51,9 @@ namespace SeudoBuild.Net
         //    }
         //}
 
+        /// <summary>
+        /// Begin listening for UDP discovery beacons.
+        /// </summary>
         public void Start()
         {
             // Initialize
@@ -67,6 +75,9 @@ namespace SeudoBuild.Net
             pruneThread.Start();
         }
 
+        /// <summary>
+        /// Stop listening for UDP discovery beacons.
+        /// </summary>
         public void Stop()
         {
             Console.WriteLine("Server Discovery Stopped");
@@ -77,6 +88,9 @@ namespace SeudoBuild.Net
             }
         }
 
+        /// <summary>
+        /// Listen for new servers.
+        /// </summary>
         void ReceiveThread()
         {
             //			try {
@@ -107,6 +121,10 @@ namespace SeudoBuild.Net
             IsRunning = false;
         }
 
+        /// <summary>
+        /// Prune known servers that have not broadcast discovery beacons
+        /// for some time.
+        /// </summary>
         void PruneThread()
         {
             while (IsRunning)

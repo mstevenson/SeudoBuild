@@ -3,6 +3,9 @@ using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {
+    /// <summary>
+    /// Queues projects and feeds them sequentially to a builder.
+    /// </summary>
     public interface IBuildQueue
     {
         BuildResult ActiveBuild { get; }

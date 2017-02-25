@@ -22,17 +22,21 @@ namespace SeudoBuild.Agent
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Submit the given project configuration and build target to a build
+        /// agent on the network.
+        /// </summary>
         public void Submit(string projectJson, string target, string agentName)
         {
             logger.WriteLine("Submitting build to " + agentName);
 
             // Find agent on the network, with timeout
-            var discovery = new UdpDiscoveryClient(port);
+            var discovery = new UdpDiscoveryClient();
             discovery.Start();
 
             //while (!discovery.AvailableServers.Any (s => s.guid);
 
-            UdpDiscoveryClient client = new UdpDiscoveryClient(port);
+            UdpDiscoveryClient client = new UdpDiscoveryClient();
             try
             {
                 client.Start();
