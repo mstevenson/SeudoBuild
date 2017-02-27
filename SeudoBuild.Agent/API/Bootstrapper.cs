@@ -17,7 +17,7 @@ namespace SeudoBuild.Agent
 
             base.ConfigureApplicationContainer(container);
             // FIXME the entrypoint method also initializes a logger
-            var logger = new BuildConsole();
+            var logger = new Logger();
             container.Register<ILogger>(logger);
             var moduleLoader = new ModuleLoaderFactory().Create(logger);
             container.Register<IModuleLoader>(moduleLoader);

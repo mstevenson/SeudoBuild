@@ -34,7 +34,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="packages.config" />
-    <Compile Include="BuildConsole.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Macros.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Workspace.cs" />

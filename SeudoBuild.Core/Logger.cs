@@ -2,7 +2,7 @@
 
 namespace SeudoBuild
 {
-    public class BuildConsole : ILogger
+    public class Logger : ILogger
     {
         static string indentString = "";
         static int indentLevel;

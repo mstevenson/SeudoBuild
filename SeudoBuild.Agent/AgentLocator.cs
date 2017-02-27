@@ -128,7 +128,7 @@ namespace SeudoBuild.Agent
                 var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
                 // FIXME should the agent have set its own address before responding? Does it even know its own address?
                 agent.Address = beacon.address.ToString();
-                //BuildConsole.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
+                //logger.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
 
                 agents[beacon.guid] = agent;
                 if (AgentFound != null)

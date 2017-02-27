@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Executes all pipeline steps in a given project for a given build target.
+    /// </summary>
     public class PipelineRunner
     {
         PipelineConfig builderConfig;
@@ -41,7 +44,7 @@ namespace SeudoBuild.Pipeline
             logger.IndentLevel++;
             logger.WritePlus($"Project:  {projectConfig.ProjectName}");
             logger.WritePlus($"Target:   {buildTargetName}");
-            //BuildConsole.WritePlus($"Location: {projectsBaseDirectory}/{projectNameSanitized}"); 
+            //logger.WritePlus($"Location: {projectsBaseDirectory}/{projectNameSanitized}"); 
             logger.IndentLevel--;
             Console.WriteLine("");
 

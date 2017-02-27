@@ -68,7 +68,7 @@ namespace SeudoBuild.Agent
 
         public static void Main(string[] args)
         {
-            logger = new BuildConsole();
+            logger = new Logger();
 
             Console.Title = "SeudoBuild";
 
