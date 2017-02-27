@@ -28,7 +28,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                 // Replace in-line variables
                 filename = workspace.Macros.ReplaceVariablesInText(config.Filename);
                 // Sanitize
-                filename = filename.Replace(' ', '_');
+                filename = filename.SanitizeFilename();
                 filename = filename + ".zip";
                 string filepath = $"{workspace.ArchivesDirectory}/{filename}";
 

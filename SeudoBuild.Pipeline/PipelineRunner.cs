@@ -49,9 +49,7 @@ namespace SeudoBuild.Pipeline
             Console.WriteLine("");
 
             // Create workspace
-            string regex = new string(Path.GetInvalidFileNameChars());
-            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regex)));
-            string projectNameSanitized = r.Replace(projectConfig.ProjectName, "").Replace(' ', '_');
+            string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
             string projectDirectory = $"{builderConfig.OutputDirectory}/{projectNameSanitized}";
             var workspace = new Workspace(projectDirectory, new FileSystem());
             workspace.CreateSubDirectories();

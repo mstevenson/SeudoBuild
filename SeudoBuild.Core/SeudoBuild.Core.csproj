@@ -39,6 +39,7 @@
     <Compile Include="Serializer.cs" />
     <Compile Include="Workspace.cs" />
     <Compile Include="FileSystem.cs" />
+    <Compile Include="StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
