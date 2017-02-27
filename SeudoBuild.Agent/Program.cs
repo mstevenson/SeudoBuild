@@ -93,7 +93,7 @@ namespace SeudoBuild.Agent
 
             // Load pipeline modules
             var factory = new ModuleLoaderFactory();
-            ModuleLoader moduleLoader = factory.Create(logger);
+            IModuleLoader moduleLoader = factory.Create(logger);
 
             // Load project config
             ProjectConfig projectConfig = null;

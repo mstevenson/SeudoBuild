@@ -4,9 +4,12 @@ using System.Linq;
 
 namespace SeudoBuild.Pipeline
 {
+    /// <summary>
+    /// Creates a ModuleLoader object.
+    /// </summary>
     public class ModuleLoaderFactory
     {
-        public ModuleLoader Create(ILogger logger)
+        public IModuleLoader Create(ILogger logger)
         {
             ModuleLoader loader = new ModuleLoader();
             string modulesDirectory = Path.Combine(Environment.CurrentDirectory, "Modules");
