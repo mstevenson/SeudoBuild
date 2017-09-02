@@ -53,7 +53,7 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
                 while (!process.StandardOutput.EndOfStream)
                 {
                     string line = process.StandardOutput.ReadLine();
-                    logger.WriteLine(line);
+                    logger.Write(line);
                 }
 
                 process.WaitForExit();

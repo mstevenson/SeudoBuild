@@ -4,12 +4,7 @@
     {
         int IndentLevel { get; set; }
 
-        void WriteLine(string value);
-        void WriteBullet(string value);
-        void WritePlus(string value);
-        void WriteSuccess(string value);
-        void WriteFailure(string value);
-        void WriteAlert(string value);
+        void Write(string value, LogType logType = LogType.None);
         void QueueNotification(string value);
     }
 }

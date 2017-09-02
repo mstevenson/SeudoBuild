@@ -43,7 +43,7 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
                 Text = body
             };
 
-            logger.WriteLine($"Sending email notification to {toAddress}");
+            logger.Write($"Sending email notification to {toAddress}");
 
             using (var client = new SmtpClient())
             {
@@ -58,7 +58,7 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
                 client.Timeout = 10000;
             }
 
-            logger.WriteLine("Email notification sent");
+            logger.Write("Email notification sent");
         }
     }
 }

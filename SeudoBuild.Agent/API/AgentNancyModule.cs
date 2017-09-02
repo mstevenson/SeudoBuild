@@ -33,7 +33,7 @@ namespace SeudoBuild.Agent
                 }
                 catch (Exception e)
                 {
-                    logger.WriteFailure(e.Message);
+                    logger.Write(e.Message, LogType.Failure);
                     return HttpStatusCode.BadRequest;
                 }
             };
@@ -51,7 +51,7 @@ namespace SeudoBuild.Agent
                 }
                 catch (Exception e)
                 {
-                    logger.WriteFailure(e.Message);
+                    logger.Write(e.Message, LogType.Failure);
                     return HttpStatusCode.BadRequest;
                 }
             };

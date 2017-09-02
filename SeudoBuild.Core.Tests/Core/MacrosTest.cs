@@ -27,7 +27,7 @@ namespace SeudoBuild.Tests
         {
             string str = "a %b% c";
             macros.Add("b", "1");
-            string result = macros.ReplaceVariablesInText("a 1 c");
+            string result = macros.ReplaceVariablesInText(str);
 
             Assert.That(result, Is.EqualTo("a 1 c"));
         }

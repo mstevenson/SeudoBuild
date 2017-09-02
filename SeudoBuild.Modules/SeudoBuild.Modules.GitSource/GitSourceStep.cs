@@ -125,7 +125,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
             if (config.UseLFS)
             {
-                logger.WriteLine($"Cloning LFS repository:  {config.RepositoryURL}");
+                logger.Write($"Cloning LFS repository:  {config.RepositoryURL}");
 
                 // FIXME extremely insecure to include password in the URL, but it's the only way I've
                 // found to circumvent the manual password prompt when running git-lfs
@@ -136,7 +136,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             }
             else
             {
-                logger.WriteLine($"Cloning repository:  {config.RepositoryURL}");
+                logger.Write($"Cloning repository:  {config.RepositoryURL}");
 
                 var cloneOptions = new CloneOptions
                 {
@@ -155,7 +155,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         // Pull
         public void Update()
         {
-            logger.WriteLine("Cleaning working copy");
+            logger.Write("Cleaning working copy");
 
             // Clean the repo
             using (var repo = new Repository(workspace.SourceDirectory))
@@ -179,7 +179,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
                 // Pull changes
 
-                logger.WriteLine($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {config.RepositoryURL}");
+                logger.Write($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {config.RepositoryURL}");
 
                 var pullOptions = new PullOptions
                 {
@@ -199,19 +199,19 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
                 if (config.UseLFS)
                 {
-                    logger.WriteLine("Fetching LFS files");
+                    logger.Write("Fetching LFS files");
                     ExecuteLFSCommand("fetch");
-                    logger.WriteLine("Checking out LFS files into working copy");
+                    logger.Write("Checking out LFS files into working copy");
                     ExecuteLFSCommand("checkout");
                 }
 
                 if (mergeResult.Status == MergeStatus.UpToDate)
                 {
-                    logger.WriteLine($"Repository is already up-to-date");
+                    logger.Write($"Repository is already up-to-date");
                 }
                 else
                 {
-                    logger.WriteLine($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}");
+                    logger.Write($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}");
                 }
             }
         }

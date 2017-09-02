@@ -36,14 +36,14 @@ namespace SeudoBuild.Pipeline
             BuildTargetConfig targetConfig = projectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
             if (targetConfig == null)
             {
-                throw new ArgumentException("The specified build target could not be found in the project.", "buildTargetName");
+                throw new ArgumentException("The specified build target could not be found in the project.", nameof(buildTargetName));
             }
 
             Console.WriteLine("");
-            logger.WriteLine("Running Pipeline");
+            logger.Write("Running Pipeline");
             logger.IndentLevel++;
-            logger.WritePlus($"Project:  {projectConfig.ProjectName}");
-            logger.WritePlus($"Target:   {buildTargetName}");
+            logger.Write($"Project:  {projectConfig.ProjectName}", LogType.Plus);
+            logger.Write($"Target:   {buildTargetName}", LogType.Plus);
             //logger.WritePlus($"Location: {projectsBaseDirectory}/{projectNameSanitized}"); 
             logger.IndentLevel--;
             Console.WriteLine("");
@@ -77,7 +77,7 @@ namespace SeudoBuild.Pipeline
 
             // Done
             logger.IndentLevel = 0;
-            logger.WriteLine("");
+            logger.Write("");
             Console.WriteLine("Build process completed.");
         }
 
@@ -85,12 +85,12 @@ namespace SeudoBuild.Pipeline
             where TOutSeq : PipelineSequenceResults, new()
         {
             logger.IndentLevel = 0;
-            logger.WriteBullet(sequenceName);
+            logger.Write(sequenceName, LogType.Bullet);
             logger.IndentLevel++;
 
             if (sequenceSteps.Count == 0)
             {
-                logger.WriteAlert($"No {sequenceName} steps.");
+                logger.Write($"No {sequenceName} steps.", LogType.Alert);
                 return new TOutSeq {
                     IsSuccess = true,
                     IsSkipped = true,
@@ -136,7 +136,7 @@ namespace SeudoBuild.Pipeline
             // Verify that the pipeline has not previously failed
             if (!previousSequence.IsSuccess)
             {
-                logger.WriteFailure("Skipping, previous pipeline step failed");
+                logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
                 results = new TOutSeq
                 {
                     IsSuccess = false,
@@ -173,7 +173,7 @@ namespace SeudoBuild.Pipeline
                 //stepIndex++;
                 currentStep = step;
 
-                logger.WriteBullet(step.Type);
+                logger.Write(step.Type, LogType.Bullet);
 
                 TOutStep stepResult = null;
                 stepResult = stepExecuteCallback.Invoke(step);
@@ -184,7 +184,7 @@ namespace SeudoBuild.Pipeline
                     results.IsSuccess = false;
                     results.Exception = stepResult.Exception;
                     string error = $"{sequenceName} sequence failed on step {currentStep.Type}";
-                    logger.WriteFailure(error);
+                    logger.Write(error, LogType.Failure);
                     break;
                 }
             }

@@ -148,11 +148,11 @@ namespace SeudoBuild.Agent
             // FIXME don't hard-code port
             locator.AgentFound += (agent) =>
             {
-                logger.WriteBullet($"{agent.AgentName} ({agent.Address})");
+                logger.Write($"{agent.AgentName} ({agent.Address})", LogType.Bullet);
             };
             locator.AgentLost += (agent) =>
             {
-                logger.WriteBullet($"Lost agent: {agent.AgentName} ({agent.Address})");
+                logger.Write($"Lost agent: {agent.AgentName} ({agent.Address})", LogType.Bullet);
             };
             Console.WriteLine();
             Console.ReadKey();
@@ -172,7 +172,7 @@ namespace SeudoBuild.Agent
             }
             catch
             {
-                logger.WriteFailure("Project could not be read from " + opts.ProjectConfigPath);
+                logger.Write("Project could not be read from " + opts.ProjectConfigPath, LogType.Failure);
                 return 1;
             }
 
@@ -183,7 +183,7 @@ namespace SeudoBuild.Agent
             }
             catch (Exception e)
             {
-                logger.WriteFailure("Could not submit job: " + e.Message);
+                logger.Write("Could not submit job: " + e.Message, LogType.Failure);
                 return 1;
             }
 
@@ -224,7 +224,7 @@ namespace SeudoBuild.Agent
                     }
                     catch
                     {
-                        logger.WriteAlert("Could not initialize build agent discovery beacon");
+                        logger.Write("Could not initialize build agent discovery beacon", LogType.Alert);
                     }
                 }
                 catch (Exception e)

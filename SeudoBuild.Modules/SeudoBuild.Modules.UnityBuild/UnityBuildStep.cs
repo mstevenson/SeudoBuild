@@ -48,7 +48,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                 throw new Exception("Unity executable does not exist at path " + unityInstallation.ExePath);
             }
 
-            logger.WriteLine($"Building with Unity {unityInstallation.Version}");
+            logger.Write($"Building with Unity {unityInstallation.Version}");
 
             string projectFolderPath = Path.Combine(workspace.SourceDirectory, relativeUnityProjectFolder);
 
@@ -89,7 +89,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                         string logOutput = logParser.ProcessLogLine(e.Data);
                         if (logOutput != null)
                         {
-                            logger.WriteLine(logOutput);
+                            logger.Write(logOutput);
                         }
                     };
                     

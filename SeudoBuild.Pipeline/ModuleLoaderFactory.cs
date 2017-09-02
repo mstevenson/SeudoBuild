@@ -15,25 +15,25 @@ namespace SeudoBuild.Pipeline
             string modulesDirectory = Path.Combine(Environment.CurrentDirectory, "Modules");
             loader.LoadAllAssemblies(modulesDirectory);
 
-            logger.WriteLine("Loading Pipeline Modules");
+            logger.Write("Loading Pipeline Modules");
             logger.IndentLevel++;
 
             string line = "";
 
             line = "Source:      " + string.Join(", ", loader.Registry.GetModules<ISourceModule>().Select(m => m.Name).ToArray());
-            logger.WritePlus(line);
+            logger.Write(line, LogType.Plus);
 
             line = "Build:       " + string.Join(", ", loader.Registry.GetModules<IBuildModule>().Select(m => m.Name).ToArray());
-            logger.WritePlus(line);
+            logger.Write(line, LogType.Plus);
 
             line = "Archive:     " + string.Join(", ", loader.Registry.GetModules<IArchiveModule>().Select(m => m.Name).ToArray());
-            logger.WritePlus(line);
+            logger.Write(line, LogType.Plus);
 
             line = "Distribute:  " + string.Join(", ", loader.Registry.GetModules<IDistributeModule>().Select(m => m.Name).ToArray());
-            logger.WritePlus(line);
+            logger.Write(line, LogType.Plus);
 
             line = "Notify:      " + string.Join(", ", loader.Registry.GetModules<INotifyModule>().Select(m => m.Name).ToArray());
-            logger.WritePlus(line);
+            logger.Write(line, LogType.Plus);
 
             logger.IndentLevel--;
 

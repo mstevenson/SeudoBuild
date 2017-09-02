@@ -28,7 +28,7 @@ namespace SeudoBuild.Agent
         /// </summary>
         public void Submit(string projectJson, string target, string agentName)
         {
-            logger.WriteLine("Submitting build to " + agentName);
+            logger.Write("Submitting build to " + agentName);
 
             // Find agent on the network, with timeout
             var discovery = new UdpDiscoveryClient();

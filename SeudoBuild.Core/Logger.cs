@@ -26,45 +26,57 @@ namespace SeudoBuild
             }
         }
 
-        public void WriteLine(string value)
+        public void Write(string value, LogType logType = LogType.None)
         {
-            Console.WriteLine($"{indentString}  {value}");
-        }
+            switch (logType)
+            {
+                case LogType.None:
+                {
+                    Console.WriteLine($"{indentString}  {value}");
+                    break;
+                }
 
-        public void WriteBullet(string value)
-        {
-            Console.ResetColor();
-            Console.WriteLine($"{indentString}• {value}");
-        }
+                case LogType.Plus:
+                {
+                    Console.ResetColor();
+                    Console.WriteLine($"{indentString}+ {value}");
+                    break;
+                }
 
-        public void WritePlus(string value)
-        {
-            Console.ResetColor();
-            Console.WriteLine($"{indentString}+ {value}");
-        }
+                case LogType.Bullet:
+                {
+                    Console.ResetColor();
+                    Console.WriteLine($"{indentString}• {value}");
+                    break;
+                }
 
-        public void WriteSuccess(string value)
-        {
-            ConsoleColor originalColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{indentString}✔ {value}");
-            Console.ResetColor();
-        }
+                case LogType.Success:
+                {
+                    ConsoleColor originalColor = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"{indentString}✔ {value}");
+                    Console.ResetColor();
+                    break;
+                }
 
-        public void WriteFailure(string value)
-        {
-            ConsoleColor originalColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{indentString}✘ {value}");
-            Console.ResetColor();
-        }
+                case LogType.Failure:
+                {
+                    ConsoleColor originalColor = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"{indentString}✘ {value}");
+                    Console.ResetColor();
+                    break;
+                }
 
-        public void WriteAlert(string value)
-        {
-            ConsoleColor originalColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"{indentString}! {value}");
-            Console.ResetColor();
+                case LogType.Alert:
+                {
+                    ConsoleColor originalColor = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"{indentString}✘ {value}");
+                    Console.ResetColor();
+                    break;
+                }
+            }
         }
 
         public void QueueNotification(string value)
