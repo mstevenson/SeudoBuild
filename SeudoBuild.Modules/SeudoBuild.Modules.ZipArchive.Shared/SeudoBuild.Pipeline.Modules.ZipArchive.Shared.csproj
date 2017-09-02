@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SeudoBuild.Modules.ZipArchive</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.ZipArchive.Shared</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

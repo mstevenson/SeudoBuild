@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SeudoBuild.Modules.UnityBuild</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.UnityBuild</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +29,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -44,9 +44,6 @@
     <Compile Include="UnityParameterizedBuildStep.cs" />
     <Compile Include="UnityStandardBuildModule.cs" />
     <Compile Include="UnityStandardBuildStep.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
@@ -68,6 +65,9 @@
       <Name>SeudoBuild.Core.Shared</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

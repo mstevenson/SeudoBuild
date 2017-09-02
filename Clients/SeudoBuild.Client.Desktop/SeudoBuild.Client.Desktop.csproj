@@ -40,11 +40,11 @@
     <Reference Include="Eto">
       <HintPath>..\..\packages\Eto.Forms.2.3.0\lib\portable-net45+win8+wp8+wpa81+Xamarin.Mac+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Eto.dll</HintPath>
     </Reference>
-    <Reference Include="Portable.Xaml">
-      <HintPath>..\..\packages\Portable.Xaml.0.14.0\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Portable.Xaml.dll</HintPath>
-    </Reference>
     <Reference Include="Eto.Serialization.Xaml">
       <HintPath>..\..\packages\Eto.Serialization.Xaml.2.3.0\lib\portable-win8+net45+wp8+wpa81+monotouch+monoandroid+xamarin.mac\Eto.Serialization.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="Portable.Xaml">
+      <HintPath>..\..\packages\Portable.Xaml.0.16.0\lib\portable-net45+win8+wpa81+wp8\Portable.Xaml.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

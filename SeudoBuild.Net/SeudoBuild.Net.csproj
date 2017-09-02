@@ -7,6 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SeudoBuild.Net</RootNamespace>
     <AssemblyName>SeudoBuild.Net</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

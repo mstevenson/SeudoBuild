@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SeudoBuild.Modules.ShellBuild</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.ShellBuild</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +29,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -37,9 +37,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShellBuildStep.cs" />
     <Compile Include="ShellBuildModule.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SeudoBuild.Core\SeudoBuild.Core.csproj">
@@ -61,6 +58,9 @@
       <Project>{A83AE4DF-7C67-4B2C-BB57-F66EB562ECED}</Project>
       <Name>SeudoBuild.Pipeline.Modules.ShellBuild.Shared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
