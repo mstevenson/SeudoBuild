@@ -9,12 +9,12 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
     public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
         GitSourceConfig config;
-        IWorkspace workspace;
+        ITargetWorkspace workspace;
         ILogger logger;
 
         public string Type { get; } = "Git";
 
-        public void Initialize(GitSourceConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(GitSourceConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
@@ -34,7 +34,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             //lfsFilter = GlobalSettings.RegisterFilter(filter);
         }
 
-        public SourceStepResults ExecuteStep(IWorkspace workspace)
+        public SourceStepResults ExecuteStep(ITargetWorkspace workspace)
         {
             logger.IndentLevel++;
 
@@ -72,7 +72,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         {
             get
             {
-                return Repository.IsValid(workspace.WorkingDirectory);
+                return Repository.IsValid(workspace.SourceDirectory);
             }
         }
 
@@ -81,7 +81,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             get
             {
                 string result = null;
-                using (var repo = new Repository(workspace.WorkingDirectory))
+                using (var repo = new Repository(workspace.SourceDirectory))
                 {
                     result = repo.Head.Tip.Sha;
                 }
@@ -104,7 +104,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
         void StoreCredentials()
         {
-            string credentialsPath = $"{workspace.WorkingDirectory}/../git-credentials";
+            string credentialsPath = $"{workspace.SourceDirectory}/../git-credentials";
 
             var uri = new Uri(config.RepositoryURL);
             // Should use UriBuilder, but it doesn't include the password in the resulting uri string
@@ -121,7 +121,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         // Clone
         public void Download()
         {
-            workspace.CleanWorkingDirectory();
+            workspace.CleanSourceDirectory();
 
             if (config.UseLFS)
             {
@@ -132,7 +132,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
                 var uri = new Uri(config.RepositoryURL);
                 string repoUrlWithPassword = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
 
-                ExecuteLFSCommand($"clone {repoUrlWithPassword} {workspace.WorkingDirectory}");
+                ExecuteLFSCommand($"clone {repoUrlWithPassword} {workspace.SourceDirectory}");
             }
             else
             {
@@ -146,7 +146,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
                     RecurseSubmodules = true
                 };
 
-                Repository.Clone(config.RepositoryURL, workspace.WorkingDirectory, cloneOptions);
+                Repository.Clone(config.RepositoryURL, workspace.SourceDirectory, cloneOptions);
             }
 
             // TODO Handle sub-module credentials
@@ -158,7 +158,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             logger.WriteLine("Cleaning working copy");
 
             // Clean the repo
-            using (var repo = new Repository(workspace.WorkingDirectory))
+            using (var repo = new Repository(workspace.SourceDirectory))
             {
                 // Skip the LFS smudge filter when resetting the repo.
                 // LFS files will be integrated manually.
@@ -224,7 +224,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             {
                 FileName = "git-lfs",
                 Arguments = arguments,
-                WorkingDirectory = workspace.WorkingDirectory,
+                WorkingDirectory = workspace.SourceDirectory,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,

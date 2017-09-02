@@ -11,13 +11,13 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
         
         public string Type { get; } = "Zip File";
 
-        public void Initialize(ZipArchiveConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(ZipArchiveConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.logger = logger;
         }
 
-        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, IWorkspace workspace)
+        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, ITargetWorkspace workspace)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                 using (var zipFile = new ZipFile())
                 using (var stream = fs.OpenWrite(filepath))
                 {
-                    zipFile.AddDirectory(workspace.BuildOutputDirectory);
+                    zipFile.AddDirectory(workspace.OutputDirectory);
                     zipFile.Save(stream);
                 }
 

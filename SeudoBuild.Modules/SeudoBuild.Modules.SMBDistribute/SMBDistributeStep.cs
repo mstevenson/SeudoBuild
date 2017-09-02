@@ -11,13 +11,13 @@ namespace SeudoBuild.Pipeline.Modules.SMBDistribute
 
         public string Type { get; } = "SMB Transfer";
 
-        public void Initialize(SMBDistributeConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(SMBDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.logger = logger;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace SeudoBuild.Pipeline.Modules.SMBDistribute
 
         void Mount(bool mount, SMBDistributeConfig config)
         {
-            if (Workspace.RunningPlatform == Platform.Mac)
+            if (TargetWorkspace.RunningPlatform == Platform.Mac)
             {
                 const string mountDir = "SMBDistribute";
                 string serverPath = Path.Combine(config.Host, config.Directory);
@@ -46,7 +46,7 @@ namespace SeudoBuild.Pipeline.Modules.SMBDistribute
             }
             else
             {
-                throw new Exception("SMB Distribute does not support platform " + Workspace.RunningPlatform);
+                throw new Exception("SMB Distribute does not support platform " + TargetWorkspace.RunningPlatform);
             }
         }
     }

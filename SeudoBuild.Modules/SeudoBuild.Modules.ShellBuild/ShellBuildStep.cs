@@ -14,19 +14,19 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
     public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
     {
         ShellBuildStepConfig config;
-        IWorkspace workspace;
+        ITargetWorkspace workspace;
         ILogger logger;
 
         public string Type { get; } = "Shell Script";
 
-        public void Initialize(ShellBuildStepConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(ShellBuildStepConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
             this.logger = logger;
         }
 
-        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, IWorkspace workspace)
+        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, ITargetWorkspace workspace)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
                 {
                     FileName = "bash",
                     Arguments = $"-c \"{command}\"",
-                    WorkingDirectory = workspace.WorkingDirectory,
+                    WorkingDirectory = workspace.SourceDirectory,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true

@@ -5,24 +5,24 @@ namespace SeudoBuild.Pipeline.Modules.FolderArchive
     public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
     {
         FolderArchiveConfig config;
-        IWorkspace workspace;
+        ITargetWorkspace workspace;
         ILogger logger;
 
         public string Type { get; } = "Folder";
 
-        public void Initialize(FolderArchiveConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(FolderArchiveConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
             this.logger = logger;
         }
 
-        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, IWorkspace workspace)
+        public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, ITargetWorkspace workspace)
         {
             try
             {
                 string folderName = workspace.Macros.ReplaceVariablesInText(config.FolderName);
-                string source = workspace.BuildOutputDirectory;
+                string source = workspace.OutputDirectory;
                 string dest = $"{workspace.ArchivesDirectory}/{folderName}";
 
                 // Remove old directory

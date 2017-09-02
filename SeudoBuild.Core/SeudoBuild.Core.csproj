@@ -37,9 +37,10 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Macros.cs" />
     <Compile Include="Serializer.cs" />
-    <Compile Include="Workspace.cs" />
+    <Compile Include="TargetWorkspace.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="ProjectWorkspace.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

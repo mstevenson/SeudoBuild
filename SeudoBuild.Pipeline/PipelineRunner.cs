@@ -51,7 +51,7 @@ namespace SeudoBuild.Pipeline
             // Create workspace
             string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
             string projectDirectory = $"{builderConfig.OutputDirectory}/{projectNameSanitized}";
-            var workspace = new Workspace(projectDirectory, new FileSystem());
+            var workspace = new TargetWorkspace(projectDirectory, new FileSystem());
             workspace.CreateSubDirectories();
 
             // Setup pipeline
@@ -65,7 +65,7 @@ namespace SeudoBuild.Pipeline
             macros["app_version"] = pipeline.TargetConfig.Version.ToString();
 
             // Clean
-            workspace.CleanBuildOutputDirectory();
+            workspace.CleanOutputDirectory();
 
             // Run pipeline
             var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), workspace);
@@ -101,7 +101,7 @@ namespace SeudoBuild.Pipeline
         }
 
         // First step of pipeline execution
-        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, Workspace workspace)
+        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, TargetWorkspace workspace)
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
         {
@@ -121,7 +121,7 @@ namespace SeudoBuild.Pipeline
         }
 
         // Pipeline execution step that had a step before it
-        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, Workspace workspace)
+        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, TargetWorkspace workspace)
             where TInSeq : PipelineSequenceResults // previous sequence results
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results

@@ -25,7 +25,7 @@ namespace SeudoBuild.Pipeline
             TargetConfig = ProjectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
         }
 
-        public void LoadBuildStepModules(IModuleLoader moduleLoader, IWorkspace workspace)
+        public void LoadBuildStepModules(IModuleLoader moduleLoader, ITargetWorkspace workspace)
         {
             stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, workspace);
             stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, workspace);
@@ -34,7 +34,7 @@ namespace SeudoBuild.Pipeline
             stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, workspace);
         }
 
-        IReadOnlyCollection<T> CreatePipelineSteps<T>(IModuleLoader loader, IWorkspace workspace)
+        IReadOnlyCollection<T> CreatePipelineSteps<T>(IModuleLoader loader, ITargetWorkspace workspace)
             where T : class, IPipelineStep
         {
             List<T> pipelineSteps = new List<T>();

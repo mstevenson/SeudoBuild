@@ -7,15 +7,15 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
     {
         public override string Type { get; } = "Unity Standard Build";
 
-        protected override string GetBuildArgs(UnityStandardBuildConfig config, IWorkspace workspace)
+        protected override string GetBuildArgs(UnityStandardBuildConfig config, ITargetWorkspace workspace)
         {
             var args = new List<string>();
             args.Add("-quit");
             args.Add("-batchmode");
             args.Add("-projectPath");
-            args.Add(Path.Combine(workspace.WorkingDirectory, config.SubDirectory));
+            args.Add(Path.Combine(workspace.SourceDirectory, config.SubDirectory));
             args.Add("-logfile");
-            args.Add(Workspace.StandardOutputPath);
+            args.Add(TargetWorkspace.StandardOutputPath);
 
             string executableExtension = "";
 
@@ -37,7 +37,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                     break;
             }
 
-            string exePath = $"{workspace.BuildOutputDirectory}/{config.OutputName}{executableExtension}";
+            string exePath = $"{workspace.OutputDirectory}/{config.OutputName}{executableExtension}";
             args.Add(exePath);
 
             return string.Join(" ", args.ToArray());

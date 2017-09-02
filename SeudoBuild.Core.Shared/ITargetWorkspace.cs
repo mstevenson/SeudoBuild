@@ -8,28 +8,27 @@
     // %build_date% -- the date that the build was completed
     // %commit_identifier% -- the current commit number or hash
 
-    public interface IWorkspace
+    public interface ITargetWorkspace
     {
         /// <summary>
         /// Contains project files downloaded from a version control system.
         /// </summary>
-        string WorkingDirectory { get; set; }
+        string SourceDirectory { get; }
 
         /// <summary>
-        /// Contains intermediate build files
+        /// Contains build output files.
         /// </summary>
-        /// <value>The output directory.</value>
-        string BuildOutputDirectory { get; set; }
+        string OutputDirectory { get; }
 
         /// <summary>
-        /// Contains products resulting from a build.
+        /// Contains build products that are packaged for distribution or archival.
         /// </summary>
-        string ArchivesDirectory { get; set; }
+        string ArchivesDirectory { get; }
 
         /// <summary>
-        /// Contains products resulting from a build.
+        /// Contains build logs.
         /// </summary>
-        string LogsDirectory { get; set; }
+        string LogsDirectory { get; }
 
         IMacros Macros { get; }
 
@@ -37,9 +36,9 @@
 
         void CreateSubDirectories();
 
-        void CleanWorkingDirectory();
+        void CleanSourceDirectory();
 
-        void CleanBuildOutputDirectory();
+        void CleanOutputDirectory();
 
         void CleanArchivesDirectory();
 

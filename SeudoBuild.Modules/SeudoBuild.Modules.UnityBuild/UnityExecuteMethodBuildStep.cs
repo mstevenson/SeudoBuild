@@ -6,10 +6,10 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
     {
         public override string Type { get; } = "Unity Execute Method";
 
-        protected override string GetBuildArgs(UnityExecuteMethodBuildConfig config, IWorkspace workspace)
+        protected override string GetBuildArgs(UnityExecuteMethodBuildConfig config, ITargetWorkspace workspace)
         {
-            string projectPath = Path.Combine(workspace.WorkingDirectory, config.SubDirectory);
-            string args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {projectPath} -logfile {Workspace.StandardOutputPath}";
+            string projectPath = Path.Combine(workspace.SourceDirectory, config.SubDirectory);
+            string args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {projectPath} -logfile {TargetWorkspace.StandardOutputPath}";
             return args;
         }
     }

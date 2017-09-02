@@ -12,13 +12,13 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 
         public string Type { get; } = "SFTP Upload";
 
-        public void Initialize(SFTPDistributeConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(SFTPDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.logger = logger;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)
         {
             var results = new DistributeStepResults();
 
@@ -53,7 +53,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
             }
         }
 
-        public void Upload(ArchiveStepResults archiveInfo, IWorkspace workspace)
+        public void Upload(ArchiveStepResults archiveInfo, ITargetWorkspace workspace)
         {
             // Supply the password via fake keyboard input
             var keyboardAuthMethod = new KeyboardInteractiveAuthenticationMethod(config.Username);

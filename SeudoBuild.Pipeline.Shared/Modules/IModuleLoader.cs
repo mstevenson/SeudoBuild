@@ -7,6 +7,6 @@
     public interface IModuleLoader
     {
         IModuleRegistry Registry { get; }
-        T CreatePipelineStep<T>(StepConfig config, IWorkspace workspace) where T : IPipelineStep;
+        T CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace) where T : IPipelineStep;
     }
 }

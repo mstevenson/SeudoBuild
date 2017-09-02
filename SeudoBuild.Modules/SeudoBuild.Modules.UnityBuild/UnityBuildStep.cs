@@ -9,10 +9,10 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
         where T : UnityBuildConfig
     {
         protected T config;
-        protected IWorkspace workspace;
+        protected ITargetWorkspace workspace;
         ILogger logger;
 
-        public void Initialize(T config, IWorkspace workspace, ILogger logger)
+        public void Initialize(T config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.workspace = workspace;
@@ -21,9 +21,9 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
 
         public abstract string Type { get; }
 
-        protected abstract string GetBuildArgs(T config, IWorkspace workspace);
+        protected abstract string GetBuildArgs(T config, ITargetWorkspace workspace);
 
-        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, IWorkspace workspace)
+        public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, ITargetWorkspace workspace)
         {
             var unityVersion = config.UnityVersionNumber;
             string unityDirName = "Unity";
@@ -41,7 +41,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             return buildResult;
         }
 
-        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, IWorkspace workspace, string relativeUnityProjectFolder)
+        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, ITargetWorkspace workspace, string relativeUnityProjectFolder)
         {
             if (!workspace.FileSystem.FileExists(unityInstallation.ExePath))
             {
@@ -50,7 +50,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
 
             logger.WriteLine($"Building with Unity {unityInstallation.Version}");
 
-            string projectFolderPath = Path.Combine(workspace.WorkingDirectory, relativeUnityProjectFolder);
+            string projectFolderPath = Path.Combine(workspace.SourceDirectory, relativeUnityProjectFolder);
 
             // Validate Unity project folder contents
             var dirs = Directory.GetDirectories(projectFolderPath);
@@ -67,7 +67,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             {
                 FileName = unityInstallation.ExePath,
                 Arguments = arguments,
-                WorkingDirectory = workspace.WorkingDirectory,
+                WorkingDirectory = workspace.SourceDirectory,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 UseShellExecute = false
@@ -123,7 +123,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             }
         }
 
-        protected string GetBuildLogPath(IWorkspace workspace)
+        protected string GetBuildLogPath(ITargetWorkspace workspace)
         {
             string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
             return $"{workspace.LogsDirectory}/Unity_Build_Log_{now}.txt";

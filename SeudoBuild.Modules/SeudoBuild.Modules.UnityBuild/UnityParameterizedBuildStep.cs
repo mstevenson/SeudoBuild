@@ -7,7 +7,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
     {
         public override string Type { get; } = "Unity Parameterized Build";
 
-        protected override string GetBuildArgs(UnityParameterizedBuildConfig config, IWorkspace workspace)
+        protected override string GetBuildArgs(UnityParameterizedBuildConfig config, ITargetWorkspace workspace)
         {
             // FIXME match this to the Unity build script method name
             const string methodName = "Builder.RemoteBuild";
@@ -19,9 +19,9 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             args.Add("-executeMethod");
             args.Add(methodName);
             args.Add("-projectPath");
-            args.Add(Path.Combine(workspace.WorkingDirectory, config.SubDirectory));
+            args.Add(Path.Combine(workspace.SourceDirectory, config.SubDirectory));
             args.Add("-logfile");
-            args.Add(Workspace.StandardOutputPath);
+            args.Add(TargetWorkspace.StandardOutputPath);
 
             // Custom args
 
@@ -32,7 +32,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             args.Add(System.Enum.GetName(typeof(UnityPlatform), config.TargetPlatform));
 
             args.Add("-outputDirectory");
-            args.Add(workspace.BuildOutputDirectory);
+            args.Add(workspace.OutputDirectory);
 
             if (config.DevelopmentBuild)
             {

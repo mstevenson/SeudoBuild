@@ -29,7 +29,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
         /// </summary>
         public static UnityInstallation FindUnityInstallation (VersionNumber version, IFileSystem fileSystem)
         {
-            Platform platform = Workspace.RunningPlatform;
+            Platform platform = TargetWorkspace.RunningPlatform;
 
             switch (platform)
             {

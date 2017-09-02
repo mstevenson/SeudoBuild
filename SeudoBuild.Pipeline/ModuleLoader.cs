@@ -92,7 +92,7 @@ namespace SeudoBuild.Pipeline
             }
         }
 
-        public T CreatePipelineStep<T>(StepConfig config, IWorkspace workspace)
+        public T CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace)
             where T : IPipelineStep
         {
             foreach (var module in Registry.GetModulesForStepType<T>())

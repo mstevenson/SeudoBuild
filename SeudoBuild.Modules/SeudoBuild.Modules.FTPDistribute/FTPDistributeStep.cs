@@ -11,13 +11,13 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
 
         public string Type { get; } = "FTP Upload";
 
-        public void Initialize(FTPDistributeConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(FTPDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.logger = logger;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)
         {
             var results = new DistributeStepResults();
 
@@ -52,7 +52,7 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
             }
         }
 
-        void Upload (ArchiveStepResults archiveInfo, IWorkspace workspace)
+        void Upload (ArchiveStepResults archiveInfo, ITargetWorkspace workspace)
         {
             // Get the object used to communicate with the server.
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{config.URL}:{config.Port}/{config.BasePath}/{archiveInfo.ArchiveFileName}");

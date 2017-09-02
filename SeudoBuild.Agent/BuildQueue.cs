@@ -54,7 +54,7 @@ namespace SeudoBuild.Agent
         string CreateOutputFolder()
         {
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            if (Workspace.RunningPlatform == Platform.Mac)
+            if (TargetWorkspace.RunningPlatform == Platform.Mac)
             {
                 directory = Path.Combine(directory, "Documents");
             }

@@ -11,13 +11,13 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
 
         public string Type { get; } = "Email Notification";
 
-        public void Initialize(EmailNotifyConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(EmailNotifyConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.logger = logger;
         }
 
-        public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, IWorkspace workspace)
+        public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, ITargetWorkspace workspace)
         {
             try
             {

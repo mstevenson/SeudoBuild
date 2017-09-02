@@ -7,13 +7,13 @@
 
         public string Type { get; } = "Steam Upload";
 
-        public void Initialize(SteamDistributeConfig config, IWorkspace workspace, ILogger logger)
+        public void Initialize(SteamDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
             this.config = config;
             this.logger = logger;
         }
 
-        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, IWorkspace workspace)
+        public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)
         {
             // TODO
 

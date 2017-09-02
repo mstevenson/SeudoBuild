@@ -11,7 +11,11 @@ namespace SeudoBuild
     // %build_date% -- the date that the build was completed
     // %commit_identifier% -- the current commit number or hash
 
-    public class Workspace : IWorkspace
+
+    /// <summary>
+    /// Manages the files and directory structure of a specific target within a project.
+    /// </summary>
+    public class TargetWorkspace : ITargetWorkspace
     {
         public static Platform RunningPlatform
         {
@@ -47,97 +51,78 @@ namespace SeudoBuild
             }
         }
 
+
+
+
+
+        public enum DirectoryType
+        {
+        }
+
+        public string GetDirectory(DirectoryType type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string CleanDirectory(DirectoryType type)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+
         /// <summary>
         /// Contains project files downloaded from a version control system.
         /// </summary>
-        public string WorkingDirectory
-        {
-            get
-            {
-                return workingDirectory;
-            }
-            set
-            {
-                workingDirectory = value;
-                Macros["working_directory"] = workingDirectory;
-            }
-        }
-        string workingDirectory = "";
+        public string SourceDirectory { get; private set; }
 
         /// <summary>
-        /// Contains intermediate build files
+        /// Contains build output files.
         /// </summary>
-        /// <value>The output directory.</value>
-        public string BuildOutputDirectory
-        {
-            get
-            {
-                return buildOutputDirectory;
-            }
-            set
-            {
-                buildOutputDirectory = value;
-                Macros["build_output_directory"] = buildOutputDirectory;
-            }
-        }
-        string buildOutputDirectory = "";
+        public string OutputDirectory { get; private set; }
 
         /// <summary>
-        /// Contains products resulting from a build.
+        /// Contains build products that are packaged for distribution or archival.
         /// </summary>
-        public string ArchivesDirectory
-        {
-            get
-            {
-                return archivesDirectory;
-            }
-            set
-            {
-                archivesDirectory = value;
-                Macros["archives_directory"] = archivesDirectory;
-            }
-        }
-        string archivesDirectory = "";
+        public string ArchivesDirectory { get; private set; }
 
         /// <summary>
-        /// Contains products resulting from a build.
+        /// Contains detailed build logs for this target.
         /// </summary>
-        public string LogsDirectory
-        {
-            get
-            {
-                return logsDirectory;
-            }
-            set
-            {
-                logsDirectory = value;
-                Macros["logs_directory"] = logsDirectory;
-            }
-        }
-        string logsDirectory = "";
+        public string LogsDirectory { get; private set; }
 
         public IMacros Macros { get; } = new Macros();
 
         public IFileSystem FileSystem { get; private set; }
 
-        public Workspace(string projectDirectory, IFileSystem fileSystem)
+        public TargetWorkspace(string projectDirectory, IFileSystem fileSystem)
         {
-            WorkingDirectory = $"{projectDirectory}/Workspace";
-            BuildOutputDirectory = $"{projectDirectory}/Output";
+            SourceDirectory = $"{projectDirectory}/Workspace";
+            Macros["working_directory"] = SourceDirectory;
+
+            OutputDirectory = $"{projectDirectory}/Output";
+            Macros["build_output_directory"] = OutputDirectory;
+
             ArchivesDirectory = $"{projectDirectory}/Archives";
+            Macros["archives_directory"] = ArchivesDirectory;
+
             LogsDirectory = $"{projectDirectory}/Logs";
+            Macros["logs_directory"] = LogsDirectory;
+
             this.FileSystem = fileSystem;
         }
 
         public void CreateSubDirectories()
         {
-            if (!FileSystem.DirectoryExists(WorkingDirectory))
+            if (!FileSystem.DirectoryExists(SourceDirectory))
             {
-                FileSystem.CreateDirectory(WorkingDirectory);
+                FileSystem.CreateDirectory(SourceDirectory);
             }
-            if (!FileSystem.DirectoryExists(BuildOutputDirectory))
+            if (!FileSystem.DirectoryExists(OutputDirectory))
             {
-                FileSystem.CreateDirectory(BuildOutputDirectory);
+                FileSystem.CreateDirectory(OutputDirectory);
             }
             if (!FileSystem.DirectoryExists(ArchivesDirectory))
             {
@@ -149,14 +134,14 @@ namespace SeudoBuild
             }
         }
 
-        public void CleanWorkingDirectory()
+        public void CleanSourceDirectory()
         {
-            CleanDirectory(WorkingDirectory);
+            CleanDirectory(SourceDirectory);
         }
 
-        public void CleanBuildOutputDirectory()
+        public void CleanOutputDirectory()
         {
-            CleanDirectory(BuildOutputDirectory);
+            CleanDirectory(OutputDirectory);
         }
 
         public void CleanArchivesDirectory()
