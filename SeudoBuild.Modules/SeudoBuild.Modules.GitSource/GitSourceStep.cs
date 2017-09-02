@@ -170,9 +170,9 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
                 // Clone a new copy if necessary
 
-                if (!IsWorkingCopyInitialized || repo.Head.Remote.Url != config.RepositoryURL)
+                if (!IsWorkingCopyInitialized || repo.Network.Remotes[repo.Head.RemoteName].Url != config.RepositoryURL)
                 {
-                    logger.WriteLine($"Repository URL has changed, cloning a new copy:  {config.RepositoryURL}");
+                    logger.Write($"Repository URL has changed, cloning a new copy:  {config.RepositoryURL}");
                     Download();
                     return;
                 }
@@ -195,7 +195,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
                         FailOnConflict = false
                     }
                 };
-                var mergeResult = repo.Network.Pull(signature, pullOptions);
+                var mergeResult = Commands.Pull(repo, signature, pullOptions);
 
                 if (config.UseLFS)
                 {
