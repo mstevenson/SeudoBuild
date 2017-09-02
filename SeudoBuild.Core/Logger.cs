@@ -76,6 +76,15 @@ namespace SeudoBuild
                     Console.ResetColor();
                     break;
                 }
+
+                case LogType.Debug:
+                {
+                    ConsoleColor originalColor = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine(value);
+                    Console.ResetColor();
+                    break;
+                }
             }
         }
 

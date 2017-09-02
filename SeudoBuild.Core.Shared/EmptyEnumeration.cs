@@ -8,5 +8,6 @@
         Success,
         Failure,
         Alert,
+        Debug
     }
 }
