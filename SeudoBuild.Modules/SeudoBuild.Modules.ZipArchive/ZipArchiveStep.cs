@@ -37,7 +37,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                     fs.DeleteFile(filepath);
                 }
 
-                logger.Write($"Creating zip file {filename}");
+                logger.Write($"Creating zip file {filename}", LogType.SmallBullet);
 
                 // Save zip file
                 using (var zipFile = new ZipFile())
@@ -47,7 +47,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                     zipFile.Save(stream);
                 }
 
-                logger.Write("Zip file saved");
+                logger.Write("Zip file saved", LogType.SmallBullet);
 
                 var results = new ArchiveStepResults { ArchiveFileName = filename, IsSuccess = true };
                 return results;

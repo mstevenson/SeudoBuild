@@ -11,6 +11,7 @@
 
     public enum LogType
     {
+        Header,
         None,
         Plus,
         Bullet,

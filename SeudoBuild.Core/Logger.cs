@@ -64,10 +64,16 @@ namespace SeudoBuild
                     break;
                 }
 
+                case LogType.Header:
+                {
+                    Console.WriteLine($"{BoldOn}{value}{Normal}");
+                    break;
+                }
+
                 case LogType.Plus:
                 {
                     Console.ResetColor();
-                    Console.WriteLine($"{indentString}+ {value}");
+                    Console.WriteLine($"{indentString}‣ {value}");
                     break;
                 }
 

@@ -40,7 +40,7 @@ namespace SeudoBuild.Pipeline
             }
 
             Console.WriteLine("");
-            logger.Write("Running Pipeline\n", logStyle: LogStyle.Bold);
+            logger.Write("Running Pipeline\n", LogType.Header);
             logger.IndentLevel++;
             logger.Write($"Project:  {projectConfig.ProjectName}", LogType.Plus);
             logger.Write($"Target:   {buildTargetName}", LogType.Plus);
@@ -86,7 +86,7 @@ namespace SeudoBuild.Pipeline
         TOutSeq InitializeSequence<TOutSeq>(string sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
             where TOutSeq : PipelineSequenceResults, new()
         {
-            logger.IndentLevel = 0;
+            logger.IndentLevel = 1;
             logger.Write(sequenceName, LogType.Bullet);
             logger.IndentLevel++;
 

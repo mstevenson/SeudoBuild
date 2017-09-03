@@ -4,13 +4,19 @@ using System.IO;
 using Nancy.Hosting.Self;
 using SeudoBuild.Pipeline;
 using SeudoBuild.Net;
-using System.Net;
-using System.Threading;
 
 namespace SeudoBuild.Agent
 {
     class Program
     {
+        const string header = @"
+                _     _       _ _   _ 
+  ___ ___ _ _ _| |___| |_ _ _|_| |_| |
+ |_ -| -_| | | . | . | . | | | | | . |
+ |___|___|___|___|___|___|___|_|_|___|
+                                      
+";
+
         static ILogger logger;
 
         [Verb("build", HelpText = "Create a local build.")]
@@ -91,7 +97,7 @@ namespace SeudoBuild.Agent
         {
             Console.Title = "SeudoBuild • Build";
 
-            PrintHeader();
+            Console.WriteLine(header);
 
             // Load pipeline modules
             var factory = new ModuleLoaderFactory();
@@ -269,18 +275,6 @@ namespace SeudoBuild.Agent
             Console.WriteLine(name);
             Console.WriteLine();
             return 0;
-        }
-
-        static void PrintHeader()
-        {
-            string header = @"
-                 _     _       _ _   _   
-   ___ ___ _ _ _| |___| |_ _ _|_| |_| |  
-  |_ -| -_| | | . | . | . | | | | | . |  
-  |___|___|___|___|___|___|___|_|_|___|  
-                                                      
-";
-            Console.WriteLine(header);
         }
     }
 }

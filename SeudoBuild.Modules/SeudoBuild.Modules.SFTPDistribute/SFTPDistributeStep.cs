@@ -71,7 +71,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 
             using (var client = new SftpClient(connectionInfo))
             {
-                logger.Write($"Uploading {archiveInfo.ArchiveFileName} to {config.Host} {config.WorkingDirectory}");
+                logger.Write($"Uploading {archiveInfo.ArchiveFileName} to {config.Host} {config.WorkingDirectory}", LogType.SmallBullet);
 
                 client.Connect();
                 client.ChangeDirectory(config.WorkingDirectory);
@@ -85,7 +85,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
                     client.UploadFile(stream, filename);
                 }
 
-                logger.Write("Upload succeeded");
+                logger.Write("Upload succeeded", LogType.SmallBullet);
             }
         }
     }

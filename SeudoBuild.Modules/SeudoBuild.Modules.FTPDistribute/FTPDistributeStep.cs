@@ -81,7 +81,7 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
             fileStream.Close();
 
             FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-            logger.Write($"Upload File Complete, status {response.StatusDescription}");
+            logger.Write($"Upload File Complete, status {response.StatusDescription}", LogType.SmallBullet);
             response.Close();
         }
     }

@@ -11,7 +11,7 @@ namespace SeudoBuild.Pipeline
     {
         public IModuleLoader Create(ILogger logger)
         {
-            logger.Write($"Loading Modules\n", logStyle: LogStyle.Bold);
+            logger.Write($"Loading Modules\n", LogType.Header);
             ModuleLoader loader = new ModuleLoader(logger);
 
             try
