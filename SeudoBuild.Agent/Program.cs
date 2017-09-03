@@ -91,6 +91,8 @@ namespace SeudoBuild.Agent
         {
             Console.Title = "SeudoBuild • Build";
 
+            PrintHeader();
+
             // Load pipeline modules
             var factory = new ModuleLoaderFactory();
             IModuleLoader moduleLoader = factory.Create(logger);
@@ -267,6 +269,18 @@ namespace SeudoBuild.Agent
             Console.WriteLine(name);
             Console.WriteLine();
             return 0;
+        }
+
+        static void PrintHeader()
+        {
+            string header = @"
+                 _     _       _ _   _   
+   ___ ___ _ _ _| |___| |_ _ _|_| |_| |  
+  |_ -| -_| | | . | . | . | | | | | . |  
+  |___|___|___|___|___|___|___|_|_|___|  
+                                                      
+";
+            Console.WriteLine(header);
         }
     }
 }

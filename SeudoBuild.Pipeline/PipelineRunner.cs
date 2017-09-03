@@ -14,7 +14,7 @@ namespace SeudoBuild.Pipeline
     {
         PipelineConfig builderConfig;
 
-        ILogger logger;
+        readonly ILogger logger;
 
         public PipelineRunner(PipelineConfig config, ILogger logger)
         {

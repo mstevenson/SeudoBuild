@@ -1,4 +1,4 @@
-﻿#define DEBUG_ASSEMBLIES
+﻿//#define DEBUG_ASSEMBLIES
 
 using System;
 using System.Collections.Generic;
@@ -63,7 +63,7 @@ namespace SeudoBuild.Pipeline
                 // Instantiate each IModule type
                 foreach (Type moduleType in moduleTypesInAssembly)
                 {
-                    DebugWrite($"       Activating module type:  {moduleType}");
+                    DebugWrite($"       Activating type:  {moduleType}");
                     object obj = Activator.CreateInstance(moduleType);
                     Registry.RegisterModule((IModule)obj);
                 }
@@ -81,6 +81,7 @@ namespace SeudoBuild.Pipeline
             string[] moduleDirectories = Directory.GetDirectories(modulesBaseDirectory);
             foreach (var moduleDirectory in moduleDirectories)
             {
+                DebugWrite($"[Started module {Path.GetFileName(moduleDirectory)}]");
                 string[] files = Directory.GetFiles(moduleDirectory, "*.dll");
                 foreach (var file in files)
                 {
@@ -102,6 +103,7 @@ namespace SeudoBuild.Pipeline
                         throw;
                     }
                 }
+                DebugWrite($"[Finished module {Path.GetFileName(moduleDirectory)}]");
                 DebugWrite("");
             }
             DebugWrite("");
@@ -124,11 +126,9 @@ namespace SeudoBuild.Pipeline
 
 
                     // FIXME The GitSource module fails to find types belonging to the LibGit2Sharp assembly
-                    // 
+                    // LibGit2Sharp uses dllmap to point to platform-specific DLLs.
+                    // How should this be handled by the SeudoBuild plugin loader?
 
-
-                    // FIXME Fails need to load LibGit2Sharp. How?
-                    // Need to load all assemblies required by each module ahead of time?
 
                     // Instantiate a IPipelineStep object
                     object pipelineStepObj = null;
