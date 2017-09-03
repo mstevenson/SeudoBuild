@@ -25,16 +25,16 @@ namespace SeudoBuild.Pipeline
             TargetConfig = ProjectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
         }
 
-        public void LoadBuildStepModules(IModuleLoader moduleLoader, ITargetWorkspace workspace)
+        public void LoadBuildStepModules(IModuleLoader moduleLoader, ITargetWorkspace workspace, ILogger logger)
         {
-            stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, workspace);
-            stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, workspace);
-            stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(moduleLoader, workspace);
-            stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(moduleLoader, workspace);
-            stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, workspace);
+            stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, workspace, logger);
+            stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, workspace, logger);
+            stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(moduleLoader, workspace, logger);
+            stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(moduleLoader, workspace, logger);
+            stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, workspace, logger);
         }
 
-        IReadOnlyCollection<T> CreatePipelineSteps<T>(IModuleLoader loader, ITargetWorkspace workspace)
+        IReadOnlyCollection<T> CreatePipelineSteps<T>(IModuleLoader loader, ITargetWorkspace workspace, ILogger logger)
             where T : class, IPipelineStep
         {
             List<T> pipelineSteps = new List<T>();
@@ -43,7 +43,7 @@ namespace SeudoBuild.Pipeline
             {
                 foreach (var stepConfig in TargetConfig.SourceSteps)
                 {
-                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
                     if (step != null)
                     {
                         pipelineSteps.Add(step);
@@ -54,7 +54,7 @@ namespace SeudoBuild.Pipeline
             {
                 foreach (var stepConfig in TargetConfig.BuildSteps)
                 {
-                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
                     if (step != null)
                     {
                         pipelineSteps.Add(step);
@@ -65,7 +65,7 @@ namespace SeudoBuild.Pipeline
             {
                 foreach (var stepConfig in TargetConfig.ArchiveSteps)
                 {
-                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
                     if (step != null)
                     {
                         pipelineSteps.Add(step);
@@ -76,7 +76,7 @@ namespace SeudoBuild.Pipeline
             {
                 foreach (var stepConfig in TargetConfig.DistributeSteps)
                 {
-                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
                     if (step != null)
                     {
                         pipelineSteps.Add(step);
@@ -87,7 +87,7 @@ namespace SeudoBuild.Pipeline
             {
                 foreach (var stepConfig in TargetConfig.NotifySteps)
                 {
-                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace);
+                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
                     if (step != null)
                     {
                         pipelineSteps.Add(step);

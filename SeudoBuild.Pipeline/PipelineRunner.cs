@@ -56,7 +56,7 @@ namespace SeudoBuild.Pipeline
 
             // Setup pipeline
             var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
-            pipeline.LoadBuildStepModules(moduleLoader, workspace);
+            pipeline.LoadBuildStepModules(moduleLoader, workspace, logger);
 
             var macros = workspace.Macros;
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;

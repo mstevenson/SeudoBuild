@@ -16,6 +16,13 @@ namespace SeudoBuild.Pipeline
         const string pipelineNamespace = "SeudoBuild.Pipeline";
         const string pipelineAssemblyName = "SeudoBuild.Pipeline.Shared";
 
+        readonly ILogger logger;
+
+        public ModuleLoader (ILogger logger)
+        {
+            this.logger = logger;
+        }
+
         void LoadAssembly(string file)
         {
             // Absolute path
@@ -56,7 +63,7 @@ namespace SeudoBuild.Pipeline
                 // Instantiate each IModule type
                 foreach (Type moduleType in moduleTypesInAssembly)
                 {
-                    DebugWrite($"Activating type: {moduleType}");
+                    DebugWrite($"       Activating module type:  {moduleType}");
                     object obj = Activator.CreateInstance(moduleType);
                     Registry.RegisterModule((IModule)obj);
                 }
@@ -67,35 +74,40 @@ namespace SeudoBuild.Pipeline
             }
         }
 
-        public void LoadAllAssemblies(string modulesFolder)
+        public void LoadAllModules(string modulesBaseDirectory)
         {
-            DebugWrite("Loading assemblies:\n");
+            DebugWrite("Loading assemblies for all modules:\n");
 
-            string[] moduleDirs = Directory.GetDirectories(modulesFolder);
-            foreach (var dir in moduleDirs)
+            string[] moduleDirectories = Directory.GetDirectories(modulesBaseDirectory);
+            foreach (var moduleDirectory in moduleDirectories)
             {
-                string[] files = Directory.GetFiles(dir, "*.dll");
+                string[] files = Directory.GetFiles(moduleDirectory, "*.dll");
                 foreach (var file in files)
                 {
                     try
                     {
                         LoadAssembly(file);
-                        DebugWrite($"    {file}");
+                        DebugWrite($"    {Path.GetFileName(Path.GetDirectoryName(file))}/{Path.GetFileName(file)}");
                     }
-                    catch (Exception e)
+                    catch (FileLoadException e)
                     {
-                        if (e is FileLoadException || e is FileNotFoundException)
-                        {
-                            throw new ModuleLoadException("Assembly could not be loaded at " + file, e);
-                        }
+                        throw new ModuleLoadException($"Assembly for module {Path.GetFileName(moduleDirectory)} could not be loaded at {file}", e);
+                    }
+                    catch (FileNotFoundException e)
+                    {
+                        throw new ModuleLoadException($"Assembly for module {Path.GetFileName(moduleDirectory)} was not found at {file}", e);
+                    }
+                    catch
+                    {
                         throw;
                     }
                 }
+                DebugWrite("");
             }
             DebugWrite("");
         }
 
-        public T CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace)
+        public T CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace, ILogger logger)
             where T : IPipelineStep
         {
             foreach (var module in Registry.GetModulesForStepType<T>())
@@ -108,28 +120,42 @@ namespace SeudoBuild.Pipeline
                     // Example:  IPipelineStepWithConfig<ZipArchiveConfig>
                     Type pipelineStepWithConfigType = typeof(IInitializable<>).MakeGenericType(configType);
 
-                    Console.WriteLine("fails after this step: " + module.StepType);
+
+
+
+                    // FIXME The GitSource module fails to find types belonging to the LibGit2Sharp assembly
+                    // 
+
+
+                    // FIXME Fails need to load LibGit2Sharp. How?
+                    // Need to load all assemblies required by each module ahead of time?
 
                     // Instantiate a IPipelineStep object
-                    object pipelineStepObj = Activator.CreateInstance(module.StepType);
+                    object pipelineStepObj = null;
+                    try
+                    {
+                        pipelineStepObj = Activator.CreateInstance(module.StepType);
 
-                    // Initialize the pipeline step with the config object
-                    var method = pipelineStepWithConfigType.GetMethod("Initialize");
-                    method.Invoke(pipelineStepObj, new object[] { config, workspace });
+                        // Initialize the pipeline step with the config object
+                        var method = pipelineStepWithConfigType.GetMethod("Initialize");
+                        method.Invoke(pipelineStepObj, new object[] { config, workspace, logger });
 
-                    T step = (T)pipelineStepObj;
-                    return step;
+                        T step = (T)pipelineStepObj;
+                        return step;
+                    }
+                    catch (TypeLoadException e)
+                    {
+                        logger.Write($"Loading module step failed:\n {e.Message}", LogType.Failure);
+                    }
                 }
             }
             return default(T);
         }
 
         [Conditional("DEBUG_ASSEMBLIES")]
-        void DebugWrite(string line)
+        void DebugWrite(string message)
         {
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
-            Console.WriteLine(line);
-            Console.ResetColor();
+            logger.Write(message, LogType.Debug);
         }
     }
 }

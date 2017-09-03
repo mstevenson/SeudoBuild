@@ -11,11 +11,19 @@ namespace SeudoBuild.Pipeline
     {
         public IModuleLoader Create(ILogger logger)
         {
-            ModuleLoader loader = new ModuleLoader();
-            string modulesDirectory = Path.Combine(Environment.CurrentDirectory, "Modules");
-            loader.LoadAllAssemblies(modulesDirectory);
-
             logger.Write("Loading Pipeline Modules");
+            ModuleLoader loader = new ModuleLoader(logger);
+
+            try
+            {
+                string modulesDirectory = Path.Combine(Environment.CurrentDirectory, "Modules");
+                loader.LoadAllModules(modulesDirectory);
+            }
+            catch (ModuleLoadException e)
+            {
+                logger.Write(e.Message, LogType.Failure);
+            }
+
             logger.IndentLevel++;
 
             string line = "";
