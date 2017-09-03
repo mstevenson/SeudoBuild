@@ -69,7 +69,10 @@ namespace SeudoBuild.Pipeline
 
             // Run pipeline
             var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), workspace);
-            macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier; // fixme don't hard-code index
+            if (sourceResults.StepResults.Count > 0) {
+                // fixme don't hard-code step results index
+                macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier;
+            }
             var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, workspace);
             var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, workspace);
             var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, workspace);

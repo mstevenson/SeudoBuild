@@ -48,6 +48,8 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                 throw new Exception("Unity executable does not exist at path " + unityInstallation.ExePath);
             }
 
+            logger.IndentLevel++;
+
             logger.Write($"Building with Unity {unityInstallation.Version}");
 
             string projectFolderPath = Path.Combine(workspace.SourceDirectory, relativeUnityProjectFolder);
@@ -118,6 +120,8 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                     results.IsSuccess = false;
                     results.Exception = new Exception("Build process exited abnormally");
                 }
+
+                logger.IndentLevel--;
 
                 return results;
             }

@@ -78,6 +78,13 @@ namespace SeudoBuild
                     break;
                 }
 
+                case LogType.SmallBullet:
+                {
+                    Console.ResetColor();
+                    Console.WriteLine($"{indentString}◦ {value}");
+                    break;
+                }
+
                 case LogType.Success:
                 {
                     ConsoleColor originalColor = Console.ForegroundColor;

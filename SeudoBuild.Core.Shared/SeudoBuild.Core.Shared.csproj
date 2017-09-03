@@ -36,7 +36,7 @@
     <Compile Include="IMacros.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="ILogger.cs" />
-    <Compile Include="EmptyEnumeration.cs" />
+    <Compile Include="LogEnums.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
