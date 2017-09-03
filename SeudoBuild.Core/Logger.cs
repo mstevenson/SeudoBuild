@@ -6,11 +6,14 @@ namespace SeudoBuild
     {
         static string indentString = "";
         static int indentLevel;
-        public int IndentLevel {
-            get {
+        public int IndentLevel
+        {
+            get
+            {
                 return indentLevel;
             }
-            set {
+            set
+            {
                 if (value != indentLevel)
                 {
                     indentLevel = value;
@@ -26,8 +29,33 @@ namespace SeudoBuild
             }
         }
 
-        public void Write(string value, LogType logType = LogType.None)
+        public const string Normal = "\x1b[0m";
+        public const string BoldOn = "\x1b[1m";
+        //public const string BoldOff = "\x1b[21m";
+        public const string DimOn = "\x1b[2m";
+        //public const string DimOff = "\x1b[22m";
+        public const string UnderlineOn = "\x1b[4m";
+        //public const string UnderlineOff = "\x1b[24m";
+        public const string InvertOn = "\x1b[7m";
+        //public const string InvertOff = "\x1b[27m";
+
+        public void Write(string value, LogType logType = LogType.None, LogStyle logStyle = LogStyle.None)
         {
+            switch (logStyle) {
+                case LogStyle.Bold:
+                    value = $"{BoldOn}{value}{Normal}";
+                    break;
+                case LogStyle.Dim:
+                    value = $"{DimOn}{value}{Normal}";
+                    break;
+                case LogStyle.Underline:
+                    value = $"{UnderlineOn}{value}{Normal}";
+                    break;
+                case LogStyle.Invert:
+                    value = $"{InvertOn}{value}{Normal}";
+                    break;
+            }
+
             switch (logType)
             {
                 case LogType.None:
@@ -71,8 +99,8 @@ namespace SeudoBuild
                 case LogType.Alert:
                 {
                     ConsoleColor originalColor = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"{indentString}✘ {value}");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{indentString}! {value}");
                     Console.ResetColor();
                     break;
                 }

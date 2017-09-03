@@ -40,7 +40,7 @@ namespace SeudoBuild.Pipeline
             }
 
             Console.WriteLine("");
-            logger.Write("Running Pipeline");
+            logger.Write("Running Pipeline\n", logStyle: LogStyle.Bold);
             logger.IndentLevel++;
             logger.Write($"Project:  {projectConfig.ProjectName}", LogType.Plus);
             logger.Write($"Target:   {buildTargetName}", LogType.Plus);
@@ -77,8 +77,7 @@ namespace SeudoBuild.Pipeline
 
             // Done
             logger.IndentLevel = 0;
-            logger.Write("");
-            Console.WriteLine("Build process completed.");
+            logger.Write("\nBuild process completed.", logStyle: LogStyle.Bold);
         }
 
         TOutSeq InitializeSequence<TOutSeq>(string sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)

@@ -11,7 +11,7 @@ namespace SeudoBuild.Pipeline
     {
         public IModuleLoader Create(ILogger logger)
         {
-            logger.Write("Loading Pipeline Modules");
+            logger.Write($"Loading Modules\n", logStyle: LogStyle.Bold);
             ModuleLoader loader = new ModuleLoader(logger);
 
             try
@@ -28,24 +28,22 @@ namespace SeudoBuild.Pipeline
 
             string line = "";
 
-            line = "Source:      " + string.Join(", ", loader.Registry.GetModules<ISourceModule>().Select(m => m.Name).ToArray());
-            logger.Write(line, LogType.Plus);
+            line = "    Source:  " + string.Join(", ", loader.Registry.GetModules<ISourceModule>().Select(m => m.Name).ToArray());
+            logger.Write(line);
 
-            line = "Build:       " + string.Join(", ", loader.Registry.GetModules<IBuildModule>().Select(m => m.Name).ToArray());
-            logger.Write(line, LogType.Plus);
+            line = "     Build:  " + string.Join(", ", loader.Registry.GetModules<IBuildModule>().Select(m => m.Name).ToArray());
+            logger.Write(line);
 
-            line = "Archive:     " + string.Join(", ", loader.Registry.GetModules<IArchiveModule>().Select(m => m.Name).ToArray());
-            logger.Write(line, LogType.Plus);
+            line = "   Archive:  " + string.Join(", ", loader.Registry.GetModules<IArchiveModule>().Select(m => m.Name).ToArray());
+            logger.Write(line);
 
             line = "Distribute:  " + string.Join(", ", loader.Registry.GetModules<IDistributeModule>().Select(m => m.Name).ToArray());
-            logger.Write(line, LogType.Plus);
+            logger.Write(line);
 
-            line = "Notify:      " + string.Join(", ", loader.Registry.GetModules<INotifyModule>().Select(m => m.Name).ToArray());
-            logger.Write(line, LogType.Plus);
+            line = "    Notify:  " + string.Join(", ", loader.Registry.GetModules<INotifyModule>().Select(m => m.Name).ToArray());
+            logger.Write(line);
 
             logger.IndentLevel--;
-
-            Console.WriteLine("");
 
             return loader;
         }
