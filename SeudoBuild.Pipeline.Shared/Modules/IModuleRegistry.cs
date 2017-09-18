@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using SeudoBuild;
+using System.Collections.Generic;
 
 namespace SeudoBuild.Pipeline
 {
@@ -17,6 +17,6 @@ namespace SeudoBuild.Pipeline
 
         void RegisterModule(IModule module);
 
-        JsonConverter[] GetJsonConverters();
+        IEnumerable<SerializedTypeMap> GetSerializedTypeMaps();
     }
 }

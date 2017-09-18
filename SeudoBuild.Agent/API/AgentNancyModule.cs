@@ -101,18 +101,19 @@ namespace SeudoBuild.Agent
             };
         }
 
+        // FIXME convert to YAML
         ProjectConfig ProcessReceivedBuildRequest(Request request, string target, IModuleLoader moduleLoader, IFileSystem filesystem)
         {
             // We'd ordinarily use Nancy's Bind method, but we need to use custom
             // JSON converters to propertly deserialize the ProjectConfig object
-            string json = "";
+            string yaml = "";
             using (var sr = new StreamReader(request.Body))
             {
-                json = sr.ReadToEnd();
+                yaml = sr.ReadToEnd();
             }
-            var converters = moduleLoader.Registry.GetJsonConverters();
-            var serializer = new Serializer(filesystem);
-            var config = serializer.Deserialize<ProjectConfig>(json, converters);
+            var typeMaps = moduleLoader.Registry.GetSerializedTypeMaps();
+            var serializer = new Serializer(filesystem, typeMaps);
+            var config = serializer.Deserialize<ProjectConfig>(yaml);
 
             if (!string.IsNullOrEmpty(target))
             {

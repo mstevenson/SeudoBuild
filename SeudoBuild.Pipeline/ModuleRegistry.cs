@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace SeudoBuild.Pipeline
 {
     public class ModuleRegistry : IModuleRegistry
     {
+        // Contains refrences to all modules belonging to a specific base type: Source, Build, Archive, Distribute, or Notify
         class ModuleCategory
         {
-            public readonly Type moduleBaseType;
-            public readonly Type moduleStepBaseType;
-            public readonly Type stepConfigBaseType;
+            public readonly Type moduleBaseType; // inherits from IModule
+            public readonly Type moduleStepBaseType; // inherits from IPipelineStep
+            public readonly Type stepConfigBaseType; // inherits from StepConfig
+
             public readonly List<IModule> loadedModules = new List<IModule>();
 
             public ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
@@ -22,25 +23,17 @@ namespace SeudoBuild.Pipeline
             }
         }
 
-        class ModuleCategory<T, U, V> : ModuleCategory
-            where T : IModule
-            where U : IPipelineStep
-            where V : StepConfig
-        {
-            public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) { }
-        }
-
         readonly ModuleCategory[] moduleCategories = {
-            new ModuleCategory<ISourceModule, ISourceStep, SourceStepConfig>(),
-            new ModuleCategory<IBuildModule, IBuildStep, BuildStepConfig>(),
-            new ModuleCategory<IArchiveModule, IArchiveStep, ArchiveStepConfig>(),
-            new ModuleCategory<IDistributeModule, IDistributeStep, DistributeStepConfig>(),
-            new ModuleCategory<INotifyModule, INotifyStep, NotifyStepConfig>()
+            new ModuleCategory(typeof(ISourceModule), typeof(ISourceStep), typeof(SourceStepConfig)),
+            new ModuleCategory(typeof(IBuildModule), typeof(IBuildStep), typeof(BuildStepConfig)),
+            new ModuleCategory(typeof(IArchiveModule), typeof(IArchiveStep), typeof(ArchiveStepConfig)),
+            new ModuleCategory(typeof(IDistributeModule), typeof(IDistributeStep), typeof(DistributeStepConfig)),
+            new ModuleCategory(typeof(INotifyModule), typeof(INotifyStep), typeof(NotifyStepConfig))
         };
 
         public IEnumerable<IModule> GetAllModules()
         {
-            return moduleCategories.Select(cat => cat.loadedModules).SelectMany(m => m);
+            return moduleCategories.Select(category => category.loadedModules).SelectMany(module => module);
         }
 
         public IEnumerable<T> GetModules<T>()
@@ -75,29 +68,38 @@ namespace SeudoBuild.Pipeline
             }
         }
 
-        public JsonConverter[] GetJsonConverters()
+        public IEnumerable<SerializedTypeMap> GetSerializedTypeMaps()
         {
-            var converters = new Dictionary<Type, StepConfigConverter>();
+            throw new NotImplementedException();
+
+            var typeMaps = new List<SerializedTypeMap>();
+
+
+
+
             foreach (var category in moduleCategories)
             {
-                converters.Add(category.stepConfigBaseType, new StepConfigConverter(category.stepConfigBaseType));
+                typeMaps.Add(new SerializedTypeMap("TEMP", category.stepConfigBaseType));
+
+
+                //converters.Add(category.stepConfigBaseType, new StepConfigConverter(category.stepConfigBaseType));
             }
 
-            var allModules = GetAllModules();
+            //var allModules = GetAllModules();
 
-            foreach (var kvp in converters)
-            {
-                foreach (var module in allModules)
-                {
-                    Type configBaseType = kvp.Key;
-                    if (configBaseType.IsAssignableFrom(module.StepConfigType))
-                    {
-                        converters[configBaseType].RegisterConfigType(module.StepConfigName, module.StepConfigType);
-                    }
-                }
-            }
+            //foreach (var kvp in converters)
+            //{
+            //    foreach (var module in allModules)
+            //    {
+            //        Type configBaseType = kvp.Key;
+            //        if (configBaseType.IsAssignableFrom(module.StepConfigType))
+            //        {
+            //            converters[configBaseType].RegisterConfigType(module.StepConfigName, module.StepConfigType);
+            //        }
+            //    }
+            //}
 
-            return converters.Values.ToArray();
+            //return converters.Values.ToArray();
         }
     }
 }

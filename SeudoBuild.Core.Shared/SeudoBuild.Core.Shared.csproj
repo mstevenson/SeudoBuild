@@ -37,6 +37,7 @@
     <Compile Include="Platform.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="LogEnums.cs" />
+    <Compile Include="SerializedTypeMap.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
