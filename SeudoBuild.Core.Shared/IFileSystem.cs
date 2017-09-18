@@ -29,5 +29,7 @@ namespace SeudoBuild
         System.IO.Stream OpenRead(string path);
 
         System.IO.Stream OpenWrite(string path);
+
+        void WriteAllText(string path, string contents);
     }
 }

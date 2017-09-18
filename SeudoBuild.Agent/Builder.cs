@@ -49,7 +49,7 @@ namespace SeudoBuild.Agent
             //Task.Factory.StartNew(() =>
             //{
                 IsRunning = true;
-                PipelineRunner pipeline = new PipelineRunner(new PipelineConfig { OutputDirectory = outputDirectory }, logger);
+                PipelineRunner pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputDirectory }, logger);
                 pipeline.ExecutePipeline(projectConfig, target, moduleLoader);
                 IsRunning = false;
             //});

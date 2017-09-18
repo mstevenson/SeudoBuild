@@ -48,35 +48,42 @@ namespace SeudoBuild.Pipeline
             logger.IndentLevel--;
             Console.WriteLine("");
 
-            // Create workspace
+            // Create project and target workspaces
             string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
-            string projectDirectory = $"{builderConfig.OutputDirectory}/{projectNameSanitized}";
-            var workspace = new TargetWorkspace(projectDirectory, new FileSystem());
-            workspace.CreateSubDirectories();
+            string projectDirectory = $"{builderConfig.BaseDirectory}/{projectNameSanitized}";
+            var filesystem = new FileSystem();
+            var projectWorkspace = new ProjectWorkspace(projectDirectory, filesystem);
+            projectWorkspace.CreateSubdirectories();
+            ITargetWorkspace targetWorkspace = projectWorkspace.CreateTarget(buildTargetName);
 
-            // Setup pipeline
+            // Save a copy of the build project configuration
+            var serializer = new Serializer(filesystem);
+            string configFilePath = $"{projectDirectory}/{projectNameSanitized}{serializer.FileExtension}";
+            serializer.SerializeToFile(projectConfig, configFilePath);
+
+            // Setup build pipeline
             var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
-            pipeline.LoadBuildStepModules(moduleLoader, workspace, logger);
+            pipeline.LoadBuildStepModules(moduleLoader, targetWorkspace, logger);
 
-            var macros = workspace.Macros;
+            var macros = targetWorkspace.Macros;
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;
             macros["build_target_name"] = pipeline.TargetConfig.TargetName;
             macros["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
             macros["app_version"] = pipeline.TargetConfig.Version.ToString();
 
             // Clean
-            workspace.CleanOutputDirectory();
+            targetWorkspace.CleanOutputDirectory();
 
             // Run pipeline
-            var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), workspace);
+            var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), targetWorkspace);
             if (sourceResults.StepResults.Count > 0) {
                 // fixme don't hard-code step results index
                 macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier;
             }
-            var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, workspace);
-            var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, workspace);
-            var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, workspace);
-            var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, workspace);
+            var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, targetWorkspace);
+            var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, targetWorkspace);
+            var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, targetWorkspace);
+            var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, targetWorkspace);
 
             // Done
             logger.IndentLevel = 0;
@@ -103,7 +110,7 @@ namespace SeudoBuild.Pipeline
         }
 
         // First step of pipeline execution
-        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, TargetWorkspace workspace)
+        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, ITargetWorkspace workspace)
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
         {
@@ -123,7 +130,7 @@ namespace SeudoBuild.Pipeline
         }
 
         // Pipeline execution step that had a step before it
-        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, TargetWorkspace workspace)
+        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, ITargetWorkspace workspace)
             where TInSeq : PipelineSequenceResults // previous sequence results
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results

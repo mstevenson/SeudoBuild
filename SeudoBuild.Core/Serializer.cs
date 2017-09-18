@@ -7,6 +7,8 @@ namespace SeudoBuild
     {
         IFileSystem fileSystem;
 
+        public string FileExtension { get; } = ".json";
+
         public Serializer(IFileSystem fileSystem)
         {
             this.fileSystem = fileSystem;
@@ -40,11 +42,8 @@ namespace SeudoBuild
             {
                 fileSystem.DeleteFile(path);
             }
-            using (TextWriter tw = new StreamWriter(fileSystem.OpenWrite(path)))
-            {
-                string json = Serialize(obj);
-                tw.Write(path, json);
-            }
+            string json = Serialize(obj);
+            fileSystem.WriteAllText(path, json);
         }
     }
 }

@@ -8,6 +8,6 @@
         /// <summary>
         /// Base directory used by each pipeline step.
         /// </summary>
-        public string OutputDirectory { get; set; }
+        public string BaseDirectory { get; set; }
     }
 }

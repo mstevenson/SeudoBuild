@@ -19,7 +19,7 @@ namespace SeudoBuild
 
     public class ProjectWorkspace
     {
-        public string BaseDirectory { get; private set; }
+        public string ProjectDirectory { get; private set; }
 
         /// <summary>
         /// Contains high level logs for an entire project.
@@ -28,8 +28,52 @@ namespace SeudoBuild
 
         public string TargetsDirectory { get; private set; }
 
-        public ProjectWorkspace()
+        public IFileSystem FileSystem { get; private set; }
+
+        public ProjectWorkspace(string projectDirectory, IFileSystem fileSystem)
         {
+            ProjectDirectory = projectDirectory;
+            FileSystem = fileSystem;
+            LogsDirectory = $"{ProjectDirectory}/Logs";
+            TargetsDirectory = $"{ProjectDirectory}/Targets";
+        }
+
+        public void CreateSubdirectories()
+        {
+            if (!FileSystem.DirectoryExists(ProjectDirectory))
+            {
+                FileSystem.CreateDirectory(ProjectDirectory);
+            }
+            if (!FileSystem.DirectoryExists(LogsDirectory))
+            {
+                FileSystem.CreateDirectory(LogsDirectory);
+            }
+            if (!FileSystem.DirectoryExists(TargetsDirectory))
+            {
+                FileSystem.CreateDirectory(TargetsDirectory);
+            }
+        }
+
+        public ITargetWorkspace CreateTarget(string targetName)
+        {
+            var targetWorkspace = new TargetWorkspace($"{TargetsDirectory}/{targetName.SanitizeFilename()}", FileSystem);
+            targetWorkspace.CreateSubDirectories();
+            return targetWorkspace;
+        }
+
+        public void CleanLogsDirectory()
+        {
+            CleanDirectory(LogsDirectory);
+        }
+
+        void CleanDirectory(string directory)
+        {
+            if (!FileSystem.DirectoryExists(directory))
+            {
+                return;
+            }
+
+            FileSystem.DeleteDirectory(directory);
         }
     }
 }

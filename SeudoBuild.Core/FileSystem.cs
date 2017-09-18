@@ -127,5 +127,10 @@ namespace SeudoBuild
             var stream = System.IO.File.OpenWrite(path);
             return stream;
         }
+
+        public void WriteAllText(string path, string contents)
+        {
+            System.IO.File.WriteAllText(path, contents);
+        }
     }
 }

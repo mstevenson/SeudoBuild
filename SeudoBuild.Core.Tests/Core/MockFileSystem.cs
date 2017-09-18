@@ -211,5 +211,10 @@ namespace SeudoBuild.Tests
             }
             return file.OpenWrite();
         }
+
+        public void WriteAllText(string path, string contents)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

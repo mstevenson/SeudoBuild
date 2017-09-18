@@ -97,18 +97,18 @@ namespace SeudoBuild
 
         public IFileSystem FileSystem { get; private set; }
 
-        public TargetWorkspace(string projectDirectory, IFileSystem fileSystem)
+        public TargetWorkspace(string targetDirectory, IFileSystem fileSystem)
         {
-            SourceDirectory = $"{projectDirectory}/Workspace";
+            SourceDirectory = $"{targetDirectory}/Workspace";
             Macros["working_directory"] = SourceDirectory;
 
-            OutputDirectory = $"{projectDirectory}/Output";
+            OutputDirectory = $"{targetDirectory}/Output";
             Macros["build_output_directory"] = OutputDirectory;
 
-            ArchivesDirectory = $"{projectDirectory}/Archives";
+            ArchivesDirectory = $"{targetDirectory}/Archives";
             Macros["archives_directory"] = ArchivesDirectory;
 
-            LogsDirectory = $"{projectDirectory}/Logs";
+            LogsDirectory = $"{targetDirectory}/Logs";
             Macros["logs_directory"] = LogsDirectory;
 
             this.FileSystem = fileSystem;
