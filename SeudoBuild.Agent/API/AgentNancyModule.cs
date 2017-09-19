@@ -27,7 +27,7 @@ namespace SeudoBuild.Agent
                 try
                 {
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, null, moduleLoader, filesystem);
-                    logger.QueueNotification($"Received build request: project '{config.ProjectName}', default target, host {Request.UserHostAddress}");
+                    logger.QueueNotification($"Received build request: project '{config.ProjectName}', default target, from {Request.UserHostAddress}");
                     var buildRequest = buildQueue.EnqueueBuild(config);
                     return buildRequest.Id.ToString();
                 }
@@ -45,7 +45,7 @@ namespace SeudoBuild.Agent
                 {
                     string target = parameters.target;
                     ProjectConfig config = ProcessReceivedBuildRequest(Request, target, moduleLoader, filesystem);
-                    logger.QueueNotification($"Queuing build request: project '{config.ProjectName}', target '{target}', host {Request.UserHostAddress}");
+                    logger.QueueNotification($"Queuing build request: project '{config.ProjectName}', target '{target}', from {Request.UserHostAddress}");
                     var buildRequest = buildQueue.EnqueueBuild(config, target);
                     return buildRequest.Id.ToString();
                 }
@@ -118,13 +118,13 @@ namespace SeudoBuild.Agent
             {
                 if (!config.BuildTargets.Exists(t => t.TargetName == target))
                 {
-                    throw new Exception($"Received project configuration from {request.UserHostAddress} but could not find a build target named '{target}'");
+                    throw new Exception($"‣ Received project configuration from {request.UserHostAddress} but could not find a build target named '{target}'");
                 }
             }
 
             if (string.IsNullOrEmpty(config.ProjectName))
             {
-                throw new Exception($"Received invalid project configuration from {request.UserHostAddress}");
+                throw new Exception($"‣ Received invalid project configuration from {request.UserHostAddress}");
             }
 
             return config;

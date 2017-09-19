@@ -96,7 +96,6 @@ namespace SeudoBuild.Agent
         static int Build(BuildSubOptions opts)
         {
             Console.Title = "SeudoBuild • Build";
-
             Console.WriteLine(header);
 
             // Load pipeline modules
@@ -139,6 +138,9 @@ namespace SeudoBuild.Agent
         /// </summary>
         static int Scan(ScanSubOptions opts)
         {
+            Console.Title = "SeudoBuild • Scan";
+            Console.WriteLine(header);
+
             Console.WriteLine("Looking for build agents. Press any key to exit.");
             // FIXME fill in port from command line argument
             AgentLocator locator = new AgentLocator(5511);
@@ -173,6 +175,8 @@ namespace SeudoBuild.Agent
         static int Submit(SubmitSubOptions opts)
         {
             Console.Title = "SeudoBuild • Submit";
+            Console.WriteLine(header);
+
             string configJson = null;
             try
             {
@@ -205,6 +209,7 @@ namespace SeudoBuild.Agent
         static int Queue(QueueSubOptions opts)
         {
             Console.Title = "SeudoBuild • Queue";
+            Console.WriteLine(header);
 
             //string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
             // FIXME pull port from command line argument, and incorporate into ServerBeacon object
@@ -218,10 +223,14 @@ namespace SeudoBuild.Agent
             var uri = new Uri($"http://localhost:{port}");
             using (var host = new NancyHost(uri))
             {
-                Console.WriteLine("Starting build server: " + uri);
+                logger.Write("");
                 try
                 {
                     host.Start();
+
+                    logger.Write("Build Queue", LogType.Header);
+                    logger.Write("");
+                    logger.Write("Started build agent server: " + uri, LogType.Bullet);
 
                     try
                     {
@@ -229,6 +238,7 @@ namespace SeudoBuild.Agent
                         var serverInfo = new UdpDiscoveryBeacon { port = 5511 };
                         var discovery = new UdpDiscoveryServer(serverInfo);
                         discovery.Start();
+                        logger.Write("Build agent discovery beacon started", LogType.Bullet);
                     }
                     catch
                     {
@@ -242,6 +252,7 @@ namespace SeudoBuild.Agent
                     Console.ResetColor();
                     return 1;
                 }
+                Console.WriteLine("");
                 Console.WriteLine("Press any key to exit.");
                 Console.ReadKey();
             }

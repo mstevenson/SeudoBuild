@@ -44,7 +44,7 @@ namespace SeudoBuild.Net
             udpClient.JoinMulticastGroup(ip);
 
             // Run
-            Console.WriteLine("Server beacon started: port " + multicastPort);
+            //Console.WriteLine("Server beacon started: port " + multicastPort);
             IsRunning = true;
             networkThread = new Thread(new ThreadStart(NetworkThread));
             networkThread.IsBackground = true;
@@ -57,7 +57,7 @@ namespace SeudoBuild.Net
             {
                 return;
             }
-            Console.WriteLine("Server beacon stopped");
+            //Console.WriteLine("Server beacon stopped");
             IsRunning = false;
             if (udpClient != null)
             {
