@@ -47,6 +47,7 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
 
             using (var client = new SmtpClient())
             {
+                client.Timeout = 10000;
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                 client.Connect(config.Host, config.Port, false);
                 // Note: since we don't have an OAuth2 token, disable
@@ -55,7 +56,6 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
                 client.Authenticate(config.SMTPUser, config.SMTPPassword);
                 client.Send(message);
                 client.Disconnect(true);
-                client.Timeout = 10000;
             }
 
             logger.Write("Email notification sent", LogType.SmallBullet);

@@ -53,8 +53,6 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
         public SourceStepResults ExecuteStep(ITargetWorkspace workspace)
         {
-            logger.IndentLevel++;
-
             var results = new SourceStepResults();
 
             try

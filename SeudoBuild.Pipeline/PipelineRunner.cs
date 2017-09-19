@@ -183,6 +183,7 @@ namespace SeudoBuild.Pipeline
                 currentStep = step;
 
                 logger.Write(step.Type, LogType.Bullet);
+                logger.IndentLevel++;
 
                 TOutStep stepResult = null;
                 stepResult = stepExecuteCallback.Invoke(step);
@@ -192,10 +193,12 @@ namespace SeudoBuild.Pipeline
                 {
                     results.IsSuccess = false;
                     results.Exception = stepResult.Exception;
-                    string error = $"{sequenceName} sequence failed on step {currentStep.Type}";
+                    string error = $"{sequenceName} sequence failed on step {currentStep.Type}:\n      {results.Exception.Message}";
                     logger.Write(error, LogType.Failure);
                     break;
                 }
+
+                logger.IndentLevel--;
             }
 
             stopwatch.Stop();
