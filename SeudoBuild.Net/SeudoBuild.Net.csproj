@@ -28,12 +28,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UdpDiscoveryBeacon.cs" />
     <Compile Include="UdpDiscoveryClient.cs" />
     <Compile Include="UdpDiscoveryServer.cs" />
+    <Compile Include="AgentLocator.cs" />
+    <Compile Include="AgentLocation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

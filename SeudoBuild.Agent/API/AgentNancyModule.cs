@@ -2,6 +2,7 @@ using System;
 using Nancy;
 using System.IO;
 using SeudoBuild.Pipeline;
+using SeudoBuild.Net;
 
 namespace SeudoBuild.Agent
 {
@@ -17,7 +18,7 @@ namespace SeudoBuild.Agent
             {
                 //moduleLoader.Registry.
 
-                var proj = new Agent { AgentName = AgentName.GetUniqueAgentName() };
+                var proj = new AgentLocation { AgentName = AgentName.GetUniqueAgentName() };
                 return Response.AsJson(proj);
             };
 

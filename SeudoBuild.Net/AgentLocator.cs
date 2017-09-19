@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using SeudoBuild.Net;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace SeudoBuild.Agent
+namespace SeudoBuild.Net
 {
     /// <summary>
     /// Watches for build agents on the local network.
@@ -14,22 +13,22 @@ namespace SeudoBuild.Agent
     {
         int port;
         UdpDiscoveryClient client;
-        Dictionary<Guid, Agent> agents = new Dictionary<Guid, Agent>();
+        Dictionary<Guid, AgentLocation> agents = new Dictionary<Guid, AgentLocation>();
 
         /// <summary>
         /// Occurs when an agent is found on the local network.
         /// </summary>
-        public event Action<Agent> AgentFound;
+        public event Action<AgentLocation> AgentFound;
 
         /// <summary>
         /// Occurs when a known agent is no longer seen on the local network.
         /// </summary>
-        public event Action<Agent> AgentLost;
+        public event Action<AgentLocation> AgentLost;
 
         /// <summary>
         /// All agents that are currently visible on the local network.
         /// </summary>
-        public IEnumerable<Agent> Agents
+        public IEnumerable<AgentLocation> Agents
         {
             get
             {
@@ -125,7 +124,7 @@ namespace SeudoBuild.Agent
                 StreamReader readStream = new StreamReader(resultStream, System.Text.Encoding.UTF8);
                 string json = readStream.ReadToEnd();
 
-                var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
+                var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<AgentLocation>(json);
                 // FIXME should the agent have set its own address before responding? Does it even know its own address?
                 agent.Address = beacon.address.ToString();
                 //logger.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
@@ -147,7 +146,7 @@ namespace SeudoBuild.Agent
         /// </summary>
         void OnServerLost(UdpDiscoveryBeacon server)
         {
-            Agent agent;
+            AgentLocation agent;
             bool haveAgent = agents.TryGetValue(server.guid, out agent);
             haveAgent = haveAgent && agent != null;
 

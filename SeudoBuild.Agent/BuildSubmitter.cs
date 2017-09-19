@@ -50,11 +50,11 @@ namespace SeudoBuild.Agent
             {
                 // Validate build agent name
                 string agentAddress = $"http://{beacon.address}:{beacon.port}/info";
-                Agent agentInfo = null;
+                AgentLocation agentInfo = null;
                 using (var webClient = new WebClient())
                 {
                     string json = webClient.DownloadString(agentAddress);
-                    agentInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Agent>(json);
+                    agentInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<AgentLocation>(json);
                 }
                 if (agentInfo.AgentName != agentName)
                 {
