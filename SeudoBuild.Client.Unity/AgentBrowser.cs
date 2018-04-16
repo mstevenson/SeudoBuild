@@ -7,16 +7,29 @@ using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Client.Unity
 {
-    public class AgentBrowser
+    public class AgentBrowser : EditorWindow
     {
-        //AgentLocator locator;
+        AgentLocator locator;
 
-        //List<AgentInfo> agents = new List<AgentInfo>();
+        List<AgentLocation> agents = new List<AgentLocation>();
 
-        public void Start()
+        [MenuItem("Window/Build Agent Browser")]
+        static void Init()
+        {
+            var window = CreateInstance<AgentBrowser>();
+            window.Show();
+        }
+
+        void OnEnable()
         {
             // FIXME configure port
-            //locator = new AgentLocator(5511);
+            locator = new AgentLocator(5511);
+
+            locator.Start();
+            Debug.Log("start locator");
+            locator.AgentFound += HandleAgentFound;
+            locator.AgentLost += HandleAgentLost;
+
 
             //if (client == null)
             //{
@@ -30,9 +43,32 @@ namespace SeudoBuild.Client.Unity
             //}
         }
 
-        public void Stop()
+        void HandleAgentFound(AgentLocation agent)
         {
-            //locator.Stop();
+            if (!agents.Contains(agent))
+            {
+                agents.Add(agent);
+            }
+        }
+
+        void HandleAgentLost(AgentLocation agent)
+        {
+            if (agents.Contains(agent))
+            {
+                agents.Remove(agent);
+            }
+        }
+
+        void OnDisable()
+        {
+            if (locator != null)
+            {
+                Debug.Log("stop locator");
+                locator.AgentFound -= HandleAgentFound;
+                locator.AgentLost -= HandleAgentLost;
+                locator.Stop();
+            }
+
 
             //if (!client.IsRunning)
             //{
@@ -44,12 +80,14 @@ namespace SeudoBuild.Client.Unity
         }
 
 
-        public void Draw()
+        void OnGUI()
         {
-            //foreach (var agent in locator.Agents)
-            //{
-            //    GUILayout.Label(agent.name);
-            //}
+            foreach (var agent in locator.Agents)
+            {
+                GUILayout.Label(agent.AgentName);
+                GUILayout.Label(agent.Address);
+                GUILayout.Space(10);
+            }
         }
     }
 }
