@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline
 {
+    /// <inheritdoc />
     /// <summary>
     /// Configuration values for a Build pipeline step.
     /// </summary>

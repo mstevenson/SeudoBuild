@@ -4,24 +4,24 @@ namespace SeudoBuild.Pipeline.Modules.FolderArchive
 {
     public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
     {
-        FolderArchiveConfig config;
-        ITargetWorkspace workspace;
-        ILogger logger;
+        private FolderArchiveConfig _config;
+        private ITargetWorkspace _workspace;
+        private ILogger _logger;
 
         public string Type { get; } = "Folder";
 
         public void Initialize(FolderArchiveConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.workspace = workspace;
-            this.logger = logger;
+            _config = config;
+            _workspace = workspace;
+            _logger = logger;
         }
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, ITargetWorkspace workspace)
         {
             try
             {
-                string folderName = workspace.Macros.ReplaceVariablesInText(config.FolderName);
+                string folderName = workspace.Macros.ReplaceVariablesInText(_config.FolderName);
                 string source = workspace.OutputDirectory;
                 string dest = $"{workspace.ArchivesDirectory}/{folderName}";
 
@@ -42,9 +42,9 @@ namespace SeudoBuild.Pipeline.Modules.FolderArchive
             }
         }
 
-        void CopyDirectory(string sourceDir, string destDir)
+        private void CopyDirectory(string sourceDir, string destDir)
         {
-            IFileSystem fs = workspace.FileSystem;
+            IFileSystem fs = _workspace.FileSystem;
 
             if (!fs.DirectoryExists(sourceDir))
             {

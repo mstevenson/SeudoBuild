@@ -12,7 +12,7 @@ namespace SeudoBuild
         {
             get
             {
-                string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 if (TargetWorkspace.RunningPlatform == Platform.Mac)
                 {
                     path += "/Documents";
@@ -21,7 +21,7 @@ namespace SeudoBuild
             }
         }
 
-        public List<string> GetFiles(string directoryPath, string searchPattern = null)
+        public IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null)
         {
             // Handle missing directory
             if (!System.IO.Directory.Exists(directoryPath))
@@ -30,16 +30,11 @@ namespace SeudoBuild
             }
 
             // Collect file paths
-            string[] filePaths;
-            if (searchPattern != null)
-            {
-                filePaths = System.IO.Directory.GetFiles(directoryPath, searchPattern);
-            }
-            else {
-                filePaths = System.IO.Directory.GetFiles(directoryPath);
-            }
+            var filePaths = searchPattern != null
+                ? System.IO.Directory.GetFiles(directoryPath, searchPattern)
+                : System.IO.Directory.GetFiles(directoryPath);
 
-            List<string> files = new List<string>(filePaths);
+            var files = new List<string>(filePaths);
             return files;
         }
 
@@ -68,7 +63,7 @@ namespace SeudoBuild
             System.IO.File.Replace(source, destination, backupDestination);
         }
 
-        public List<string> GetDirectories(string directoryPath, string searchPattern = null)
+        public IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null)
         {
             // Handle missing directory
             if (!System.IO.Directory.Exists(directoryPath))
@@ -77,17 +72,11 @@ namespace SeudoBuild
             }
 
             // Collect directory paths
-            string[] dirPaths;
-            if (searchPattern != null)
-            {
-                dirPaths = System.IO.Directory.GetDirectories(directoryPath, searchPattern);
-            }
-            else
-            {
-                dirPaths = System.IO.Directory.GetDirectories(directoryPath);
-            }
+            var dirPaths = searchPattern != null
+                ? System.IO.Directory.GetDirectories(directoryPath, searchPattern)
+                : System.IO.Directory.GetDirectories(directoryPath);
 
-            List<string> dirs = new List<string>(dirPaths);
+            var dirs = new List<string>(dirPaths);
             return dirs;
         }
 
@@ -105,12 +94,12 @@ namespace SeudoBuild
         {
             System.IO.DirectoryInfo directoryInfo = new System.IO.DirectoryInfo(directoryPath);
 
-            foreach (System.IO.FileInfo file in directoryInfo.GetFiles())
+            foreach (var file in directoryInfo.GetFiles())
             {
                 file.Delete();
             }
 
-            foreach (System.IO.DirectoryInfo dir in directoryInfo.GetDirectories())
+            foreach (var dir in directoryInfo.GetDirectories())
             {
                 dir.Delete(true);
             }

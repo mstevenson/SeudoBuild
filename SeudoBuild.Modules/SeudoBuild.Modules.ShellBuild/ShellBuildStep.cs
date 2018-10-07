@@ -13,17 +13,17 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
     /// </summary>
     public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
     {
-        ShellBuildStepConfig config;
-        ITargetWorkspace workspace;
-        ILogger logger;
+        private ShellBuildStepConfig _config;
+        private ITargetWorkspace _workspace;
+        private ILogger _logger;
 
         public string Type { get; } = "Shell Script";
 
         public void Initialize(ShellBuildStepConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.workspace = workspace;
-            this.logger = logger;
+            _config = config;
+            _workspace = workspace;
+            _logger = logger;
         }
 
         public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, ITargetWorkspace workspace)
@@ -31,7 +31,7 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
             try
             {
                 // Replace variables in string that begin and end with the % character
-                var command = workspace.Macros.ReplaceVariablesInText(config.Command);
+                var command = workspace.Macros.ReplaceVariablesInText(_config.Command);
                 // Escape quotes
                 command = command.Replace(@"""", @"\""");
 
@@ -48,16 +48,16 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
                 var process = new Process { StartInfo = startInfo };
                 process.Start();
 
-                System.Console.ForegroundColor = System.ConsoleColor.Cyan;
+                Console.ForegroundColor = ConsoleColor.Cyan;
 
                 while (!process.StandardOutput.EndOfStream)
                 {
                     string line = process.StandardOutput.ReadLine();
-                    logger.Write(line);
+                    _logger.Write(line);
                 }
 
                 process.WaitForExit();
-                System.Console.ResetColor();
+                Console.ResetColor();
 
                 // FIXME fill in more build step result properties?
 
@@ -66,7 +66,7 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
                 if (exitCode == 0)
                 {
                     results.IsSuccess = true;
-                    results.Exception = new Exception("Build process exited abnoramlly");
+                    results.Exception = new Exception("Build process exited abnormally");
                 }
                 else
                 {

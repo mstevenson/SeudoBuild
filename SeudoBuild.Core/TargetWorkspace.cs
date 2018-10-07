@@ -43,16 +43,7 @@ namespace SeudoBuild
             }
         }
 
-        public static string StandardOutputPath
-        {
-            get
-            {
-                return RunningPlatform == Platform.Windows ? "CON" : "/dev/stdout";
-            }
-        }
-
-
-
+        public static string StandardOutputPath => RunningPlatform == Platform.Windows ? "CON" : "/dev/stdout";
 
 
         public enum DirectoryType
@@ -73,21 +64,25 @@ namespace SeudoBuild
 
 
 
+        /// <inheritdoc />
         /// <summary>
         /// Contains project files downloaded from a version control system.
         /// </summary>
         public string SourceDirectory { get; private set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Contains build output files.
         /// </summary>
         public string OutputDirectory { get; private set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Contains build products that are packaged for distribution or archival.
         /// </summary>
         public string ArchivesDirectory { get; private set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Contains detailed build logs for this target.
         /// </summary>
@@ -111,7 +106,7 @@ namespace SeudoBuild
             LogsDirectory = $"{targetDirectory}/Logs";
             Macros["logs_directory"] = LogsDirectory;
 
-            this.FileSystem = fileSystem;
+            FileSystem = fileSystem;
         }
 
         public void CreateSubDirectories()
@@ -154,7 +149,7 @@ namespace SeudoBuild
             CleanDirectory(LogsDirectory);
         }
 
-        void CleanDirectory (string directory)
+        private void CleanDirectory (string directory)
         {
             if (!FileSystem.DirectoryExists(directory))
             {

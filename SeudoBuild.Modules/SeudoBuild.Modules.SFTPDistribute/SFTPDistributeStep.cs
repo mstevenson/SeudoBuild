@@ -7,15 +7,15 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 {
     public class SFTPDistributeStep : IDistributeStep<SFTPDistributeConfig>
     {
-        SFTPDistributeConfig config;
-        ILogger logger;
+        private SFTPDistributeConfig _config;
+        private ILogger _logger;
 
         public string Type { get; } = "SFTP Upload";
 
         public void Initialize(SFTPDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.logger = logger;
+            _config = config;
+            _logger = logger;
         }
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)
@@ -56,25 +56,25 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
         public void Upload(ArchiveStepResults archiveInfo, ITargetWorkspace workspace)
         {
             // Supply the password via fake keyboard input
-            var keyboardAuthMethod = new KeyboardInteractiveAuthenticationMethod(config.Username);
+            var keyboardAuthMethod = new KeyboardInteractiveAuthenticationMethod(_config.Username);
             keyboardAuthMethod.AuthenticationPrompt += (sender, args) => {
                 foreach (AuthenticationPrompt prompt in args.Prompts)
                 {
                     if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
                     {
-                        prompt.Response = config.Password;
+                        prompt.Response = _config.Password;
                     }
                 }
             };
                                                                                            
-            ConnectionInfo connectionInfo = new ConnectionInfo(config.Host, config.Port, config.Username, keyboardAuthMethod);
+            ConnectionInfo connectionInfo = new ConnectionInfo(_config.Host, _config.Port, _config.Username, keyboardAuthMethod);
 
             using (var client = new SftpClient(connectionInfo))
             {
-                logger.Write($"Uploading {archiveInfo.ArchiveFileName} to {config.Host} {config.WorkingDirectory}", LogType.SmallBullet);
+                _logger.Write($"Uploading {archiveInfo.ArchiveFileName} to {_config.Host} {_config.WorkingDirectory}", LogType.SmallBullet);
 
                 client.Connect();
-                client.ChangeDirectory(config.WorkingDirectory);
+                client.ChangeDirectory(_config.WorkingDirectory);
 
                 string filename = archiveInfo.ArchiveFileName;
                 string filepath = $"{workspace.ArchivesDirectory}/{filename}";
@@ -85,7 +85,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
                     client.UploadFile(stream, filename);
                 }
 
-                logger.Write("Upload succeeded", LogType.SmallBullet);
+                _logger.Write("Upload succeeded", LogType.SmallBullet);
             }
         }
     }

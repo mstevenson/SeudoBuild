@@ -6,6 +6,7 @@ using SeudoBuild.Net;
 
 namespace SeudoBuild.Agent
 {
+    /// <inheritdoc />
     /// <summary>
     /// RESTful API for controlling an Agent via HTTP requests.
     /// </summary>
@@ -105,8 +106,8 @@ namespace SeudoBuild.Agent
         ProjectConfig ProcessReceivedBuildRequest(Request request, string target, IModuleLoader moduleLoader, IFileSystem filesystem)
         {
             // We'd ordinarily use Nancy's Bind method, but we need to use custom
-            // JSON converters to propertly deserialize the ProjectConfig object
-            string json = "";
+            // JSON converters to properly deserialize the ProjectConfig object
+            string json;
             using (var sr = new StreamReader(request.Body))
             {
                 json = sr.ReadToEnd();

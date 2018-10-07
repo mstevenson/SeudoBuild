@@ -2,6 +2,7 @@
 
 namespace SeudoBuild.Pipeline
 {
+    /// <inheritdoc />
     /// <summary>
     /// Results from distributing an archive of a build product.
     /// </summary>

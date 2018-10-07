@@ -13,14 +13,14 @@ namespace SeudoBuild.Net
     {
         UdpDiscoveryBeacon server;
 
-        const int broadcastDelay = 1000; // milliseconds
+        private const int BroadcastDelay = 1000; // milliseconds
 
-        const ushort multicastPort = 6767;
-        const string multicastAddress = "239.17.0.1";
+        private const ushort MulticastPort = 6767;
+        private const string MulticastAddress = "239.17.0.1";
 
-        UdpClient udpClient;
-        IPEndPoint endPoint;
-        Thread networkThread;
+        private UdpClient _udpClient;
+        private IPEndPoint _endPoint;
+        private Thread _networkThread;
 
         public bool IsRunning { get; protected set; }
 
@@ -37,18 +37,17 @@ namespace SeudoBuild.Net
             }
 
             // Initialize
-            udpClient = new UdpClient();
-            var ip = IPAddress.Parse(multicastAddress);
-            endPoint = new IPEndPoint(ip, multicastPort);
-            udpClient.MulticastLoopback = true;
-            udpClient.JoinMulticastGroup(ip);
+            _udpClient = new UdpClient();
+            var ip = IPAddress.Parse(MulticastAddress);
+            _endPoint = new IPEndPoint(ip, MulticastPort);
+            _udpClient.MulticastLoopback = true;
+            _udpClient.JoinMulticastGroup(ip);
 
             // Run
             //Console.WriteLine("Server beacon started: port " + multicastPort);
             IsRunning = true;
-            networkThread = new Thread(new ThreadStart(NetworkThread));
-            networkThread.IsBackground = true;
-            networkThread.Start();
+            _networkThread = new Thread(NetworkThread) { IsBackground = true };
+            _networkThread.Start();
         }
 
         public void Stop()
@@ -57,36 +56,34 @@ namespace SeudoBuild.Net
             {
                 return;
             }
+
             //Console.WriteLine("Server beacon stopped");
             IsRunning = false;
-            if (udpClient != null)
-            {
-                udpClient.Close();
-                //udpClient.Dispose();
-            }
+            _udpClient?.Close();
+            //udpClient.Dispose();
         }
 
-        void NetworkThread()
+        private void NetworkThread()
         {
-            //			try {
+//			try {
             while (IsRunning)
             {
                 // Broadcast server beacon to all clients on the local network
                 byte[] message = UdpDiscoveryBeacon.ToBytes(server);
-                udpClient.Send(message, message.Length, endPoint);
-                //				Console.WriteLine ("Broadcasted");
-                Thread.Sleep(broadcastDelay);
+                _udpClient.Send(message, message.Length, _endPoint);
+//				Console.WriteLine ("Broadcasted");
+                Thread.Sleep(BroadcastDelay);
             }
-            //			} catch {}
+
+//			} catch {}
             IsRunning = false;
         }
 
         public void Dispose()
         {
             IsRunning = false;
-            udpClient.Close();
+            _udpClient.Close();
         }
     }
-
 }
 

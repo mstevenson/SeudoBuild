@@ -6,15 +6,15 @@ namespace SeudoBuild.Pipeline.Modules.SMBDistribute
 {
     public class SMBDistributeStep : IDistributeStep<SMBDistributeConfig>
     {
-        SMBDistributeConfig config;
-        ILogger logger;
+        private SMBDistributeConfig _config;
+        private ILogger _logger;
 
         public string Type { get; } = "SMB Transfer";
 
         public void Initialize(SMBDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.logger = logger;
+            _config = config;
+            _logger = logger;
         }
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)
@@ -33,7 +33,7 @@ namespace SeudoBuild.Pipeline.Modules.SMBDistribute
             }
         }
 
-        void Mount(bool mount, SMBDistributeConfig config)
+        private void Mount(bool mount, SMBDistributeConfig config)
         {
             if (TargetWorkspace.RunningPlatform == Platform.Mac)
             {

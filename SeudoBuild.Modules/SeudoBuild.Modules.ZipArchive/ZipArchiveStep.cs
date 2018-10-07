@@ -6,15 +6,15 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
 {
     public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
     {
-        ZipArchiveConfig config;
-        ILogger logger;
+        private ZipArchiveConfig _config;
+        private ILogger _logger;
         
         public string Type { get; } = "Zip File";
 
         public void Initialize(ZipArchiveConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.logger = logger;
+            _config = config;
+            _logger = logger;
         }
 
         public ArchiveStepResults ExecuteStep(BuildSequenceResults buildInfo, ITargetWorkspace workspace)
@@ -24,9 +24,9 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                 var fs = workspace.FileSystem;
 
                 // Remove file extension in case it was accidentally included in the config data
-                string filename = Path.GetFileNameWithoutExtension(config.Filename);
+                string filename = Path.GetFileNameWithoutExtension(_config.Filename);
                 // Replace in-line variables
-                filename = workspace.Macros.ReplaceVariablesInText(config.Filename);
+                filename = workspace.Macros.ReplaceVariablesInText(filename);
                 // Sanitize
                 filename = filename.SanitizeFilename();
                 filename = filename + ".zip";
@@ -37,7 +37,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                     fs.DeleteFile(filepath);
                 }
 
-                logger.Write($"Creating zip file {filename}", LogType.SmallBullet);
+                _logger.Write($"Creating zip file {filename}", LogType.SmallBullet);
 
                 // Save zip file
                 using (var zipFile = new ZipFile())
@@ -47,7 +47,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                     zipFile.Save(stream);
                 }
 
-                logger.Write("Zip file saved", LogType.SmallBullet);
+                _logger.Write("Zip file saved", LogType.SmallBullet);
 
                 var results = new ArchiveStepResults { ArchiveFileName = filename, IsSuccess = true };
                 return results;

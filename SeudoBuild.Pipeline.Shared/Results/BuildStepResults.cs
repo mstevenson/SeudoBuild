@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline
 {
+    /// <inheritdoc />
     /// <summary>
     /// Results from building project files.
     /// </summary>

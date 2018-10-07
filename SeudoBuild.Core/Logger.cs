@@ -4,28 +4,19 @@ namespace SeudoBuild
 {
     public class Logger : ILogger
     {
-        static string indentString = "";
-        static int indentLevel;
+        private static string _indentString = "";
+        private static int _indentLevel;
         public int IndentLevel
         {
-            get
-            {
-                return indentLevel;
-            }
+            get => _indentLevel;
             set
             {
-                if (value != indentLevel)
+                if (value == _indentLevel)
                 {
-                    indentLevel = value;
-                    if (indentLevel > 0)
-                    {
-                        indentString = new string(' ', indentLevel * 2);
-                    }
-                    else
-                    {
-                        indentString = "";
-                    }
+                    return;
                 }
+                _indentLevel = value;
+                _indentString = _indentLevel > 0 ? new string(' ', _indentLevel * 2) : "";
             }
         }
 
@@ -60,7 +51,7 @@ namespace SeudoBuild
             {
                 case LogType.None:
                 {
-                    Console.WriteLine($"{indentString}  {value}");
+                    Console.WriteLine($"{_indentString}  {value}");
                     break;
                 }
 
@@ -73,21 +64,21 @@ namespace SeudoBuild
                 case LogType.Plus:
                 {
                     Console.ResetColor();
-                    Console.WriteLine($"{indentString}‣ {value}");
+                    Console.WriteLine($"{_indentString}‣ {value}");
                     break;
                 }
 
                 case LogType.Bullet:
                 {
                     Console.ResetColor();
-                    Console.WriteLine($"{indentString}• {value}");
+                    Console.WriteLine($"{_indentString}• {value}");
                     break;
                 }
 
                 case LogType.SmallBullet:
                 {
                     Console.ResetColor();
-                    Console.WriteLine($"{indentString}◦ {value}");
+                    Console.WriteLine($"{_indentString}◦ {value}");
                     break;
                 }
 
@@ -95,7 +86,7 @@ namespace SeudoBuild
                 {
                     ConsoleColor originalColor = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"{indentString}✔ {value}");
+                    Console.WriteLine($"{_indentString}✔ {value}");
                     Console.ResetColor();
                     break;
                 }
@@ -104,7 +95,7 @@ namespace SeudoBuild
                 {
                     ConsoleColor originalColor = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"{indentString}✘ {value}");
+                    Console.WriteLine($"{_indentString}✘ {value}");
                     Console.ResetColor();
                     break;
                 }
@@ -113,7 +104,7 @@ namespace SeudoBuild
                 {
                     ConsoleColor originalColor = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{indentString}! {value}");
+                    Console.WriteLine($"{_indentString}! {value}");
                     Console.ResetColor();
                     break;
                 }
@@ -126,6 +117,8 @@ namespace SeudoBuild
                     Console.ResetColor();
                     break;
                 }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(logType), logType, null);
             }
         }
 

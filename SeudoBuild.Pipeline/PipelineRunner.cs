@@ -12,14 +12,14 @@ namespace SeudoBuild.Pipeline
     /// </summary>
     public class PipelineRunner
     {
-        PipelineConfig builderConfig;
+        readonly PipelineConfig _builderConfig;
 
-        readonly ILogger logger;
+        private readonly ILogger _logger;
 
         public PipelineRunner(PipelineConfig config, ILogger logger)
         {
-            this.builderConfig = config;
-            this.logger = logger;
+            _builderConfig = config;
+            _logger = logger;
         }
 
         public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, IModuleLoader moduleLoader)
@@ -40,17 +40,17 @@ namespace SeudoBuild.Pipeline
             }
 
             Console.WriteLine("");
-            logger.Write("Running Pipeline\n", LogType.Header);
-            logger.IndentLevel++;
-            logger.Write($"Project:  {projectConfig.ProjectName}", LogType.Plus);
-            logger.Write($"Target:   {buildTargetName}", LogType.Plus);
+            _logger.Write("Running Pipeline\n", LogType.Header);
+            _logger.IndentLevel++;
+            _logger.Write($"Project:  {projectConfig.ProjectName}", LogType.Plus);
+            _logger.Write($"Target:   {buildTargetName}", LogType.Plus);
             //logger.WritePlus($"Location: {projectsBaseDirectory}/{projectNameSanitized}"); 
-            logger.IndentLevel--;
+            _logger.IndentLevel--;
             Console.WriteLine("");
 
             // Create project and target workspaces
             string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
-            string projectDirectory = $"{builderConfig.BaseDirectory}/{projectNameSanitized}";
+            string projectDirectory = $"{_builderConfig.BaseDirectory}/{projectNameSanitized}";
             var filesystem = new FileSystem();
             var projectWorkspace = new ProjectWorkspace(projectDirectory, filesystem);
             projectWorkspace.CreateSubdirectories();
@@ -63,7 +63,7 @@ namespace SeudoBuild.Pipeline
 
             // Setup build pipeline
             var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
-            pipeline.LoadBuildStepModules(moduleLoader, targetWorkspace, logger);
+            pipeline.LoadBuildStepModules(moduleLoader, targetWorkspace, _logger);
 
             var macros = targetWorkspace.Macros;
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;
@@ -86,20 +86,20 @@ namespace SeudoBuild.Pipeline
             var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, targetWorkspace);
 
             // Done
-            logger.IndentLevel = 0;
-            logger.Write("\nBuild process completed.", logStyle: LogStyle.Bold);
+            _logger.IndentLevel = 0;
+            _logger.Write("\nBuild process completed.", logStyle: LogStyle.Bold);
         }
 
-        TOutSeq InitializeSequence<TOutSeq>(string sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
+        private TOutSeq InitializeSequence<TOutSeq>(string sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
             where TOutSeq : PipelineSequenceResults, new()
         {
-            logger.IndentLevel = 1;
-            logger.Write(sequenceName, LogType.Bullet);
-            logger.IndentLevel++;
+            _logger.IndentLevel = 1;
+            _logger.Write(sequenceName, LogType.Bullet);
+            _logger.IndentLevel++;
 
             if (sequenceSteps.Count == 0)
             {
-                logger.Write($"No {sequenceName} steps.", LogType.Alert);
+                _logger.Write($"No {sequenceName} steps.", LogType.Alert);
                 return new TOutSeq {
                     IsSuccess = true,
                     IsSkipped = true,
@@ -110,7 +110,7 @@ namespace SeudoBuild.Pipeline
         }
 
         // First step of pipeline execution
-        TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, ITargetWorkspace workspace)
+        private TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, ITargetWorkspace workspace)
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
         {
@@ -130,7 +130,7 @@ namespace SeudoBuild.Pipeline
         }
 
         // Pipeline execution step that had a step before it
-        TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, ITargetWorkspace workspace)
+        private TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, ITargetWorkspace workspace)
             where TInSeq : PipelineSequenceResults // previous sequence results
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
@@ -145,7 +145,7 @@ namespace SeudoBuild.Pipeline
             // Verify that the pipeline has not previously failed
             if (!previousSequence.IsSuccess)
             {
-                logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
+                _logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
                 results = new TOutSeq
                 {
                     IsSuccess = false,
@@ -155,14 +155,12 @@ namespace SeudoBuild.Pipeline
             }
 
             // Run the sequence
-            results = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TInSeq, TOutSeq, TOutStep>>(sequenceName, sequenceSteps, (step) =>
-            {
-                return step.ExecuteStep(previousSequence, workspace);
-            });
+            results = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TInSeq, TOutSeq, TOutStep>>(sequenceName,
+                sequenceSteps, step => step.ExecuteStep(previousSequence, workspace));
             return results;
         }
 
-        TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string sequenceName, IReadOnlyCollection<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep> stepExecuteCallback)
+        private TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string sequenceName, IReadOnlyCollection<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep> stepExecuteCallback)
             where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
             where TOutStep : PipelineStepResults, new() // current step results
             where TPipeStep : class, IPipelineStep
@@ -172,7 +170,6 @@ namespace SeudoBuild.Pipeline
 
             //const int startIndex = -1;
             //int stepIndex = startIndex;
-            TPipeStep currentStep = null;
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -180,10 +177,10 @@ namespace SeudoBuild.Pipeline
             foreach (var step in sequenceSteps)
             {
                 //stepIndex++;
-                currentStep = step;
+                var currentStep = step;
 
-                logger.Write(step.Type, LogType.Bullet);
-                logger.IndentLevel++;
+                _logger.Write(step.Type, LogType.Bullet);
+                _logger.IndentLevel++;
 
                 TOutStep stepResult = null;
                 stepResult = stepExecuteCallback.Invoke(step);
@@ -194,11 +191,11 @@ namespace SeudoBuild.Pipeline
                     results.IsSuccess = false;
                     results.Exception = stepResult.Exception;
                     string error = $"{sequenceName} sequence failed on step {currentStep.Type}:\n      {results.Exception.Message}";
-                    logger.Write(error, LogType.Failure);
+                    _logger.Write(error, LogType.Failure);
                     break;
                 }
 
-                logger.IndentLevel--;
+                _logger.IndentLevel--;
             }
 
             stopwatch.Stop();

@@ -2,15 +2,15 @@
 {
     public class SteamDistributeStep : IDistributeStep<SteamDistributeConfig>
     {
-        SteamDistributeConfig config;
-        ILogger logger;
+        private SteamDistributeConfig _config;
+        private ILogger _logger;
 
         public string Type { get; } = "Steam Upload";
 
         public void Initialize(SteamDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.logger = logger;
+            _config = config;
+            _logger = logger;
         }
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)

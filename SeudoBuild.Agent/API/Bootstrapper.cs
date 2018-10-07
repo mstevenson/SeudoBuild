@@ -4,8 +4,9 @@ using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent
 {
+    /// <inheritdoc />
     /// <summary>
-    /// Entrypoint for Agent's RESTful API.
+    /// Entry point for Agent's RESTful API.
     /// </summary>
     public class Bootstrapper : DefaultNancyBootstrapper
     {
@@ -16,11 +17,11 @@ namespace SeudoBuild.Agent
             StaticConfiguration.DisableErrorTraces = false;
 
             base.ConfigureApplicationContainer(container);
-            // FIXME the entrypoint method also initializes a logger
+            // FIXME the entry point method also initializes a logger
             var logger = new Logger();
             container.Register<ILogger>(logger);
             var moduleLoader = new ModuleLoaderFactory().Create(logger);
-            container.Register<IModuleLoader>(moduleLoader);
+            container.Register(moduleLoader);
 
             var fs = new FileSystem();
             container.Register<IFileSystem>(fs);

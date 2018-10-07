@@ -9,25 +9,25 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 {
     public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
-        GitSourceConfig config;
-        ITargetWorkspace workspace;
-        ILogger logger;
+        private GitSourceConfig _config;
+        private ITargetWorkspace _workspace;
+        private ILogger _logger;
 
         public string Type { get; } = "Git";
 
         public void Initialize(GitSourceConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.workspace = workspace;
-            this.logger = logger;
+            _config = config;
+            _workspace = workspace;
+            _logger = logger;
 
-            credentials = new UsernamePasswordCredentials
+            _credentials = new UsernamePasswordCredentials
             {
                 Username = config.Username,
                 Password = config.Password
             };
-            credentialsHandler = (url, usernameFromUrl, types) => new UsernamePasswordCredentials { Username = config.Username, Password = config.Password };
-            signature = new Signature(new Identity("SeudoBuild", "info@basenjigames.com"), DateTimeOffset.UtcNow);
+            _credentialsHandler = (url, usernameFromUrl, types) => new UsernamePasswordCredentials { Username = config.Username, Password = config.Password };
+            _signature = new Signature(new Identity("SeudoBuild", "info@basenjigames.com"), DateTimeOffset.UtcNow);
 
             // Set up LFS filter
             if (config.UseLFS)
@@ -35,7 +35,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
                 //if (IsLFSAvailable())
                 //{
                     var filter = new LFSFilter("lfs", workspace.SourceDirectory, new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
-                    lfsFilter = GlobalSettings.RegisterFilter(filter);
+                    _lfsFilter = GlobalSettings.RegisterFilter(filter);
                 //}
                 //else
                 //{
@@ -78,25 +78,19 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         }
 
 
-        UsernamePasswordCredentials credentials;
-        FilterRegistration lfsFilter;
-        Signature signature;
-        CredentialsHandler credentialsHandler;
+        private UsernamePasswordCredentials _credentials;
+        private FilterRegistration _lfsFilter;
+        private Signature _signature;
+        private CredentialsHandler _credentialsHandler;
 
-        public bool IsWorkingCopyInitialized
-        {
-            get
-            {
-                return Repository.IsValid(workspace.SourceDirectory);
-            }
-        }
+        public bool IsWorkingCopyInitialized => Repository.IsValid(_workspace.SourceDirectory);
 
         public string CurrentCommit
         {
             get
             {
-                string result = null;
-                using (var repo = new Repository(workspace.SourceDirectory))
+                string result;
+                using (var repo = new Repository(_workspace.SourceDirectory))
                 {
                     result = repo.Head.Tip.Sha;
                 }
@@ -104,26 +98,22 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             }
         }
 
-        string CurrentCommitShortHash
+        private string CurrentCommitShortHash
         {
             get
             {
                 string commit = CurrentCommit;
-                if (commit.Length == 0)
-                {
-                    return "";
-                }
-                return commit.Substring(0, 7);
+                return commit.Length == 0 ? "" : commit.Substring(0, 7);
             }
         }
 
-        void StoreCredentials()
+        private void StoreCredentials()
         {
-            string credentialsPath = $"{workspace.SourceDirectory}/../git-credentials";
+            string credentialsPath = $"{_workspace.SourceDirectory}/../git-credentials";
 
-            var uri = new Uri(config.RepositoryURL);
+            var uri = new Uri(_config.RepositoryURL);
             // Should use UriBuilder, but it doesn't include the password in the resulting uri string
-            string urlWithCredentials = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}{uri.AbsolutePath}";
+            string urlWithCredentials = $"{uri.Scheme}://{_config.Username}:{_config.Password}@{uri.Host}{uri.AbsolutePath}";
 
             // FIXME abstract using IFileSystem
 
@@ -136,33 +126,33 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         // Clone
         public void Download()
         {
-            workspace.CleanSourceDirectory();
+            _workspace.CleanSourceDirectory();
 
-            if (config.UseLFS)
+            if (_config.UseLFS)
             {
-                logger.Write($"Cloning LFS repository:  {config.RepositoryURL}", LogType.SmallBullet);
+                _logger.Write($"Cloning LFS repository:  {_config.RepositoryURL}", LogType.SmallBullet);
 
                 // FIXME extremely insecure to include password in the URL, but it's the only way I've
                 // found to circumvent the manual password prompt when running git-lfs
                 // TODO investigate git credential managers on Mac and Windows
-                var uri = new Uri(config.RepositoryURL);
-                string repoUrlWithPassword = $"{uri.Scheme}://{config.Username}:{config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
+                var uri = new Uri(_config.RepositoryURL);
+                string repoUrlWithPassword = $"{uri.Scheme}://{_config.Username}:{_config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
 
-                ExecuteLFSCommand($"clone {repoUrlWithPassword} {workspace.SourceDirectory}");
+                ExecuteLFSCommand($"clone {repoUrlWithPassword} {_workspace.SourceDirectory}");
             }
             else
             {
-                logger.Write($"Cloning repository:  {config.RepositoryURL}", LogType.SmallBullet);
+                _logger.Write($"Cloning repository:  {_config.RepositoryURL}", LogType.SmallBullet);
 
                 var cloneOptions = new CloneOptions
                 {
-                    CredentialsProvider = credentialsHandler,
-                    BranchName = string.IsNullOrEmpty(config.RepositoryBranchName) ? "master" : config.RepositoryBranchName,
+                    CredentialsProvider = _credentialsHandler,
+                    BranchName = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "master" : _config.RepositoryBranchName,
                     Checkout = true,
                     RecurseSubmodules = true
                 };
 
-                Repository.Clone(config.RepositoryURL, workspace.SourceDirectory, cloneOptions);
+                Repository.Clone(_config.RepositoryURL, _workspace.SourceDirectory, cloneOptions);
             }
 
             // TODO Handle sub-module credentials
@@ -171,10 +161,10 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         // Pull
         public void Update()
         {
-            logger.Write("Cleaning working copy", LogType.SmallBullet);
+            _logger.Write("Cleaning working copy", LogType.SmallBullet);
 
             // Clean the repo
-            using (var repo = new Repository(workspace.SourceDirectory))
+            using (var repo = new Repository(_workspace.SourceDirectory))
             {
                 //// Skip the LFS smudge filter when resetting the repo.
                 //// LFS files will be integrated manually.
@@ -186,22 +176,22 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
                 // Clone a new copy if necessary
 
-                if (!IsWorkingCopyInitialized || repo.Network.Remotes[repo.Head.RemoteName].Url != config.RepositoryURL)
+                if (!IsWorkingCopyInitialized || repo.Network.Remotes[repo.Head.RemoteName].Url != _config.RepositoryURL)
                 {
-                    logger.Write($"Repository URL has changed, cloning a new copy:  {config.RepositoryURL}", LogType.SmallBullet);
+                    _logger.Write($"Repository URL has changed, cloning a new copy:  {_config.RepositoryURL}", LogType.SmallBullet);
                     Download();
                     return;
                 }
 
                 // Pull changes
 
-                logger.Write($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {config.RepositoryURL}", LogType.SmallBullet);
+                _logger.Write($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {_config.RepositoryURL}", LogType.SmallBullet);
 
                 var pullOptions = new PullOptions
                 {
                     FetchOptions = new FetchOptions
                     {
-                        CredentialsProvider = credentialsHandler
+                        CredentialsProvider = _credentialsHandler
                     },
                     MergeOptions = new MergeOptions
                     {
@@ -211,28 +201,28 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
                         FailOnConflict = false
                     }
                 };
-                var mergeResult = Commands.Pull(repo, signature, pullOptions);
+                var mergeResult = Commands.Pull(repo, _signature, pullOptions);
 
-                if (config.UseLFS)
+                if (_config.UseLFS)
                 {
-                    logger.Write("Fetching LFS files", LogType.SmallBullet);
+                    _logger.Write("Fetching LFS files", LogType.SmallBullet);
                     ExecuteLFSCommand("fetch");
-                    logger.Write("Checking out LFS files into working copy", LogType.SmallBullet);
+                    _logger.Write("Checking out LFS files into working copy", LogType.SmallBullet);
                     ExecuteLFSCommand("checkout");
                 }
 
                 if (mergeResult.Status == MergeStatus.UpToDate)
                 {
-                    logger.Write($"Repository is already up-to-date", LogType.SmallBullet);
+                    _logger.Write($"Repository is already up-to-date", LogType.SmallBullet);
                 }
                 else
                 {
-                    logger.Write($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}", LogType.SmallBullet);
+                    _logger.Write($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}", LogType.SmallBullet);
                 }
             }
         }
 
-        void ExecuteLFSCommand(string arguments)
+        private void ExecuteLFSCommand(string arguments)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
 
@@ -240,7 +230,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             {
                 FileName = "git-lfs",
                 Arguments = arguments,
-                WorkingDirectory = workspace.SourceDirectory,
+                WorkingDirectory = _workspace.SourceDirectory,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,

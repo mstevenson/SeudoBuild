@@ -7,22 +7,22 @@ namespace SeudoBuild.Pipeline
 {
     public class ModuleRegistry : IModuleRegistry
     {
-        class ModuleCategory
+        private class ModuleCategory
         {
-            public readonly Type moduleBaseType;
-            public readonly Type moduleStepBaseType;
-            public readonly Type stepConfigBaseType;
-            public readonly List<IModule> loadedModules = new List<IModule>();
+            public readonly Type ModuleBaseType;
+            public readonly Type ModuleStepBaseType;
+            public readonly Type StepConfigBaseType;
+            public readonly List<IModule> LoadedModules = new List<IModule>();
 
-            public ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
+            protected ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
             {
-                this.moduleBaseType = moduleBaseType;
-                this.moduleStepBaseType = moduleStepBaseType;
-                this.stepConfigBaseType = stepConfigBaseType;
+                ModuleBaseType = moduleBaseType;
+                ModuleStepBaseType = moduleStepBaseType;
+                StepConfigBaseType = stepConfigBaseType;
             }
         }
 
-        class ModuleCategory<T, U, V> : ModuleCategory
+        private class ModuleCategory<T, U, V> : ModuleCategory
             where T : IModule
             where U : IPipelineStep
             where V : StepConfig
@@ -30,7 +30,7 @@ namespace SeudoBuild.Pipeline
             public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) { }
         }
 
-        readonly ModuleCategory[] moduleCategories = {
+        private readonly ModuleCategory[] _moduleCategories = {
             new ModuleCategory<ISourceModule, ISourceStep, SourceStepConfig>(),
             new ModuleCategory<IBuildModule, IBuildStep, BuildStepConfig>(),
             new ModuleCategory<IArchiveModule, IArchiveStep, ArchiveStepConfig>(),
@@ -40,7 +40,7 @@ namespace SeudoBuild.Pipeline
 
         public IEnumerable<IModule> GetAllModules()
         {
-            return moduleCategories.Select(cat => cat.loadedModules).SelectMany(m => m);
+            return _moduleCategories.Select(cat => cat.LoadedModules).SelectMany(m => m);
         }
 
         public IEnumerable<T> GetModules<T>()
@@ -48,8 +48,8 @@ namespace SeudoBuild.Pipeline
         {
             try
             {
-                var category = moduleCategories.First(cat => cat.moduleBaseType == typeof(T));
-                return category.loadedModules.Cast<T>();
+                var category = _moduleCategories.First(cat => cat.ModuleBaseType == typeof(T));
+                return category.LoadedModules.Cast<T>();
             }
             catch
             {
@@ -60,34 +60,32 @@ namespace SeudoBuild.Pipeline
         public IEnumerable<IModule> GetModulesForStepType<T>()
             where T : IPipelineStep
         {
-            var category = moduleCategories.First(cat => cat.moduleStepBaseType == typeof(T));
-            return category.loadedModules;
+            var category = _moduleCategories.First(cat => cat.ModuleStepBaseType == typeof(T));
+            return category.LoadedModules;
         }
 
         public void RegisterModule(IModule module)
         {
-            foreach (var category in moduleCategories)
+            foreach (var category in _moduleCategories)
             {
-                if (category.moduleBaseType.IsAssignableFrom(module.GetType()))
+                if (category.ModuleBaseType.IsInstanceOfType(module))
                 {
-                    category.loadedModules.Add(module);
+                    category.LoadedModules.Add(module);
                 }
             }
         }
 
-        public JsonConverter[] GetJsonConverters()
+        public StepConfigConverter[] GetJsonConverters()
         {
             var converters = new Dictionary<Type, StepConfigConverter>();
-            foreach (var category in moduleCategories)
+            foreach (var category in _moduleCategories)
             {
-                converters.Add(category.stepConfigBaseType, new StepConfigConverter(category.stepConfigBaseType));
+                converters.Add(category.StepConfigBaseType, new StepConfigConverter(category.StepConfigBaseType));
             }
-
-            var allModules = GetAllModules();
 
             foreach (var kvp in converters)
             {
-                foreach (var module in allModules)
+                foreach (var module in GetAllModules())
                 {
                     Type configBaseType = kvp.Key;
                     if (configBaseType.IsAssignableFrom(module.StepConfigType))

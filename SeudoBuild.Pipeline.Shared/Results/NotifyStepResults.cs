@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline
 {
+    /// <inheritdoc />
     /// <summary>
     /// Results from a notification step in the pipeline.
     /// </summary>

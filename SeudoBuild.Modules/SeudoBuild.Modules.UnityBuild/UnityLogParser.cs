@@ -14,9 +14,9 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             Cancelled
         }
 
-        State currentState = State.Start;
-        Matches universalMatches = new Matches();
-        Dictionary<State, Matches> stateMatches = new Dictionary<State, Matches>();
+        private State _currentState = State.Start;
+        private readonly Matches _universalMatches;
+        private readonly Dictionary<State, Matches> _stateMatches;
 
 
         public class Match
@@ -54,24 +54,24 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
 
         public UnityLogParser()
         {
-            universalMatches = new Matches
+            _universalMatches = new Matches
             {
-                { "WARNING: ", (line) => line },
-                { "ERROR: ", (line) => line },
+                { "WARNING: ", line => line },
+                { "ERROR: ", line => line },
                 { "Aborting batchmode due to failure", (line) => line },
                 { "- starting compile", (line) => line },
                 { "Compilation failed", (line) => line },
                 { "Finished compile", (line) => line },
                 { "building ", (line) => line },
-                { "*** Cancelled", (line) => { currentState = State.Cancelled; return "Cancelled build"; } },
+                { "*** Cancelled", (line) => { _currentState = State.Cancelled; return "Cancelled build"; } },
                 { "*** Completed", (line) => line }
             };
 
-            stateMatches = new Dictionary<State, Matches>
+            _stateMatches = new Dictionary<State, Matches>
             {
                 { State.Start, new Matches
                     {
-                        { "Initialize mono", (line) => { currentState = State.None; return "Loading Unity project"; } }
+                        { "Initialize mono", (line) => { _currentState = State.None; return "Loading Unity project"; } }
                     }
                 },
                 { State.Cancelled, new Matches
@@ -89,7 +89,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                 return null;
             }
 
-            foreach (var match in universalMatches)
+            foreach (var match in _universalMatches)
             {
                 if (line.Contains(match.text))
                 {
@@ -98,8 +98,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                 }
             }
 
-            Matches matches = null;
-            if (stateMatches.TryGetValue(currentState, out matches))
+            if (_stateMatches.TryGetValue(_currentState, out var matches))
             {
                 foreach (var match in matches)
                 {

@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {
+    /// <inheritdoc />
     /// <summary>
     /// Configuration values for a build pipeline step for a Unity project.
     /// </summary>

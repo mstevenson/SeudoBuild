@@ -8,14 +8,14 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 {
     public class LFSFilter : Filter
     {
-        Process process;
-        string repoPath;
+        private Process _process;
+        private readonly string _repoPath;
 
-        FilterMode mode;
+        private FilterMode _mode;
 
         public LFSFilter(string name, string repoPath, IEnumerable<FilterAttributeEntry> attributes) : base(name, attributes)
         {
-            this.repoPath = repoPath;
+            _repoPath = repoPath;
         }
 
         protected override void Initialize()
@@ -27,48 +27,48 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
 
-            this.mode = mode;
+            _mode = mode;
             string modeArg = mode == FilterMode.Clean ? "clean" : "smudge";
 
             var startInfo = new ProcessStartInfo
             {
                 FileName = "git-lfs",
                 Arguments = $"{modeArg} {path}",
-                WorkingDirectory = repoPath,
+                WorkingDirectory = _repoPath,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
-            process = new Process { StartInfo = startInfo };
-            process.Start();
+            _process = new Process { StartInfo = startInfo };
+            _process.Start();
         }
 
         protected override void Complete(string path, string root, Stream output)
         {
             // Wait for git-lfs to finish
-            process.StandardInput.Flush();
-            process.StandardInput.Close();
+            _process.StandardInput.Flush();
+            _process.StandardInput.Close();
 
-            if (mode == FilterMode.Clean)
+            if (_mode == FilterMode.Clean)
             {
-                process.WaitForExit();
+                _process.WaitForExit();
             }
 
             // For smudge: save file to working copy
             // For clean: pass git-lfs pointer to git
-            process.StandardOutput.BaseStream.CopyTo(output);
-            process.StandardOutput.BaseStream.Flush();
-            process.StandardOutput.Close();
+            _process.StandardOutput.BaseStream.CopyTo(output);
+            _process.StandardOutput.BaseStream.Flush();
+            _process.StandardOutput.Close();
             output.Flush();
             output.Close();
 
-            if (mode == FilterMode.Smudge)
+            if (_mode == FilterMode.Smudge)
             {
-                process.WaitForExit();
+                _process.WaitForExit();
             }
 
-            process.Dispose();
+            _process.Dispose();
 
             Console.ResetColor();
         }
@@ -76,14 +76,14 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         protected override void Smudge(string path, string root, Stream input, Stream output)
         {
             // Write git-lfs pointer to stdin
-            input.CopyTo(process.StandardInput.BaseStream);
+            input.CopyTo(_process.StandardInput.BaseStream);
             input.Flush();
         }
 
         protected override void Clean(string path, string root, Stream input, Stream output)
         {
             // Write file data to stdin
-            input.CopyTo(process.StandardInput.BaseStream);
+            input.CopyTo(_process.StandardInput.BaseStream);
             input.Flush();
         }
     }

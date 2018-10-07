@@ -5,13 +5,13 @@ namespace SeudoBuild
 {
     public class Serializer
     {
-        IFileSystem fileSystem;
+        readonly IFileSystem _fileSystem;
 
         public string FileExtension { get; } = ".json";
 
         public Serializer(IFileSystem fileSystem)
         {
-            this.fileSystem = fileSystem;
+            _fileSystem = fileSystem;
         }
 
         public T Deserialize<T>(string json, JsonConverter[] converters)
@@ -23,27 +23,27 @@ namespace SeudoBuild
 
         public T DeserializeFromFile<T>(string path, JsonConverter[] converters)
         {
-            using (TextReader tr = new StreamReader(fileSystem.OpenRead(path)))
+            using (TextReader tr = new StreamReader(_fileSystem.OpenRead(path)))
             {
-                string json = tr.ReadToEnd();
+                var json = tr.ReadToEnd();
                 return Deserialize<T>(json, converters);
             }
         }
 
         public string Serialize<T>(T obj)
         {
-            string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
             return json;
         }
 
         public void SerializeToFile<T>(T obj, string path)
         {
-            if (fileSystem.FileExists(path))
+            if (_fileSystem.FileExists(path))
             {
-                fileSystem.DeleteFile(path);
+                _fileSystem.DeleteFile(path);
             }
-            string json = Serialize(obj);
-            fileSystem.WriteAllText(path, json);
+            var json = Serialize(obj);
+            _fileSystem.WriteAllText(path, json);
         }
     }
 }

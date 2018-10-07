@@ -13,13 +13,13 @@ namespace SeudoBuild.Agent
     public class BuildSubmitter
     {
         // FIXME don't hard-code
-        const int port = 5511;
+        private const int Port = 5511;
 
-        ILogger logger;
+        private readonly ILogger _logger;
 
         public BuildSubmitter(ILogger logger)
         {
-            this.logger = logger;
+            _logger = logger;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace SeudoBuild.Agent
         /// </summary>
         public void Submit(string projectJson, string target, string agentName)
         {
-            logger.Write("Submitting build to " + agentName);
+            _logger.Write("Submitting build to " + agentName);
 
             // Find agent on the network, with timeout
             var discovery = new UdpDiscoveryClient();
@@ -36,7 +36,7 @@ namespace SeudoBuild.Agent
 
             //while (!discovery.AvailableServers.Any (s => s.guid);
 
-            UdpDiscoveryClient client = new UdpDiscoveryClient();
+            var client = new UdpDiscoveryClient();
             try
             {
                 client.Start();
@@ -49,11 +49,11 @@ namespace SeudoBuild.Agent
             client.ServerFound += (beacon) =>
             {
                 // Validate build agent name
-                string agentAddress = $"http://{beacon.address}:{beacon.port}/info";
-                AgentLocation agentInfo = null;
+                var agentAddress = $"http://{beacon.Address}:{beacon.Port}/info";
+                AgentLocation agentInfo;
                 using (var webClient = new WebClient())
                 {
-                    string json = webClient.DownloadString(agentAddress);
+                    var json = webClient.DownloadString(agentAddress);
                     agentInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<AgentLocation>(json);
                 }
                 if (agentInfo.AgentName != agentName)
@@ -63,23 +63,23 @@ namespace SeudoBuild.Agent
 
                 // Send build request
 
-                string command = target != null ? $"submit/target" : "submit";
-                string address = $"http://{beacon.address}:{beacon.port}/{command}";
+                var command = target != null ? $"submit/target" : "submit";
+                var address = $"http://{beacon.Address}:{beacon.Port}/{command}";
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
+                var request = (HttpWebRequest)WebRequest.Create(address);
                 request.Method = "POST";
                 request.ContentType = "application/json";
                 request.ContentLength = projectJson.Length;
-                StreamWriter requestWriter = new StreamWriter(request.GetRequestStream(), System.Text.Encoding.ASCII);
+                var requestWriter = new StreamWriter(request.GetRequestStream(), System.Text.Encoding.ASCII);
                 requestWriter.Write(projectJson);
                 requestWriter.Close();
 
                 try
                 {
-                    WebResponse webResponse = request.GetResponse();
-                    Stream webStream = webResponse.GetResponseStream();
-                    StreamReader responseReader = new StreamReader(webStream);
-                    string response = responseReader.ReadToEnd();
+                    var webResponse = request.GetResponse();
+                    var webStream = webResponse.GetResponseStream();
+                    var responseReader = new StreamReader(webStream);
+                    var response = responseReader.ReadToEnd();
 
                     // TODO handle the response
                     Console.Out.WriteLine(response);

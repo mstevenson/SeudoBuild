@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.ZipArchive
 {
+    /// <inheritdoc />
     /// <summary>
     /// Configuration values for an archive pipeline step that generates a zip file.
     /// </summary>

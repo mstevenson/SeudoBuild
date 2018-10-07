@@ -5,13 +5,14 @@ using System.Collections.Generic;
 
 namespace SeudoBuild.Pipeline
 {
+    /// <inheritdoc />
     /// <summary>
     /// Converts a StepConfig object to and from a serialized JSON representation.
     /// </summary>
     public class StepConfigConverter : JsonConverter
     {
-        readonly Type configBaseType;
-        readonly Dictionary<string, Type> configTypeMap = new Dictionary<string, Type>();
+        private readonly Type _configBaseType;
+        private readonly Dictionary<string, Type> _configTypeMap = new Dictionary<string, Type>();
 
         public StepConfigConverter(Type configBaseType)
         {
@@ -19,29 +20,28 @@ namespace SeudoBuild.Pipeline
             {
                 throw new ArgumentException("StepConfigConverter must be given a type that inherits from StepConfig");
             }
-            this.configBaseType = configBaseType;
+            _configBaseType = configBaseType;
         }
 
         public void RegisterConfigType(string jsonName, Type type)
         {
-            if (!configBaseType.IsAssignableFrom(type))
+            if (!_configBaseType.IsAssignableFrom(type))
             {
-                throw new ArgumentException($"Type {type} is not assignable from {configBaseType}");
+                throw new ArgumentException($"Type {type} is not assignable from {_configBaseType}");
             }
-            configTypeMap.Add(jsonName, type);
+            _configTypeMap.Add(jsonName, type);
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == configBaseType);
+            return (objectType == _configBaseType);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jobj = JObject.Load(reader);
             string jsonType = jobj["Type"].Value<string>();
-            Type configType = null;
-            bool found = configTypeMap.TryGetValue(jsonType, out configType);
+            bool found = _configTypeMap.TryGetValue(jsonType, out var configType);
 
             if (found)
             {
@@ -64,6 +64,7 @@ namespace SeudoBuild.Pipeline
         }
     }
 
+    /// <inheritdoc />
     /// <summary>
     /// Converts a StepConfig object of the given subtype to and from
     /// a serialized JSON representation.

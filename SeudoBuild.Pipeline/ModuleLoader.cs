@@ -1,7 +1,6 @@
 ﻿//#define DEBUG_ASSEMBLIES
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Linq;
@@ -13,14 +12,14 @@ namespace SeudoBuild.Pipeline
     {
         public IModuleRegistry Registry { get; } = new ModuleRegistry();
 
-        const string pipelineNamespace = "SeudoBuild.Pipeline";
-        const string pipelineAssemblyName = "SeudoBuild.Pipeline.Shared";
+        private const string PipelineNamespace = "SeudoBuild.Pipeline";
+        private const string PipelineAssemblyName = "SeudoBuild.Pipeline.Shared";
 
-        readonly ILogger logger;
+        private readonly ILogger _logger;
 
         public ModuleLoader (ILogger logger)
         {
-            this.logger = logger;
+            _logger = logger;
         }
 
         void LoadAssembly(string file)
@@ -50,7 +49,7 @@ namespace SeudoBuild.Pipeline
             try
             {
                 // Locate all types in the assembly that inherit from IModule
-                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals(pipelineAssemblyName));
+                Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals(PipelineAssemblyName));
                 Type[] allTypesInAssembly = moduleAssembly.GetTypes();
 
                 var moduleTypesInAssembly = (
@@ -115,47 +114,48 @@ namespace SeudoBuild.Pipeline
             foreach (var module in Registry.GetModulesForStepType<T>())
             {
                 Type configType = config.GetType();
-                
-                if (configType == module.StepConfigType)
+
+                if (configType != module.StepConfigType)
                 {
-                    // Construct a pipeline step type with a generic parameter for our config type
-                    // Example:  IPipelineStepWithConfig<ZipArchiveConfig>
-                    Type pipelineStepWithConfigType = typeof(IInitializable<>).MakeGenericType(configType);
+                    continue;
+                }
+                
+                // Construct a pipeline step type with a generic parameter for our config type
+                // Example:  IPipelineStepWithConfig<ZipArchiveConfig>
+                Type pipelineStepWithConfigType = typeof(IInitializable<>).MakeGenericType(configType);
 
 
 
 
-                    // FIXME The GitSource module fails to find types belonging to the LibGit2Sharp assembly
-                    // LibGit2Sharp uses dllmap to point to platform-specific DLLs.
-                    // How should this be handled by the SeudoBuild plugin loader?
+                // FIXME The GitSource module fails to find types belonging to the LibGit2Sharp assembly
+                // LibGit2Sharp uses dllmap to point to platform-specific DLLs.
+                // How should this be handled by the SeudoBuild plugin loader?
 
 
-                    // Instantiate a IPipelineStep object
-                    object pipelineStepObj = null;
-                    try
-                    {
-                        pipelineStepObj = Activator.CreateInstance(module.StepType);
+                // Instantiate a IPipelineStep object
+                try
+                {
+                    var pipelineStepObj = Activator.CreateInstance(module.StepType);
 
-                        // Initialize the pipeline step with the config object
-                        var method = pipelineStepWithConfigType.GetMethod("Initialize");
-                        method.Invoke(pipelineStepObj, new object[] { config, workspace, logger });
+                    // Initialize the pipeline step with the config object
+                    var method = pipelineStepWithConfigType.GetMethod("Initialize");
+                    method?.Invoke(pipelineStepObj, new object[] { config, workspace, logger });
 
-                        T step = (T)pipelineStepObj;
-                        return step;
-                    }
-                    catch (TypeLoadException e)
-                    {
-                        logger.Write($"Loading module step failed:\n {e.Message}", LogType.Failure);
-                    }
+                    var step = (T)pipelineStepObj;
+                    return step;
+                }
+                catch (TypeLoadException e)
+                {
+                    logger.Write($"Loading module step failed:\n {e.Message}", LogType.Failure);
                 }
             }
             return default(T);
         }
 
         [Conditional("DEBUG_ASSEMBLIES")]
-        void DebugWrite(string message)
+        private void DebugWrite(string message)
         {
-            logger.Write(message, LogType.Debug);
+            _logger.Write(message, LogType.Debug);
         }
     }
 }

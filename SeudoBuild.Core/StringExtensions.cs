@@ -5,17 +5,17 @@ namespace SeudoBuild
 {
     public static class StringExtensions
     {
-        static Regex regex;
+        private static readonly Regex Regex;
 
         static StringExtensions()
         {
-            string regexString = new string(Path.GetInvalidFileNameChars());
-            regex = new Regex(string.Format("[{0}]", Regex.Escape(regexString)));
+            var regexString = new string(Path.GetInvalidFileNameChars());
+            Regex = new Regex($"[{Regex.Escape(regexString)}]");
         }
 
         public static string SanitizeFilename(this string filename)
         {
-            return regex.Replace(filename, "").Replace(' ', '_');
+            return Regex.Replace(filename, "").Replace(' ', '_');
         }
     }
 }

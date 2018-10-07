@@ -1,5 +1,4 @@
-﻿using System;
-namespace SeudoBuild.Agent
+﻿namespace SeudoBuild.Agent
 {
     public interface IReceiver
     {

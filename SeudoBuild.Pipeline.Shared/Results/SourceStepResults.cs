@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline
 {
+    /// <inheritdoc />
     /// <summary>
     /// Results from retrieving project files from a repository.
     /// </summary>

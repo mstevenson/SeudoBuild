@@ -28,6 +28,7 @@ namespace SeudoBuild.Pipeline
         public TimeSpan Duration { get; set; }
     }
 
+    /// <inheritdoc />
     /// <summary>
     /// Results from an entire sequence of pipeline steps of the same type,
     /// given a specific results object type.

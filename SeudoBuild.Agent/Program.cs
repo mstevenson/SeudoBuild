@@ -9,7 +9,7 @@ namespace SeudoBuild.Agent
 {
     class Program
     {
-        const string header = @"
+        private const string Header = @"
                 _     _       _ _   _ 
   ___ ___ _ _ _| |___| |_ _ _|_| |_| |
  |_ -| -_| | | . | . | . | | | | | . |
@@ -17,10 +17,10 @@ namespace SeudoBuild.Agent
                                       
 ";
 
-        static ILogger logger;
+        private static ILogger _logger;
 
         [Verb("build", HelpText = "Create a local build.")]
-        class BuildSubOptions
+        private class BuildSubOptions
         {
             [Option('t', "build-target", HelpText = "Name of the build target as specified in the project configuration file. If no build target is specified, the first target will be used.")]
             public string BuildTarget { get; set; }
@@ -33,12 +33,12 @@ namespace SeudoBuild.Agent
         }
 
         [Verb("scan", HelpText = "List build agents found on the local network.")]
-        class ScanSubOptions
+        private class ScanSubOptions
         {
         }
 
         [Verb("submit", HelpText = "Submit a build request for a remote build agent to fulfill.")]
-        class SubmitSubOptions
+        private class SubmitSubOptions
         {
             [Option('p', "project-config", HelpText = "Path to a project configuration file.", Required = true)]
             public string ProjectConfigPath { get; set; }
@@ -51,7 +51,7 @@ namespace SeudoBuild.Agent
         }
 
         [Verb("queue", HelpText = "Queue build requests received over the network.")]
-        class QueueSubOptions
+        private class QueueSubOptions
         {
             [Option('n', "agent-name", HelpText = "A unique name for the build agent. If not set, a name will be generated.")]
             public string AgentName { get; set; }
@@ -61,12 +61,12 @@ namespace SeudoBuild.Agent
         }
 
         [Verb("deploy", HelpText = "Listen for deployment messages.")]
-        class DeploySubOptions
+        private class DeploySubOptions
         {
         }
 
         [Verb("name", Hidden = true)]
-        class NameSubOptions
+        private class NameSubOptions
         {
             [Option('r', "random")]
             public bool Random { get; set; }
@@ -74,7 +74,7 @@ namespace SeudoBuild.Agent
 
         public static void Main(string[] args)
         {
-            logger = new Logger();
+            _logger = new Logger();
 
             Console.Title = "SeudoBuild";
 
@@ -93,14 +93,14 @@ namespace SeudoBuild.Agent
         /// <summary>
         /// Build a single target, then exit.
         /// </summary>
-        static int Build(BuildSubOptions opts)
+        private static int Build(BuildSubOptions opts)
         {
             Console.Title = "SeudoBuild • Build";
-            Console.WriteLine(header);
+            Console.WriteLine(Header);
 
             // Load pipeline modules
             var factory = new ModuleLoaderFactory();
-            IModuleLoader moduleLoader = factory.Create(logger);
+            IModuleLoader moduleLoader = factory.Create(_logger);
 
             // Load project config
             ProjectConfig projectConfig = null;
@@ -119,13 +119,13 @@ namespace SeudoBuild.Agent
             }
 
             // Execute build
-            Builder builder = new Builder(moduleLoader, logger);
+            var builder = new Builder(moduleLoader, _logger);
 
-            string parentDirectory = opts.OutputPath;
+            var parentDirectory = opts.OutputPath;
             if (string.IsNullOrEmpty(parentDirectory))
             {
                 // Config file's directory
-                parentDirectory = new FileInfo(opts.ProjectConfigPath).Directory.FullName;
+                parentDirectory = new FileInfo(opts.ProjectConfigPath).Directory?.FullName;
             }
 
             bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory);
@@ -136,14 +136,14 @@ namespace SeudoBuild.Agent
         /// <summary>
         /// Discover build agents on the network.
         /// </summary>
-        static int Scan(ScanSubOptions opts)
+        private static int Scan(ScanSubOptions opts)
         {
             Console.Title = "SeudoBuild • Scan";
-            Console.WriteLine(header);
+            Console.WriteLine(Header);
 
             Console.WriteLine("Looking for build agents. Press any key to exit.");
             // FIXME fill in port from command line argument
-            AgentLocator locator = new AgentLocator(5511);
+            var locator = new AgentLocator(5511);
             try
             {
                 locator.Start();
@@ -158,11 +158,11 @@ namespace SeudoBuild.Agent
             // FIXME don't hard-code port
             locator.AgentFound += (agent) =>
             {
-                logger.Write($"{agent.AgentName} ({agent.Address})", LogType.Bullet);
+                _logger.Write($"{agent.AgentName} ({agent.Address})", LogType.Bullet);
             };
             locator.AgentLost += (agent) =>
             {
-                logger.Write($"Lost agent: {agent.AgentName} ({agent.Address})", LogType.Bullet);
+                _logger.Write($"Lost agent: {agent.AgentName} ({agent.Address})", LogType.Bullet);
             };
             Console.WriteLine();
             Console.ReadKey();
@@ -172,10 +172,10 @@ namespace SeudoBuild.Agent
         /// <summary>
         /// Submit a build job to another agent.
         /// </summary>
-        static int Submit(SubmitSubOptions opts)
+        private static int Submit(SubmitSubOptions opts)
         {
             Console.Title = "SeudoBuild • Submit";
-            Console.WriteLine(header);
+            Console.WriteLine(Header);
 
             string configJson = null;
             try
@@ -184,18 +184,18 @@ namespace SeudoBuild.Agent
             }
             catch
             {
-                logger.Write("Project could not be read from " + opts.ProjectConfigPath, LogType.Failure);
+                _logger.Write("Project could not be read from " + opts.ProjectConfigPath, LogType.Failure);
                 return 1;
             }
 
-            var submit = new BuildSubmitter(logger);
+            var submit = new BuildSubmitter(_logger);
             try
             {
                 submit.Submit(configJson, opts.BuildTarget, opts.AgentName);
             }
             catch (Exception e)
             {
-                logger.Write("Could not submit job: " + e.Message, LogType.Failure);
+                _logger.Write("Could not submit job: " + e.Message, LogType.Failure);
                 return 1;
             }
 
@@ -206,10 +206,10 @@ namespace SeudoBuild.Agent
         /// Receive build jobs from other agents or clients, queue them, and execute them.
         /// Continue listening until user exits.
         /// </summary>
-        static int Queue(QueueSubOptions opts)
+        private static int Queue(QueueSubOptions opts)
         {
             Console.Title = "SeudoBuild • Queue";
-            Console.WriteLine(header);
+            Console.WriteLine(Header);
 
             //string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
             // FIXME pull port from command line argument, and incorporate into ServerBeacon object
@@ -223,26 +223,26 @@ namespace SeudoBuild.Agent
             var uri = new Uri($"http://localhost:{port}");
             using (var host = new NancyHost(uri))
             {
-                logger.Write("");
+                _logger.Write("");
                 try
                 {
                     host.Start();
 
-                    logger.Write("Build Queue", LogType.Header);
-                    logger.Write("");
-                    logger.Write("Started build agent server: " + uri, LogType.Bullet);
+                    _logger.Write("Build Queue", LogType.Header);
+                    _logger.Write("");
+                    _logger.Write("Started build agent server: " + uri, LogType.Bullet);
 
                     try
                     {
                         // FIXME configure the port from a command line argument
-                        var serverInfo = new UdpDiscoveryBeacon { port = 5511 };
+                        var serverInfo = new UdpDiscoveryBeacon { Port = 5511 };
                         var discovery = new UdpDiscoveryServer(serverInfo);
                         discovery.Start();
-                        logger.Write("Build agent discovery beacon started", LogType.Bullet);
+                        _logger.Write("Build agent discovery beacon started", LogType.Bullet);
                     }
                     catch
                     {
-                        logger.Write("Could not initialize build agent discovery beacon", LogType.Alert);
+                        _logger.Write("Could not initialize build agent discovery beacon", LogType.Alert);
                     }
                 }
                 catch (Exception e)
@@ -263,7 +263,7 @@ namespace SeudoBuild.Agent
         /// <summary>
         /// Deploy a build product on the local machine.
         /// </summary>
-        static int Deploy(DeploySubOptions opts)
+        private static int Deploy(DeploySubOptions opts)
         {
             return 0;
         }
@@ -271,17 +271,10 @@ namespace SeudoBuild.Agent
         /// <summary>
         /// Display the unique name for this agent.
         /// </summary>
-        static int ShowAgentName(NameSubOptions opts)
+        private static int ShowAgentName(NameSubOptions opts)
         {
-            string name = null;
-            if (opts.Random)
-            {
-                name = AgentName.GetRandomName();
-            }
-            else
-            {
-                name = AgentName.GetUniqueAgentName();
-            }
+            string name;
+            name = opts.Random ? AgentName.GetRandomName() : AgentName.GetUniqueAgentName();
             Console.WriteLine();
             Console.WriteLine(name);
             Console.WriteLine();

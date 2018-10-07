@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-
+﻿
 namespace SeudoBuild
 {
     // Project directory structure example
@@ -66,7 +64,7 @@ namespace SeudoBuild
             CleanDirectory(LogsDirectory);
         }
 
-        void CleanDirectory(string directory)
+        private void CleanDirectory(string directory)
         {
             if (!FileSystem.DirectoryExists(directory))
             {

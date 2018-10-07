@@ -11,9 +11,9 @@ namespace SeudoBuild.Net
     /// </summary>
     public class AgentLocator
     {
-        int port;
-        UdpDiscoveryClient client;
-        Dictionary<Guid, AgentLocation> agents = new Dictionary<Guid, AgentLocation>();
+        private int _port;
+        private UdpDiscoveryClient _client;
+        private readonly Dictionary<Guid, AgentLocation> _agents = new Dictionary<Guid, AgentLocation>();
 
         /// <summary>
         /// Occurs when an agent is found on the local network.
@@ -28,13 +28,7 @@ namespace SeudoBuild.Net
         /// <summary>
         /// All agents that are currently visible on the local network.
         /// </summary>
-        public IEnumerable<AgentLocation> Agents
-        {
-            get
-            {
-                return agents.Values;
-            }
-        }
+        public IEnumerable<AgentLocation> Agents => _agents.Values;
 
         /// <summary>
         /// Watches for build agents that broadcast their availability on the given UDP port.
@@ -42,7 +36,7 @@ namespace SeudoBuild.Net
         /// </summary>
         public AgentLocator(int port)
         {
-            this.port = port;
+            _port = port;
         }
 
         /// <summary>
@@ -50,17 +44,18 @@ namespace SeudoBuild.Net
         /// </summary>
         public void Start()
         {
-            if (client == null)
+            if (_client == null)
             {
-                client = new UdpDiscoveryClient();
+                _client = new UdpDiscoveryClient();
             }
-            if (!client.IsRunning)
+
+            if (!_client.IsRunning)
             {
                 try
                 {
-                    client.Start();
-                    client.ServerFound += OnServerFound;
-                    client.ServerLost += OnServerLost;
+                    _client.Start();
+                    _client.ServerFound += OnServerFound;
+                    _client.ServerLost += OnServerLost;
                 }
                 catch (System.Net.Sockets.SocketException)
                 {
@@ -75,36 +70,39 @@ namespace SeudoBuild.Net
         /// </summary>
         public void Stop()
         {
-            if (client.IsRunning)
+            if (_client.IsRunning)
             {
-                client.Stop();
-                client.ServerFound -= OnServerFound;
-                client.ServerLost -= OnServerLost;
+                _client.Stop();
+                _client.ServerFound -= OnServerFound;
+                _client.ServerLost -= OnServerLost;
             }
-            client.Dispose();
-            client = null;
+
+            _client.Dispose();
+            _client = null;
         }
 
         /// <summary>
         /// Occurs when a UdpDiscoveryServer is first seen.
         /// </summary>
-        void OnServerFound(UdpDiscoveryBeacon beacon)
+        private void OnServerFound(UdpDiscoveryBeacon beacon)
         {
             // Ignore agents that we already know about
-            if (!agents.ContainsKey (beacon.guid))
+            if (_agents.ContainsKey(beacon.Guid))
             {
-                agents[beacon.guid] = null;
-                RequestAgentInfoAsync(beacon);
+                return;
             }
+
+            _agents[beacon.Guid] = null;
+            RequestAgentInfoAsync(beacon);
         }
 
         /// <summary>
         /// Requests additional information about a build agent's capabilities
         /// after its discovery beacon is first received.
         /// </summary>
-        async Task RequestAgentInfoAsync(UdpDiscoveryBeacon beacon)
+        private async Task RequestAgentInfoAsync(UdpDiscoveryBeacon beacon)
         {
-            string address = $"http://{beacon.address}:{beacon.port}/info";
+            var address = $"http://{beacon.Address}:{beacon.Port}/info";
 
             // Request the agent's identity
             var req = WebRequest.CreateHttp(address);
@@ -121,21 +119,19 @@ namespace SeudoBuild.Net
             if (requestTask.IsCompleted)
             {
                 var resultStream = requestTask.Result.GetResponseStream();
-                StreamReader readStream = new StreamReader(resultStream, System.Text.Encoding.UTF8);
-                string json = readStream.ReadToEnd();
+                var readStream = new StreamReader(resultStream, System.Text.Encoding.UTF8);
+                var json = readStream.ReadToEnd();
 
                 var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<AgentLocation>(json);
                 // FIXME should the agent have set its own address before responding? Does it even know its own address?
-                agent.Address = beacon.address.ToString();
+                agent.Address = beacon.Address.ToString();
                 //logger.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");
 
-                agents[beacon.guid] = agent;
-                if (AgentFound != null)
-                {
-                    AgentFound.Invoke(agent);
-                }
+                _agents[beacon.Guid] = agent;
+                AgentFound?.Invoke(agent);
             }
-            else {
+            else
+            {
                 Console.WriteLine("error");
                 throw new Exception("Agent info could not be obtained: " + requestTask.Exception.Message);
             }
@@ -144,18 +140,15 @@ namespace SeudoBuild.Net
         /// <summary>
         /// Occurs when a known UdpDiscoveryServer has not been seen for some time.
         /// </summary>
-        void OnServerLost(UdpDiscoveryBeacon server)
+        private void OnServerLost(UdpDiscoveryBeacon server)
         {
-            AgentLocation agent;
-            bool haveAgent = agents.TryGetValue(server.guid, out agent);
+            var haveAgent = _agents.TryGetValue(server.Guid, out var agent);
             haveAgent = haveAgent && agent != null;
 
-            if (haveAgent) {
-                agents.Remove(server.guid);
-                if (AgentLost != null)
-                {
-                    AgentLost.Invoke(agent);
-                }
+            if (haveAgent)
+            {
+                _agents.Remove(server.Guid);
+                AgentLost?.Invoke(agent);
             }
         }
     }

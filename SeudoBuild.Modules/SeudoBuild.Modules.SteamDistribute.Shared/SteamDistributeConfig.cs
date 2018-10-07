@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.SteamDistribute
 {
+    /// <inheritdoc />
     /// <summary>
     /// Configuration values for a distribute pipeline step that uploads
     /// a build product to Steam.

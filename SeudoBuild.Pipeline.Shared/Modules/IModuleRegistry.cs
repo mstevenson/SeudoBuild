@@ -17,6 +17,6 @@ namespace SeudoBuild.Pipeline
 
         void RegisterModule(IModule module);
 
-        JsonConverter[] GetJsonConverters();
+        StepConfigConverter[] GetJsonConverters();
     }
 }

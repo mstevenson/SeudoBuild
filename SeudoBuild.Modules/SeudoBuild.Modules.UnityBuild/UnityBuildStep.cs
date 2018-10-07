@@ -8,15 +8,15 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
     public abstract class UnityBuildStep<T> : IBuildStep<T>
         where T : UnityBuildConfig
     {
-        protected T config;
-        protected ITargetWorkspace workspace;
-        ILogger logger;
+        private T _config;
+        private ITargetWorkspace _workspace;
+        ILogger _logger;
 
         public void Initialize(T config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.workspace = workspace;
-            this.logger = logger;
+            _config = config;
+            _workspace = workspace;
+            _logger = logger;
         }
 
         public abstract string Type { get; }
@@ -25,7 +25,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
 
         public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, ITargetWorkspace workspace)
         {
-            var unityVersion = config.UnityVersionNumber;
+            var unityVersion = _config.UnityVersionNumber;
             string unityDirName = "Unity";
             if (unityVersion != null && unityVersion.IsValid)
             {
@@ -35,20 +35,21 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             var fileSystem = new FileSystem();
             var unityInstallation = UnityInstallation.FindUnityInstallation(unityVersion, fileSystem);
 
-            var args = GetBuildArgs(config, workspace);
-            var buildResult = ExecuteUnity(unityInstallation, args, workspace, config.SubDirectory);
+            var args = GetBuildArgs(_config, workspace);
+            var buildResult = ExecuteUnity(unityInstallation, args, workspace, _config.SubDirectory);
 
             return buildResult;
         }
 
-        protected BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments, ITargetWorkspace workspace, string relativeUnityProjectFolder)
+        private BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments,
+            ITargetWorkspace workspace, string relativeUnityProjectFolder)
         {
             if (!workspace.FileSystem.FileExists(unityInstallation.ExePath))
             {
                 throw new Exception("Unity executable does not exist at path " + unityInstallation.ExePath);
             }
 
-            logger.Write($"Building with Unity {unityInstallation.Version}", LogType.SmallBullet);
+            _logger.Write($"Building with Unity {unityInstallation.Version}", LogType.SmallBullet);
 
             string projectFolderPath = Path.Combine(workspace.SourceDirectory, relativeUnityProjectFolder);
 
@@ -89,7 +90,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                         string logOutput = logParser.ProcessLogLine(e.Data);
                         if (logOutput != null)
                         {
-                            logger.Write(logOutput, LogType.SmallBullet);
+                            _logger.Write(logOutput, LogType.SmallBullet);
                         }
                     };
                     
@@ -123,7 +124,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             }
         }
 
-        protected string GetBuildLogPath(ITargetWorkspace workspace)
+        private string GetBuildLogPath(ITargetWorkspace workspace)
         {
             string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
             return $"{workspace.LogsDirectory}/Unity_Build_Log_{now}.txt";

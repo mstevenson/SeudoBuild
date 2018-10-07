@@ -1,5 +1,6 @@
 ﻿namespace SeudoBuild.Pipeline.Modules.EmailNotify
 {
+    /// <inheritdoc />
     /// <summary>
     /// Configuration values for a notify pipeline step that sends an email.
     /// </summary>

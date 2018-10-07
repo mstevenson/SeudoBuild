@@ -13,14 +13,14 @@ namespace SeudoBuild.Net
     /// </summary>
     public class UdpDiscoveryClient : IDisposable
     {
-        const ushort multicastPort = 6767;
-        const string multicastAddress = "239.17.0.1";
+        private const ushort MulticastPort = 6767;
+        private const string MulticastAddress = "239.17.0.1";
 
-        UdpClient udpClient;
-        IPEndPoint endPoint;
-        Thread receiveThread;
-        Thread pruneThread;
-        ConcurrentDictionary<Guid, UdpDiscoveryBeacon> servers = new ConcurrentDictionary<Guid, UdpDiscoveryBeacon>();
+        private UdpClient _udpClient;
+        private IPEndPoint _endPoint;
+        private Thread _receiveThread;
+        private Thread _pruneThread;
+        private readonly ConcurrentDictionary<Guid, UdpDiscoveryBeacon> _servers = new ConcurrentDictionary<Guid, UdpDiscoveryBeacon>();
 
         /// <summary>
         /// Occurs when a beacon is first received from a UdpDiscoveryServer.
@@ -57,22 +57,20 @@ namespace SeudoBuild.Net
         public void Start()
         {
             // Initialize
-            udpClient = new UdpClient();
-            endPoint = new IPEndPoint(IPAddress.Any, multicastPort);
-            udpClient.Client.Bind(endPoint);
-            var ip = IPAddress.Parse(multicastAddress);
-            udpClient.MulticastLoopback = true;
-            udpClient.JoinMulticastGroup(ip);
+            _udpClient = new UdpClient();
+            _endPoint = new IPEndPoint(IPAddress.Any, MulticastPort);
+            _udpClient.Client.Bind(_endPoint);
+            var ip = IPAddress.Parse(MulticastAddress);
+            _udpClient.MulticastLoopback = true;
+            _udpClient.JoinMulticastGroup(ip);
 
             // Run
-            Console.WriteLine("Server Discovery Started: " + multicastAddress + ":" + multicastPort);
+            Console.WriteLine("Server Discovery Started: " + MulticastAddress + ":" + MulticastPort);
             IsRunning = true;
-            receiveThread = new Thread(new ThreadStart(ReceiveThread));
-            receiveThread.IsBackground = true;
-            receiveThread.Start();
-            pruneThread = new Thread(new ThreadStart(PruneThread));
-            pruneThread.IsBackground = true;
-            pruneThread.Start();
+            _receiveThread = new Thread(ReceiveThread) {IsBackground = true};
+            _receiveThread.Start();
+            _pruneThread = new Thread(PruneThread) {IsBackground = true};
+            _pruneThread.Start();
         }
 
         /// <summary>
@@ -82,42 +80,36 @@ namespace SeudoBuild.Net
         {
             Console.WriteLine("Server Discovery Stopped");
             IsRunning = false;
-            if (udpClient != null)
-            {
-                udpClient.Close();
-            }
+            _udpClient?.Close();
         }
 
         /// <summary>
         /// Listen for new servers.
         /// </summary>
-        void ReceiveThread()
+        private void ReceiveThread()
         {
-            //			try {
+//			try {
             while (IsRunning)
             {
                 // blocking
-                byte[] data = udpClient.Receive(ref endPoint);
-                UdpDiscoveryBeacon serverInfo = UdpDiscoveryBeacon.FromBytes(data);
-                serverInfo.address = endPoint.Address;
+                byte[] data = _udpClient.Receive(ref _endPoint);
+                var serverInfo = UdpDiscoveryBeacon.FromBytes(data);
+                serverInfo.Address = _endPoint.Address;
 
-                if (serverInfo != null)
+                if (_servers.TryGetValue(serverInfo.Guid, out var response))
                 {
-                    UdpDiscoveryBeacon response;
-                    if (servers.TryGetValue(serverInfo.guid, out response))
+                    response.LastSeen = DateTime.Now;
+                }
+                else
+                {
+                    if (_servers.TryAdd(serverInfo.Guid, serverInfo))
                     {
-                        response.lastSeen = DateTime.Now;
-                    }
-                    else
-                    {
-                        if (servers.TryAdd(serverInfo.guid, serverInfo))
-                        {
-                            ServerFound(serverInfo);
-                        }
+                        ServerFound(serverInfo);
                     }
                 }
             }
-            //			} catch {}
+
+//			} catch {}
             IsRunning = false;
         }
 
@@ -125,24 +117,25 @@ namespace SeudoBuild.Net
         /// Prune known servers that have not broadcast discovery beacons
         /// for some time.
         /// </summary>
-        void PruneThread()
+        private void PruneThread()
         {
             while (IsRunning)
             {
                 const int timeout = 3500;
 
                 var now = DateTime.Now;
-                foreach (var kvp in servers)
+                foreach (var kvp in _servers)
                 {
                     var serverInfo = kvp.Value;
-                    var age = now.Subtract(serverInfo.lastSeen);
-                    if (age.TotalMilliseconds >= timeout)
+                    var age = now.Subtract(serverInfo.LastSeen);
+                    if (!(age.TotalMilliseconds >= timeout))
                     {
-                        UdpDiscoveryBeacon removed;
-                        if (servers.TryRemove(kvp.Key, out removed))
-                        {
-                            ServerLost(serverInfo);
-                        }
+                        continue;
+                    }
+
+                    if (_servers.TryRemove(kvp.Key, out _))
+                    {
+                        ServerLost(serverInfo);
                     }
                 }
 
@@ -153,9 +146,7 @@ namespace SeudoBuild.Net
         public void Dispose()
         {
             IsRunning = false;
-            udpClient.Close();
+            _udpClient.Close();
         }
-
     }
-
 }

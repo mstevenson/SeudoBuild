@@ -102,7 +102,7 @@ namespace SeudoBuild.Tests
             }
         }
 
-        public List<string> GetFiles(string directoryPath, string searchPattern = null)
+        public IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null)
         {
             List<string> foundFiles = new List<string>();
             foreach (string file in allFiles.Keys)
@@ -171,7 +171,7 @@ namespace SeudoBuild.Tests
             allFiles[destination] = allFiles[source];
         }
 
-        public List<string> GetDirectories(string directoryPath, string searchPattern = null)
+        public IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null)
         {
             throw new System.NotImplementedException();
         }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace SeudoBuild.Agent
 {
+    /// <inheritdoc />
     /// <summary>
     /// Executes a build pipeline for a given project and target.
     /// </summary>
@@ -13,13 +14,13 @@ namespace SeudoBuild.Agent
         /// </summary>
         public bool IsRunning { get; private set; }
 
-        IModuleLoader moduleLoader;
-        ILogger logger;
+        private readonly IModuleLoader _moduleLoader;
+        private readonly ILogger _logger;
 
         public Builder(IModuleLoader moduleLoader, ILogger logger)
         {
-            this.moduleLoader = moduleLoader;
-            this.logger = logger;
+            _moduleLoader = moduleLoader;
+            _logger = logger;
         }
 
         /// <summary>
@@ -49,8 +50,8 @@ namespace SeudoBuild.Agent
             //Task.Factory.StartNew(() =>
             //{
                 IsRunning = true;
-                PipelineRunner pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputDirectory }, logger);
-                pipeline.ExecutePipeline(projectConfig, target, moduleLoader);
+                PipelineRunner pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputDirectory }, _logger);
+                pipeline.ExecutePipeline(projectConfig, target, _moduleLoader);
                 IsRunning = false;
             //});
 

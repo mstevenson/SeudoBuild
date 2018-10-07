@@ -29,13 +29,13 @@ namespace SeudoBuild.Agent
         }
 
         /// <summary>
-        /// Genereates an agent name based on the given random seed.
+        /// Generates an agent name based on the given random seed.
         /// </summary>
-        static string GetName(Random rand)
+        private static string GetName(Random rand)
         {
-            var adjective = adjectives[rand.Next(0, adjectives.Length)];
+            var adjective = Adjectives[rand.Next(0, Adjectives.Length)];
             //var modifier = modifiers[rand.Next(0, modifiers.Length)];
-            var animal = animals[rand.Next(0, animals.Length)];
+            var animal = Animals[rand.Next(0, Animals.Length)];
             string name = $"{adjective}-{animal}";
             return name.ToLower();
         }
@@ -44,17 +44,17 @@ namespace SeudoBuild.Agent
         /// Returns a concatenated string of the MAC addresses of all network
         /// interfaces.
         /// </summary>
-        static string GetMacAddresses()
+        private static string GetMacAddresses()
         {
-            string macAddresses = string.Empty;
-            foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+            var macAddresses = string.Empty;
+            foreach (var nic in NetworkInterface.GetAllNetworkInterfaces())
             {
                 macAddresses += nic.GetPhysicalAddress().ToString();
             }
             return macAddresses;
         }
 
-        static string[] adjectives =
+        private static readonly string[] Adjectives =
         {
             "abiding",
             "academic",
@@ -277,7 +277,7 @@ namespace SeudoBuild.Agent
             "witty"
         };
 
-        static string[] modifiers =
+        private static readonly string[] Modifiers =
         {
             "asian",
             "australian",
@@ -320,7 +320,7 @@ namespace SeudoBuild.Agent
         };
 
         // Based on https://github.com/hzlzh/Domain-Name-List/blob/master/Animal-words.txt
-        static string[] animals =
+        private static readonly string[] Animals =
         {
             "Aardvark",
             "Albatross",

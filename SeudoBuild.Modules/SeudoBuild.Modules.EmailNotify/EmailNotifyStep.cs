@@ -6,15 +6,15 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
 {
     public class EmailNotifyStep : INotifyStep<EmailNotifyConfig>
     {
-        EmailNotifyConfig config;
-        ILogger logger;
+        private EmailNotifyConfig _config;
+        private ILogger _logger;
 
         public string Type { get; } = "Email Notification";
 
         public void Initialize(EmailNotifyConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.logger = logger;
+            _config = config;
+            _logger = logger;
         }
 
         public NotifyStepResults ExecuteStep(DistributeSequenceResults distributeResults, ITargetWorkspace workspace)
@@ -23,7 +23,7 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
             {
                 string subject = "Build Completed • %project_name% • %build_target_name%";
                 subject = workspace.Macros.ReplaceVariablesInText(subject);
-                SendMessage(config.FromAddress, config.ToAddress, subject, $"Build completed in {distributeResults.Duration} seconds.");
+                SendMessage(_config.FromAddress, _config.ToAddress, subject, $"Build completed in {distributeResults.Duration} seconds.");
                 return new NotifyStepResults { IsSuccess = true };
             }
             catch (Exception e)
@@ -43,22 +43,22 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
                 Text = body
             };
 
-            logger.Write($"Sending email notification to {toAddress}", LogType.SmallBullet);
+            _logger.Write($"Sending email notification to {toAddress}", LogType.SmallBullet);
 
             using (var client = new SmtpClient())
             {
                 client.Timeout = 10000;
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-                client.Connect(config.Host, config.Port, false);
+                client.Connect(_config.Host, _config.Port, false);
                 // Note: since we don't have an OAuth2 token, disable
                 // the XOAUTH2 authentication mechanism.
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(config.SMTPUser, config.SMTPPassword);
+                client.Authenticate(_config.SMTPUser, _config.SMTPPassword);
                 client.Send(message);
                 client.Disconnect(true);
             }
 
-            logger.Write("Email notification sent", LogType.SmallBullet);
+            _logger.Write("Email notification sent", LogType.SmallBullet);
         }
     }
 }

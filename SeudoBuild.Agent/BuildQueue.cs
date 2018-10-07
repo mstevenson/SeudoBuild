@@ -13,23 +13,23 @@ namespace SeudoBuild.Agent
     /// </summary>
     public class BuildQueue : IBuildQueue
     {
-        IBuilder builder;
-        IModuleLoader moduleLoader;
-        ILogger logger;
+        private readonly IBuilder _builder;
+        private readonly IModuleLoader _moduleLoader;
+        private readonly ILogger _logger;
 
-        CancellationTokenSource tokenSource;
-        int buildIndex;
-        bool isQueueRunning;
+        private CancellationTokenSource _tokenSource;
+        private int _buildIndex;
+        private bool _isQueueRunning;
 
         public BuildResult ActiveBuild { get; private set; }
-        ConcurrentQueue<BuildResult> QueuedBuilds { get; } = new ConcurrentQueue<BuildResult>();
-        ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
+        private ConcurrentQueue<BuildResult> QueuedBuilds { get; } = new ConcurrentQueue<BuildResult>();
+        private ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
 
         public BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger logger)
         {
-            this.builder = builder;
-            this.moduleLoader = moduleLoader;
-            this.logger = logger;
+            _builder = builder;
+            _moduleLoader = moduleLoader;
+            _logger = logger;
         }
 
         /// <summary>
@@ -37,21 +37,21 @@ namespace SeudoBuild.Agent
         /// </summary>
         public void StartQueue()
         {
-            if (isQueueRunning)
+            if (_isQueueRunning)
             {
                 return;
             }
-            isQueueRunning = true;
+            _isQueueRunning = true;
 
-            tokenSource = new CancellationTokenSource();
+            _tokenSource = new CancellationTokenSource();
 
             // Create output folder in user's documents folder
             string outputPath = CreateOutputFolder();
 
-            Task.Factory.StartNew(() => TaskQueuePump(outputPath, moduleLoader), tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            Task.Factory.StartNew(() => TaskQueuePump(outputPath, _moduleLoader), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
-        string CreateOutputFolder()
+        private static string CreateOutputFolder()
         {
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             if (TargetWorkspace.RunningPlatform == Platform.Mac)
@@ -70,18 +70,18 @@ namespace SeudoBuild.Agent
             return directory;
         }
 
-        void TaskQueuePump(string outputPath, IModuleLoader moduleLoader)
+        private void TaskQueuePump(string outputPath, IModuleLoader moduleLoader)
         {
             while (true)
             {
                 // Clean up and bail out
-                if (tokenSource.IsCancellationRequested)
+                if (_tokenSource.IsCancellationRequested)
                 {
                     ActiveBuild = null;
                     return;
                 }
 
-                if (!builder.IsRunning && QueuedBuilds.Count > 0)
+                if (!_builder.IsRunning && QueuedBuilds.Count > 0)
                 {
                     BuildResult build = null;
                     if (QueuedBuilds.TryDequeue(out build))
@@ -93,10 +93,10 @@ namespace SeudoBuild.Agent
                         }
 
                         string printableTarget = string.IsNullOrEmpty(build.TargetName) ? "default target" : $"target '{build.TargetName}'";
-                        logger.QueueNotification($"Building project '{build.ProjectConfiguration.ProjectName}', {printableTarget}");
+                        _logger.QueueNotification($"Building project '{build.ProjectConfiguration.ProjectName}', {printableTarget}");
 
                         ActiveBuild = build;
-                        builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath);
+                        _builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath);
                     }
                 }
                 Thread.Sleep(200);
@@ -109,10 +109,10 @@ namespace SeudoBuild.Agent
         /// </summary>
         public BuildResult EnqueueBuild(ProjectConfig config, string target = null)
         {
-            buildIndex++;
+            _buildIndex++;
             var result = new BuildResult
             {
-                Id = buildIndex,
+                Id = _buildIndex,
                 BuildStatus = BuildResult.Status.Queued,
                 ProjectConfiguration = config,
                 TargetName = target
@@ -136,8 +136,7 @@ namespace SeudoBuild.Agent
         /// </summary>
         public BuildResult GetBuildResult(int buildId)
         {
-            BuildResult result = null;
-            Builds.TryGetValue(buildId, out result);
+            Builds.TryGetValue(buildId, out var result);
             return result;
         }
 
@@ -152,8 +151,7 @@ namespace SeudoBuild.Agent
                 // TODO signal build process to stop
             }
 
-            BuildResult result = null;
-            if (Builds.TryGetValue(buildId, out result))
+            if (Builds.TryGetValue(buildId, out var result))
             {
                 result.BuildStatus = BuildResult.Status.Cancelled;
             }

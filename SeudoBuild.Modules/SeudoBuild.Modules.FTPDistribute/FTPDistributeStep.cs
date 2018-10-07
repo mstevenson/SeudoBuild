@@ -6,15 +6,15 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
 {
     public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
     {
-        FTPDistributeConfig config;
-        ILogger logger;
+        private FTPDistributeConfig _config;
+        private ILogger _logger;
 
         public string Type { get; } = "FTP Upload";
 
         public void Initialize(FTPDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
         {
-            this.config = config;
-            this.logger = logger;
+            _config = config;
+            _logger = logger;
         }
 
         public DistributeStepResults ExecuteStep(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace)
@@ -52,11 +52,11 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
             }
         }
 
-        void Upload (ArchiveStepResults archiveInfo, ITargetWorkspace workspace)
+        private void Upload (ArchiveStepResults archiveInfo, ITargetWorkspace workspace)
         {
             // Get the object used to communicate with the server.
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{config.URL}:{config.Port}/{config.BasePath}/{archiveInfo.ArchiveFileName}");
-            request.Credentials = new NetworkCredential(config.Username, config.Password);
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{_config.URL}:{_config.Port}/{_config.BasePath}/{archiveInfo.ArchiveFileName}");
+            request.Credentials = new NetworkCredential(_config.Username, _config.Password);
             request.Method = WebRequestMethods.Ftp.UploadFile;
             request.UseBinary = true;
             request.KeepAlive = true;
@@ -81,7 +81,7 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
             fileStream.Close();
 
             FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-            logger.Write($"Upload File Complete, status {response.StatusDescription}", LogType.SmallBullet);
+            _logger.Write($"Upload File Complete, status {response.StatusDescription}", LogType.SmallBullet);
             response.Close();
         }
     }
