@@ -34,7 +34,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             {
                 //if (IsLFSAvailable())
                 //{
-                    var filter = new LFSFilter("lfs", workspace.SourceDirectory, new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
+                    var filter = new LFSFilter("lfs", workspace.GetDirectory(TargetDirectory.Source), new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
                     _lfsFilter = GlobalSettings.RegisterFilter(filter);
                 //}
                 //else
@@ -83,14 +83,14 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         private Signature _signature;
         private CredentialsHandler _credentialsHandler;
 
-        public bool IsWorkingCopyInitialized => Repository.IsValid(_workspace.SourceDirectory);
+        public bool IsWorkingCopyInitialized => Repository.IsValid(_workspace.GetDirectory(TargetDirectory.Source));
 
         public string CurrentCommit
         {
             get
             {
                 string result;
-                using (var repo = new Repository(_workspace.SourceDirectory))
+                using (var repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source)))
                 {
                     result = repo.Head.Tip.Sha;
                 }
@@ -109,7 +109,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
         private void StoreCredentials()
         {
-            string credentialsPath = $"{_workspace.SourceDirectory}/../git-credentials";
+            string credentialsPath = $"{_workspace.GetDirectory(TargetDirectory.Source)}/../git-credentials";
 
             var uri = new Uri(_config.RepositoryURL);
             // Should use UriBuilder, but it doesn't include the password in the resulting uri string
@@ -126,7 +126,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
         // Clone
         public void Download()
         {
-            _workspace.CleanSourceDirectory();
+            _workspace.CleanDirectory(TargetDirectory.Source);
 
             if (_config.UseLFS)
             {
@@ -138,7 +138,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
                 var uri = new Uri(_config.RepositoryURL);
                 string repoUrlWithPassword = $"{uri.Scheme}://{_config.Username}:{_config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
 
-                ExecuteLFSCommand($"clone {repoUrlWithPassword} {_workspace.SourceDirectory}");
+                ExecuteLFSCommand($"clone {repoUrlWithPassword} {_workspace.GetDirectory(TargetDirectory.Source)}");
             }
             else
             {
@@ -152,7 +152,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
                     RecurseSubmodules = true
                 };
 
-                Repository.Clone(_config.RepositoryURL, _workspace.SourceDirectory, cloneOptions);
+                Repository.Clone(_config.RepositoryURL, _workspace.GetDirectory(TargetDirectory.Source), cloneOptions);
             }
 
             // TODO Handle sub-module credentials
@@ -164,7 +164,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             _logger.Write("Cleaning working copy", LogType.SmallBullet);
 
             // Clean the repo
-            using (var repo = new Repository(_workspace.SourceDirectory))
+            using (var repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source)))
             {
                 //// Skip the LFS smudge filter when resetting the repo.
                 //// LFS files will be integrated manually.
@@ -213,7 +213,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
 
                 if (mergeResult.Status == MergeStatus.UpToDate)
                 {
-                    _logger.Write($"Repository is already up-to-date", LogType.SmallBullet);
+                    _logger.Write("Repository is already up-to-date", LogType.SmallBullet);
                 }
                 else
                 {
@@ -230,7 +230,7 @@ namespace SeudoBuild.Pipeline.Modules.GitSource
             {
                 FileName = "git-lfs",
                 Arguments = arguments,
-                WorkingDirectory = _workspace.SourceDirectory,
+                WorkingDirectory = _workspace.GetDirectory(TargetDirectory.Source),
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,

@@ -27,10 +27,8 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
         /// the folder name ending with the given version number.
         /// Example:  /Applications/Unity 5.3.4f2/Unity.app
         /// </summary>
-        public static UnityInstallation FindUnityInstallation (VersionNumber version, IFileSystem fileSystem)
+        public static UnityInstallation FindUnityInstallation (VersionNumber version, Platform platform)
         {
-            Platform platform = TargetWorkspace.RunningPlatform;
-
             switch (platform)
             {
                 case Platform.Mac:

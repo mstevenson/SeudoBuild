@@ -63,7 +63,7 @@ namespace SeudoBuild.Pipeline.Modules.FTPDistribute
 
             // FIXME abstract IO using IFileSystem
 
-            var file = new FileInfo($"{workspace.ArchivesDirectory}/{archiveInfo.ArchiveFileName}");
+            var file = new FileInfo($"{workspace.GetDirectory(TargetDirectory.Archives)}/{archiveInfo.ArchiveFileName}");
             request.ContentLength = file.Length;
 
             int bufferLength = 16 * 1024;

@@ -10,153 +10,61 @@ namespace SeudoBuild
     // %app_version% -- version number as major.minor.patch
     // %build_date% -- the date that the build was completed
     // %commit_identifier% -- the current commit number or hash
-
-
-    /// <summary>
-    /// Manages the files and directory structure of a specific target within a project.
-    /// </summary>
+    
     public class TargetWorkspace : ITargetWorkspace
     {
-        public static Platform RunningPlatform
-        {
-            get
-            {
-                // macOS is incorrectly detected as Unix. The solution is to check
-                // for the presence of macOS root folders.
-                // http://stackoverflow.com/questions/10138040/how-to-detect-properly-windows-linux-mac-operating-systems
-                switch (Environment.OSVersion.Platform)
-                {
-                    case PlatformID.Unix:
-                        if (Directory.Exists("/Applications")
-                            & Directory.Exists("/System")
-                            & Directory.Exists("/Users")
-                            & Directory.Exists("/Volumes"))
-                            return Platform.Mac;
-                        else
-                            return Platform.Linux;
-                    case PlatformID.MacOSX:
-                        return Platform.Mac;
-
-                    default:
-                        return Platform.Windows;
-                }
-            }
-        }
-
-        public static string StandardOutputPath => RunningPlatform == Platform.Windows ? "CON" : "/dev/stdout";
-
-
-        public enum DirectoryType
-        {
-        }
-
-        public string GetDirectory(DirectoryType type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string CleanDirectory(DirectoryType type)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Contains project files downloaded from a version control system.
-        /// </summary>
-        public string SourceDirectory { get; private set; }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Contains build output files.
-        /// </summary>
-        public string OutputDirectory { get; private set; }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Contains build products that are packaged for distribution or archival.
-        /// </summary>
-        public string ArchivesDirectory { get; private set; }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Contains detailed build logs for this target.
-        /// </summary>
-        public string LogsDirectory { get; private set; }
-
+        private readonly string _baseDirectory;
+        
         public IMacros Macros { get; } = new Macros();
 
-        public IFileSystem FileSystem { get; private set; }
-
-        public TargetWorkspace(string targetDirectory, IFileSystem fileSystem)
+        public IFileSystem FileSystem { get; }
+        
+        public TargetWorkspace(string baseDirectory, IFileSystem fileSystem)
         {
-            SourceDirectory = $"{targetDirectory}/Workspace";
-            Macros["working_directory"] = SourceDirectory;
-
-            OutputDirectory = $"{targetDirectory}/Output";
-            Macros["build_output_directory"] = OutputDirectory;
-
-            ArchivesDirectory = $"{targetDirectory}/Archives";
-            Macros["archives_directory"] = ArchivesDirectory;
-
-            LogsDirectory = $"{targetDirectory}/Logs";
-            Macros["logs_directory"] = LogsDirectory;
-
+            _baseDirectory = baseDirectory;
             FileSystem = fileSystem;
+            
+            Macros["working_directory"] = GetDirectory(TargetDirectory.Source);
+            Macros["build_output_directory"] = GetDirectory(TargetDirectory.Output);
+            Macros["archives_directory"] = GetDirectory(TargetDirectory.Archives);
+            Macros["logs_directory"] = GetDirectory(TargetDirectory.Logs);
         }
-
-        public void CreateSubDirectories()
+        
+        public string GetDirectory(TargetDirectory directory)
         {
-            if (!FileSystem.DirectoryExists(SourceDirectory))
+            switch (directory)
             {
-                FileSystem.CreateDirectory(SourceDirectory);
-            }
-            if (!FileSystem.DirectoryExists(OutputDirectory))
-            {
-                FileSystem.CreateDirectory(OutputDirectory);
-            }
-            if (!FileSystem.DirectoryExists(ArchivesDirectory))
-            {
-                FileSystem.CreateDirectory(ArchivesDirectory);
-            }
-            if (!FileSystem.DirectoryExists(LogsDirectory))
-            {
-                FileSystem.CreateDirectory(LogsDirectory);
+                case TargetDirectory.Source:
+                    return $"{_baseDirectory}/Workspace";
+                case TargetDirectory.Output:
+                    return $"{_baseDirectory}/Output";
+                case TargetDirectory.Archives:
+                    return $"{_baseDirectory}/Archives";
+                case TargetDirectory.Logs:
+                    return $"{_baseDirectory}/Logs";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(directory), directory, null);
             }
         }
 
-        public void CleanSourceDirectory()
+        public void CleanDirectory(TargetDirectory directory)
         {
-            CleanDirectory(SourceDirectory);
-        }
-
-        public void CleanOutputDirectory()
-        {
-            CleanDirectory(OutputDirectory);
-        }
-
-        public void CleanArchivesDirectory()
-        {
-            CleanDirectory(ArchivesDirectory);
-        }
-
-        public void CleanLogsDirectory()
-        {
-            CleanDirectory(LogsDirectory);
-        }
-
-        private void CleanDirectory (string directory)
-        {
-            if (!FileSystem.DirectoryExists(directory))
+            var dir = GetDirectory(directory);
+            
+            if (!FileSystem.DirectoryExists(dir))
             {
                 return;
             }
 
-            FileSystem.DeleteDirectory(directory);
+            FileSystem.DeleteDirectory(dir);
+        }
+
+        public void InitializeDirectories()
+        {
+            FileSystem.CreateDirectory(GetDirectory(TargetDirectory.Source));
+            FileSystem.CreateDirectory(GetDirectory(TargetDirectory.Output));
+            FileSystem.CreateDirectory(GetDirectory(TargetDirectory.Archives));
+            FileSystem.CreateDirectory(GetDirectory(TargetDirectory.Logs));
         }
     }
 }

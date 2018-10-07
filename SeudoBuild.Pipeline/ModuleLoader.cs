@@ -22,7 +22,7 @@ namespace SeudoBuild.Pipeline
             _logger = logger;
         }
 
-        void LoadAssembly(string file)
+        private void LoadAssembly(string file)
         {
             // Absolute path
             file = Path.GetFullPath(file);

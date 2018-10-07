@@ -46,7 +46,7 @@ namespace SeudoBuild.Agent
                 throw new Exception("Could not start build agent discovery client");
             }
 
-            client.ServerFound += (beacon) =>
+            client.ServerFound += beacon =>
             {
                 // Validate build agent name
                 var agentAddress = $"http://{beacon.Address}:{beacon.Port}/info";
@@ -63,7 +63,7 @@ namespace SeudoBuild.Agent
 
                 // Send build request
 
-                var command = target != null ? $"submit/target" : "submit";
+                var command = target != null ? "submit/target" : "submit";
                 var address = $"http://{beacon.Address}:{beacon.Port}/{command}";
 
                 var request = (HttpWebRequest)WebRequest.Create(address);

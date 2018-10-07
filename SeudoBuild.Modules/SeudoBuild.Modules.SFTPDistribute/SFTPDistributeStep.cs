@@ -67,7 +67,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
                 }
             };
                                                                                            
-            ConnectionInfo connectionInfo = new ConnectionInfo(_config.Host, _config.Port, _config.Username, keyboardAuthMethod);
+            var connectionInfo = new ConnectionInfo(_config.Host, _config.Port, _config.Username, keyboardAuthMethod);
 
             using (var client = new SftpClient(connectionInfo))
             {
@@ -77,7 +77,7 @@ namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
                 client.ChangeDirectory(_config.WorkingDirectory);
 
                 string filename = archiveInfo.ArchiveFileName;
-                string filepath = $"{workspace.ArchivesDirectory}/{filename}";
+                string filepath = $"{workspace.GetDirectory(TargetDirectory.Archives)}/{filename}";
 
                 using (var stream = new FileStream(filepath, FileMode.Open))
                 {

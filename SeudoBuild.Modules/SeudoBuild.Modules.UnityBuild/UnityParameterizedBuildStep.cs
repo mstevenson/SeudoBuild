@@ -19,9 +19,9 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             args.Add("-executeMethod");
             args.Add(methodName);
             args.Add("-projectPath");
-            args.Add(Path.Combine(workspace.SourceDirectory, config.SubDirectory));
+            args.Add(Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory));
             args.Add("-logfile");
-            args.Add(TargetWorkspace.StandardOutputPath);
+            args.Add(workspace.FileSystem.StandardOutputPath);
 
             // Custom args
 
@@ -32,7 +32,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             args.Add(System.Enum.GetName(typeof(UnityPlatform), config.TargetPlatform));
 
             args.Add("-outputDirectory");
-            args.Add(workspace.OutputDirectory);
+            args.Add(workspace.GetDirectory(TargetDirectory.Output));
 
             if (config.DevelopmentBuild)
             {

@@ -33,20 +33,20 @@ namespace SeudoBuild.Pipeline.Modules.SMBDistribute
             }
         }
 
-        private void Mount(bool mount, SMBDistributeConfig config)
+        private void Mount(bool mount, SMBDistributeConfig config, Platform platform)
         {
-            if (TargetWorkspace.RunningPlatform == Platform.Mac)
+            if (platform == Platform.Mac)
             {
                 const string mountDir = "SMBDistribute";
                 string serverPath = Path.Combine(config.Host, config.Directory);
                 string command = mount ? "mount" : "umount";
                 var startInfo = new ProcessStartInfo($"/sbin/{command}", $"mount -t -smbfs //{config.Username}:{config.Password}@{serverPath} /Volumes/{mountDir}");
                 var process = Process.Start(startInfo);
-                process.WaitForExit(10000);
+                process?.WaitForExit(10000);
             }
             else
             {
-                throw new Exception("SMB Distribute does not support platform " + TargetWorkspace.RunningPlatform);
+                throw new Exception("SMB Distribute does not support platform " + platform);
             }
         }
     }

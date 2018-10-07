@@ -31,6 +31,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Agent\AgentNameTest.cs" />
     <Compile Include="Core\MockFileSystem.cs" />
     <Compile Include="Core\UnityInstallationTest.cs" />
     <Compile Include="Core\MacrosTest.cs" />

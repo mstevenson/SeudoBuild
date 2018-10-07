@@ -39,7 +39,7 @@ namespace SeudoBuild.Pipeline.Modules.ShellBuild
                 {
                     FileName = "bash",
                     Arguments = $"-c \"{command}\"",
-                    WorkingDirectory = workspace.SourceDirectory,
+                    WorkingDirectory = workspace.GetDirectory(TargetDirectory.Source),
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true

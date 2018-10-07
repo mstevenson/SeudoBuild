@@ -30,7 +30,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                 // Sanitize
                 filename = filename.SanitizeFilename();
                 filename = filename + ".zip";
-                string filepath = $"{workspace.ArchivesDirectory}/{filename}";
+                string filepath = $"{workspace.GetDirectory(TargetDirectory.Archives)}/{filename}";
 
                 // Remove old file
                 if (fs.FileExists(filepath)) {
@@ -43,7 +43,7 @@ namespace SeudoBuild.Pipeline.Modules.ZipArchive
                 using (var zipFile = new ZipFile())
                 using (var stream = fs.OpenWrite(filepath))
                 {
-                    zipFile.AddDirectory(workspace.OutputDirectory);
+                    zipFile.AddDirectory(workspace.GetDirectory(TargetDirectory.Output));
                     zipFile.Save(stream);
                 }
 

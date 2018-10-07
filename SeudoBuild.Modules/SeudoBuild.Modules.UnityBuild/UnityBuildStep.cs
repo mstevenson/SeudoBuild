@@ -9,13 +9,11 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
         where T : UnityBuildConfig
     {
         private T _config;
-        private ITargetWorkspace _workspace;
-        ILogger _logger;
+        private ILogger _logger;
 
         public void Initialize(T config, ITargetWorkspace workspace, ILogger logger)
         {
             _config = config;
-            _workspace = workspace;
             _logger = logger;
         }
 
@@ -32,8 +30,8 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                 unityDirName = $"{unityDirName} {unityVersion.ToString()}";
             }
 
-            var fileSystem = new FileSystem();
-            var unityInstallation = UnityInstallation.FindUnityInstallation(unityVersion, fileSystem);
+            var platform = PlatformUtils.RunningPlatform;
+            var unityInstallation = UnityInstallation.FindUnityInstallation(unityVersion, platform);
 
             var args = GetBuildArgs(_config, workspace);
             var buildResult = ExecuteUnity(unityInstallation, args, workspace, _config.SubDirectory);
@@ -51,7 +49,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
 
             _logger.Write($"Building with Unity {unityInstallation.Version}", LogType.SmallBullet);
 
-            string projectFolderPath = Path.Combine(workspace.SourceDirectory, relativeUnityProjectFolder);
+            string projectFolderPath = Path.Combine(workspace.GetDirectory(TargetDirectory.Source), relativeUnityProjectFolder);
 
             // Validate Unity project folder contents
             var dirs = Directory.GetDirectories(projectFolderPath);
@@ -68,7 +66,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             {
                 FileName = unityInstallation.ExePath,
                 Arguments = arguments,
-                WorkingDirectory = workspace.SourceDirectory,
+                WorkingDirectory = workspace.GetDirectory(TargetDirectory.Source),
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 UseShellExecute = false
@@ -78,7 +76,9 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             {
                 var logParser = new UnityLogParser();
                 
-                string logPath = GetBuildLogPath(workspace);
+                string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+                string logPath = $"{workspace.GetDirectory(TargetDirectory.Logs)}/Unity_Build_Log_{now}.txt";
+                
                 var writer = new StreamWriter(logPath);
                 try
                 {
@@ -122,12 +122,6 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
 
                 return results;
             }
-        }
-
-        private string GetBuildLogPath(ITargetWorkspace workspace)
-        {
-            string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-            return $"{workspace.LogsDirectory}/Unity_Build_Log_{now}.txt";
         }
     }
 }

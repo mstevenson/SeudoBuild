@@ -4,22 +4,13 @@ using System.Collections.Generic;
 namespace SeudoBuild
 {
     /// <summary>
-    /// Default Windows and Mac filesystem for standalone apps.
+    /// Default Windows filesystem for standalone apps.
     /// </summary>
-    public class FileSystem : IFileSystem
+    public class WindowsFileSystem : IFileSystem
     {
-        public string DocumentsPath
-        {
-            get
-            {
-                var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                if (TargetWorkspace.RunningPlatform == Platform.Mac)
-                {
-                    path += "/Documents";
-                }
-                return path;
-            }
-        }
+        public virtual string StandardOutputPath { get; } = "CON";
+        
+        public virtual string DocumentsPath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
         public IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null)
         {

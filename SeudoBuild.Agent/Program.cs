@@ -106,7 +106,7 @@ namespace SeudoBuild.Agent
             ProjectConfig projectConfig = null;
             try
             {
-                var fs = new FileSystem();
+                var fs = new WindowsFileSystem();
                 var serializer = new Serializer(fs);
                 var converters = moduleLoader.Registry.GetJsonConverters();
                 projectConfig = serializer.DeserializeFromFile<ProjectConfig>(opts.ProjectConfigPath, converters);

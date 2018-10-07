@@ -4,8 +4,13 @@ namespace SeudoBuild
 {
     public interface IFileSystem
     {
-        string DocumentsPath { get; }
+        /// <summary>
+        /// Platform-specific commandline standard output.
+        /// </summary>
+        string StandardOutputPath { get; }
 
+        string DocumentsPath { get; }
+        
         IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null);
 
         bool FileExists(string path);

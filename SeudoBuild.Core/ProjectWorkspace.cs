@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.IO;
+
 namespace SeudoBuild
 {
     // Project directory structure example
@@ -14,64 +16,61 @@ namespace SeudoBuild
     //    │ └─• Logs/          // logs pertaining to the specific build target
     //    └─• Target_B/        // another workspace
     //      └─• Source/
-
-    public class ProjectWorkspace
+    
+    public class ProjectWorkspace : IProjectWorkspace
     {
-        public string ProjectDirectory { get; private set; }
-
-        /// <summary>
-        /// Contains high level logs for an entire project.
-        /// </summary>
-        public string LogsDirectory { get; private set; }
-
-        public string TargetsDirectory { get; private set; }
-
-        public IFileSystem FileSystem { get; private set; }
+        private readonly string _baseDirectory;
+        
+        public IFileSystem FileSystem { get; }
+        
+        public IMacros Macros { get; } = new Macros();
 
         public ProjectWorkspace(string projectDirectory, IFileSystem fileSystem)
         {
-            ProjectDirectory = projectDirectory;
             FileSystem = fileSystem;
-            LogsDirectory = $"{ProjectDirectory}/Logs";
-            TargetsDirectory = $"{ProjectDirectory}/Targets";
+            _baseDirectory = projectDirectory;
         }
 
-        public void CreateSubdirectories()
+        public string GetDirectory(ProjectDirectory directory)
         {
-            if (!FileSystem.DirectoryExists(ProjectDirectory))
+            switch (directory)
             {
-                FileSystem.CreateDirectory(ProjectDirectory);
-            }
-            if (!FileSystem.DirectoryExists(LogsDirectory))
-            {
-                FileSystem.CreateDirectory(LogsDirectory);
-            }
-            if (!FileSystem.DirectoryExists(TargetsDirectory))
-            {
-                FileSystem.CreateDirectory(TargetsDirectory);
+                case ProjectDirectory.Project:
+                    return _baseDirectory;
+                case ProjectDirectory.Targets:
+                    return $"{_baseDirectory}/Targets";
+                case ProjectDirectory.Logs:
+                    return $"{_baseDirectory}/Logs";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(directory), directory, null);
             }
         }
-
-        public ITargetWorkspace CreateTarget(string targetName)
+        
+        public void CleanDirectory(ProjectDirectory directory)
         {
-            var targetWorkspace = new TargetWorkspace($"{TargetsDirectory}/{targetName.SanitizeFilename()}", FileSystem);
-            targetWorkspace.CreateSubDirectories();
-            return targetWorkspace;
-        }
-
-        public void CleanLogsDirectory()
-        {
-            CleanDirectory(LogsDirectory);
-        }
-
-        private void CleanDirectory(string directory)
-        {
-            if (!FileSystem.DirectoryExists(directory))
+            var dir = GetDirectory(directory);
+            
+            if (!FileSystem.DirectoryExists(dir))
             {
                 return;
             }
 
-            FileSystem.DeleteDirectory(directory);
+            FileSystem.DeleteDirectory(dir);
+        }
+
+        public void InitializeDirectories()
+        {
+            FileSystem.CreateDirectory(GetDirectory(ProjectDirectory.Project));
+            FileSystem.CreateDirectory(GetDirectory(ProjectDirectory.Targets));
+            FileSystem.CreateDirectory(GetDirectory(ProjectDirectory.Logs));
+        }
+
+        public ITargetWorkspace CreateTarget(string targetName)
+        {
+            var targetsDirectory = GetDirectory(ProjectDirectory.Targets);
+            var targetWorkspace = new TargetWorkspace($"{targetsDirectory}/{targetName.SanitizeFilename()}", FileSystem);
+            targetWorkspace.InitializeDirectories();
+            return targetWorkspace;
         }
     }
 }

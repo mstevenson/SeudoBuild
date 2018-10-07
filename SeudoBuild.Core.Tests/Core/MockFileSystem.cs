@@ -10,22 +10,22 @@ namespace SeudoBuild.Tests
     {
         public class MockMemoryStream : System.IO.MemoryStream
         {
-            System.Action<byte[]> flushCallback;
+            private readonly Action<byte[]> _flushCallback;
 
-            public MockMemoryStream(System.Action<byte[]> flushCallback) : base()
+            public MockMemoryStream(Action<byte[]> flushCallback)
             {
-                this.flushCallback = flushCallback;
+                _flushCallback = flushCallback;
             }
 
-            public MockMemoryStream(byte[] buffer, System.Action<byte[]> flushCallback) : base(buffer)
+            public MockMemoryStream(byte[] buffer, Action<byte[]> flushCallback) : base(buffer)
             {
-                this.flushCallback = flushCallback;
+                _flushCallback = flushCallback;
             }
 
             public override void Flush()
             {
                 base.Flush();
-                flushCallback(base.ToArray());
+                _flushCallback(base.ToArray());
             }
 
             protected override void Dispose(bool disposing)
@@ -37,7 +37,7 @@ namespace SeudoBuild.Tests
 
         public byte[] Data { get; private set; }
 
-        MockMemoryStream writeStream;
+        private MockMemoryStream _writeStream;
 
         public MockFile()
         {
@@ -51,10 +51,10 @@ namespace SeudoBuild.Tests
 
         public System.IO.Stream OpenRead()
         {
-            if (writeStream != null)
+            if (_writeStream != null)
             {
-                writeStream.Flush();
-                Data = writeStream.ToArray();
+                _writeStream.Flush();
+                Data = _writeStream.ToArray();
             }
             var readStream = new MockMemoryStream(Data, OnFlush);
             return readStream;
@@ -62,20 +62,20 @@ namespace SeudoBuild.Tests
 
         public System.IO.Stream OpenWrite()
         {
-            if (writeStream != null && writeStream.CanWrite)
+            if (_writeStream != null && _writeStream.CanWrite)
             {
                 throw new System.IO.IOException("Can't write to mock file, the mock file stream is already open");
             }
             else
             {
-                writeStream = new MockMemoryStream(OnFlush);
+                _writeStream = new MockMemoryStream(OnFlush);
             }
-            return writeStream;
+            return _writeStream;
         }
 
-        void OnFlush(byte[] bytes)
+        private void OnFlush(byte[] bytes)
         {
-            this.Data = bytes;
+            Data = bytes;
         }
     }
 
@@ -84,28 +84,18 @@ namespace SeudoBuild.Tests
     /// </summary>
     public class MockFileSystem : IFileSystem
     {
-        public Dictionary<string, MockFile> allFiles = new Dictionary<string, MockFile>();
+        private readonly Dictionary<string, MockFile> _allFiles = new Dictionary<string, MockFile>();
 
-        public string TemporaryFilesPath
-        {
-            get
-            {
-                return "/temp";
-            }
-        }
+        public string TemporaryFilesPath => "/temp";
 
-        public string DocumentsPath
-        {
-            get
-            {
-                return "/documents";
-            }
-        }
+        public string StandardOutputPath { get; } = "/dev/null";
+
+        public string DocumentsPath => "/documents";
 
         public IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null)
         {
-            List<string> foundFiles = new List<string>();
-            foreach (string file in allFiles.Keys)
+            var foundFiles = new List<string>();
+            foreach (var file in _allFiles.Keys)
             {
                 // TODO implement search string
                 if (file.StartsWith(directoryPath))
@@ -118,57 +108,57 @@ namespace SeudoBuild.Tests
 
         public bool FileExists(string path)
         {
-            return allFiles.ContainsKey(path);
+            return _allFiles.ContainsKey(path);
         }
 
         public void MoveFile(string source, string destination)
         {
-            if (!allFiles.ContainsKey(source))
+            if (!_allFiles.ContainsKey(source))
             {
                 throw new System.IO.FileNotFoundException("Couldn't move file, source file does not exist: " + source);
             }
-            if (allFiles.ContainsKey(destination))
+            if (_allFiles.ContainsKey(destination))
             {
                 throw new System.IO.IOException("Destination exists, could not move file");
             }
-            var data = allFiles[source];
-            allFiles.Remove(source);
-            allFiles.Add(destination, data);
+            var data = _allFiles[source];
+            _allFiles.Remove(source);
+            _allFiles.Add(destination, data);
         }
 
         public void CopyFile(string source, string destination)
         {
-            if (!allFiles.ContainsKey(source))
+            if (!_allFiles.ContainsKey(source))
             {
                 throw new System.IO.FileNotFoundException("Could not copy file, it does not exist: " + source);
             }
             // Overwrite old file
-            if (allFiles.ContainsKey(destination))
+            if (_allFiles.ContainsKey(destination))
             {
-                allFiles.Remove(destination);
+                _allFiles.Remove(destination);
             }
-            byte[] originalData = allFiles[source].Data;
+            byte[] originalData = _allFiles[source].Data;
             int length = originalData.Length;
             byte[] dataCopy = new byte[length];
             Array.Copy(originalData, dataCopy, length);
-            allFiles.Add(destination, new MockFile(dataCopy));
+            _allFiles.Add(destination, new MockFile(dataCopy));
         }
 
         public void DeleteFile(string path)
         {
-            if (allFiles.ContainsKey(path))
+            if (_allFiles.ContainsKey(path))
             {
-                allFiles.Remove(path);
+                _allFiles.Remove(path);
             }
         }
 
         public void ReplaceFile(string source, string destination, string backupDestination)
         {
-            if (allFiles.ContainsKey(destination))
+            if (_allFiles.ContainsKey(destination))
             {
-                allFiles[backupDestination] = allFiles[destination];
+                _allFiles[backupDestination] = _allFiles[destination];
             }
-            allFiles[destination] = allFiles[source];
+            _allFiles[destination] = _allFiles[source];
         }
 
         public IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null)
@@ -193,21 +183,21 @@ namespace SeudoBuild.Tests
 
         public System.IO.Stream OpenRead(string path)
         {
-            if (!allFiles.ContainsKey(path))
+            if (!_allFiles.ContainsKey(path))
             {
                 throw new System.IO.FileNotFoundException("File not found: " + path);
             }
-            var file = allFiles[path].OpenRead();
+            var file = _allFiles[path].OpenRead();
             return file;
         }
 
         public System.IO.Stream OpenWrite(string path)
         {
             MockFile file = null;
-            if (!allFiles.TryGetValue(path, out file))
+            if (!_allFiles.TryGetValue(path, out file))
             {
                 file = new MockFile();
-                allFiles.Add(path, file);
+                _allFiles.Add(path, file);
             }
             return file.OpenWrite();
         }

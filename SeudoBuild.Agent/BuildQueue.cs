@@ -13,6 +13,8 @@ namespace SeudoBuild.Agent
     /// </summary>
     public class BuildQueue : IBuildQueue
     {
+        private const string OutputFolderName = "SeudoBuild";
+        
         private readonly IBuilder _builder;
         private readonly IModuleLoader _moduleLoader;
         private readonly ILogger _logger;
@@ -33,9 +35,9 @@ namespace SeudoBuild.Agent
         }
 
         /// <summary>
-        /// Begin executing builds in the queue. Builds will continue until the queue has been exhaused.
+        /// Begin executing builds in the queue. Builds will continue until the queue has been exhausted.
         /// </summary>
-        public void StartQueue()
+        public void StartQueue(IFileSystem fileSystem)
         {
             if (_isQueueRunning)
             {
@@ -46,23 +48,19 @@ namespace SeudoBuild.Agent
             _tokenSource = new CancellationTokenSource();
 
             // Create output folder in user's documents folder
-            string outputPath = CreateOutputFolder();
+            string outputPath = CreateOutputFolder(fileSystem);
 
             Task.Factory.StartNew(() => TaskQueuePump(outputPath, _moduleLoader), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
-        private static string CreateOutputFolder()
+        private static string CreateOutputFolder(IFileSystem fileSystem)
         {
-            string directory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            if (TargetWorkspace.RunningPlatform == Platform.Mac)
-            {
-                directory = Path.Combine(directory, "Documents");
-            }
+            var directory = fileSystem.DocumentsPath;
             if (!Directory.Exists(directory))
             {
                 throw new DirectoryNotFoundException("User documents folder not found");
             }
-            directory = Path.Combine(directory, "SeudoBuild");
+            directory = Path.Combine(directory, OutputFolderName);
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
@@ -83,8 +81,7 @@ namespace SeudoBuild.Agent
 
                 if (!_builder.IsRunning && QueuedBuilds.Count > 0)
                 {
-                    BuildResult build = null;
-                    if (QueuedBuilds.TryDequeue(out build))
+                    if (QueuedBuilds.TryDequeue(out var build))
                     {
                         // Ignore builds that have been cancelled
                         if (build.BuildStatus != BuildResult.Status.Queued)

@@ -12,7 +12,7 @@ namespace SeudoBuild.Pipeline
     /// </summary>
     public class PipelineRunner
     {
-        readonly PipelineConfig _builderConfig;
+        private readonly PipelineConfig _builderConfig;
 
         private readonly ILogger _logger;
 
@@ -51,10 +51,10 @@ namespace SeudoBuild.Pipeline
             // Create project and target workspaces
             string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
             string projectDirectory = $"{_builderConfig.BaseDirectory}/{projectNameSanitized}";
-            var filesystem = new FileSystem();
+            var filesystem = new WindowsFileSystem();
             var projectWorkspace = new ProjectWorkspace(projectDirectory, filesystem);
-            projectWorkspace.CreateSubdirectories();
-            ITargetWorkspace targetWorkspace = projectWorkspace.CreateTarget(buildTargetName);
+            projectWorkspace.InitializeDirectories();
+            var targetWorkspace = projectWorkspace.CreateTarget(buildTargetName);
 
             // Save a copy of the build project configuration
             var serializer = new Serializer(filesystem);
@@ -65,14 +65,14 @@ namespace SeudoBuild.Pipeline
             var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
             pipeline.LoadBuildStepModules(moduleLoader, targetWorkspace, _logger);
 
-            var macros = targetWorkspace.Macros;
+            var macros = projectWorkspace.Macros;
             macros["project_name"] = pipeline.ProjectConfig.ProjectName;
             macros["build_target_name"] = pipeline.TargetConfig.TargetName;
             macros["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
             macros["app_version"] = pipeline.TargetConfig.Version.ToString();
 
             // Clean
-            targetWorkspace.CleanOutputDirectory();
+            targetWorkspace.CleanDirectory(TargetDirectory.Output);
 
             // Run pipeline
             var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), targetWorkspace);

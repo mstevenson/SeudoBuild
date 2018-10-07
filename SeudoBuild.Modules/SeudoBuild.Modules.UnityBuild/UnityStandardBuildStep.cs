@@ -13,9 +13,9 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
             args.Add("-quit");
             args.Add("-batchmode");
             args.Add("-projectPath");
-            args.Add(Path.Combine(workspace.SourceDirectory, config.SubDirectory));
+            args.Add(Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory));
             args.Add("-logfile");
-            args.Add(TargetWorkspace.StandardOutputPath);
+            args.Add(workspace.FileSystem.StandardOutputPath);
 
             string executableExtension = "";
 
@@ -37,7 +37,7 @@ namespace SeudoBuild.Pipeline.Modules.UnityBuild
                     break;
             }
 
-            string exePath = $"{workspace.OutputDirectory}/{config.OutputName}{executableExtension}";
+            string exePath = $"{workspace.GetDirectory(TargetDirectory.Output)}/{config.OutputName}{executableExtension}";
             args.Add(exePath);
 
             return string.Join(" ", args.ToArray());

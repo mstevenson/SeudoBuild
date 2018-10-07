@@ -22,8 +22,8 @@ namespace SeudoBuild.Pipeline.Modules.FolderArchive
             try
             {
                 string folderName = workspace.Macros.ReplaceVariablesInText(_config.FolderName);
-                string source = workspace.OutputDirectory;
-                string dest = $"{workspace.ArchivesDirectory}/{folderName}";
+                string source = workspace.GetDirectory(TargetDirectory.Output);
+                string dest = $"{workspace.GetDirectory(TargetDirectory.Archives)}/{folderName}";
 
                 // Remove old directory
                 if (workspace.FileSystem.DirectoryExists(dest))
@@ -44,16 +44,16 @@ namespace SeudoBuild.Pipeline.Modules.FolderArchive
 
         private void CopyDirectory(string sourceDir, string destDir)
         {
-            IFileSystem fs = _workspace.FileSystem;
+            var fileSystem = _workspace.FileSystem;
 
-            if (!fs.DirectoryExists(sourceDir))
+            if (!fileSystem.DirectoryExists(sourceDir))
             {
                 throw new System.IO.DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDir);
             }
 
-            if (!fs.DirectoryExists(destDir))
+            if (!fileSystem.DirectoryExists(destDir))
             {
-                fs.CreateDirectory(destDir);
+                fileSystem.CreateDirectory(destDir);
             }
             else
             {
@@ -61,15 +61,15 @@ namespace SeudoBuild.Pipeline.Modules.FolderArchive
             }
 
             // Get the files in the directory and copy them to the new location.
-            var sourceFiles = fs.GetFiles(sourceDir);
+            var sourceFiles = fileSystem.GetFiles(sourceDir);
             foreach (string sourceFile in sourceFiles)
             {
                 string destFile = Path.Combine(destDir, Path.GetFileName(sourceFile));
-                fs.CopyFile(sourceFile, destFile);
+                fileSystem.CopyFile(sourceFile, destFile);
             }
 
             // Copy subdirectories and their contents to new location.
-            var subDirectories = fs.GetDirectories(sourceDir);
+            var subDirectories = fileSystem.GetDirectories(sourceDir);
             foreach (string subDirectory in subDirectories)
             {
                 string destPath = Path.Combine(destDir, Path.GetFileName(subDirectory));
