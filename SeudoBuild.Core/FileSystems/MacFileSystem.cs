@@ -1,4 +1,4 @@
-namespace SeudoBuild
+namespace SeudoBuild.Core.FileSystems
 {
     /// <summary>
     /// Default Mac filesystem for standalone apps.

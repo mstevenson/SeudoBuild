@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {

@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BA8156DD-3699-4184-983C-6EE6C32E2C7C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.ZipArchive</RootNamespace>
+    <RootNamespace>SeudoBuild.Pipeline.Modules.ZipArchive</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.ZipArchive.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>

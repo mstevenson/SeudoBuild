@@ -1,4 +1,6 @@
-﻿namespace SeudoBuild.Pipeline
+﻿using SeudoBuild.Core;
+
+namespace SeudoBuild.Pipeline
 {
     /// <summary>
     /// Loads pipeline module DLLs and makes them available to build scripts

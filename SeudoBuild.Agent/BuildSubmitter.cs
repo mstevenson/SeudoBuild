@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net;
 using SeudoBuild.Net;
 using System.IO;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Agent
 {

@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Tests
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SeudoBuild
+namespace SeudoBuild.Core
 {
     public class Logger : ILogger
     {

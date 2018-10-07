@@ -4,6 +4,7 @@ using System.IO;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using System.Diagnostics;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Modules.GitSource
 {

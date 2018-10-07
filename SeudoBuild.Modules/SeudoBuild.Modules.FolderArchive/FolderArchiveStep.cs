@@ -1,4 +1,5 @@
-﻿using Path = System.IO.Path;
+﻿using SeudoBuild.Core;
+using Path = System.IO.Path;
 
 namespace SeudoBuild.Pipeline.Modules.FolderArchive
 {

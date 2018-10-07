@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Modules.UnityBuild
 {

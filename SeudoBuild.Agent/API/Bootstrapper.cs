@@ -1,4 +1,6 @@
 using Nancy;
+using SeudoBuild.Core;
+using SeudoBuild.Core.FileSystems;
 using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent

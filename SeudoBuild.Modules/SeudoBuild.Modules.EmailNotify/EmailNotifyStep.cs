@@ -1,6 +1,7 @@
 ﻿using System;
 using MailKit.Net.Smtp;
 using MimeKit;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Modules.EmailNotify
 {

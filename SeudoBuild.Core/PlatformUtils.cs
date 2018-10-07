@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace SeudoBuild.Pipeline
+namespace SeudoBuild.Core
 {
     public static class PlatformUtils
     {

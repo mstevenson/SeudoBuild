@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using System.IO;
+﻿using System.IO;
+using Newtonsoft.Json;
 
-namespace SeudoBuild
+namespace SeudoBuild.Core
 {
     public class Serializer
     {

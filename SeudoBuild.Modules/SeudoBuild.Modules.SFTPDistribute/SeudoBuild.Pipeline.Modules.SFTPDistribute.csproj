@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6E953097-7C24-40D6-8E18-2AF54E32F512}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.SFTPDistribute</RootNamespace>
+    <RootNamespace>SeudoBuild.Pipeline.Modules.SFTPDistribute</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.SFTPDistribute</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>

@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{24C0EB80-9E8D-4045-B7F5-13D4CC4A4C9E}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.SteamDistribute</RootNamespace>
+    <RootNamespace>SeudoBuild.Pipeline.Modules.SteamDistribute</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.SteamDistribute.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>

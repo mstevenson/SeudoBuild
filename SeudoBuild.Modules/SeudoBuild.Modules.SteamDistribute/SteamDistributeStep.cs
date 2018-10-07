@@ -1,4 +1,6 @@
-﻿namespace SeudoBuild.Pipeline.Modules.SteamDistribute
+﻿using SeudoBuild.Core;
+
+namespace SeudoBuild.Pipeline.Modules.SteamDistribute
 {
     public class SteamDistributeStep : IDistributeStep<SteamDistributeConfig>
     {

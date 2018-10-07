@@ -1,6 +1,7 @@
 ﻿using System;
 using Path = System.IO.Path;
 using System.Diagnostics;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Modules.SMBDistribute
 {

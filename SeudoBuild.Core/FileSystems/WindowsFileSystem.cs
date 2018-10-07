@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SeudoBuild
+namespace SeudoBuild.Core.FileSystems
 {
     /// <summary>
     /// Default Windows filesystem for standalone apps.

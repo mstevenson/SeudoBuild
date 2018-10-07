@@ -1,5 +1,6 @@
 ﻿using SeudoBuild.Pipeline;
 using System.Threading.Tasks;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Agent
 {

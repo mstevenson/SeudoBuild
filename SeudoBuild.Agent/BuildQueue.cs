@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using SeudoBuild.Core;
 using SeudoBuild.Pipeline;
 
 namespace SeudoBuild.Agent

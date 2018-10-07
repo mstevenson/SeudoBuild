@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using System.Diagnostics;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline
 {

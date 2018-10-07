@@ -1,5 +1,6 @@
 ﻿using System;
 using Ionic.Zip;
+using SeudoBuild.Core;
 using Path = System.IO.Path;
 
 namespace SeudoBuild.Pipeline.Modules.ZipArchive

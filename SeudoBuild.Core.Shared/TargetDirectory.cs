@@ -1,4 +1,4 @@
-﻿namespace SeudoBuild
+﻿namespace SeudoBuild.Core
 {
     /// <summary>
     /// Directories in the top level of a TargetWorkspace folder contained within a project.

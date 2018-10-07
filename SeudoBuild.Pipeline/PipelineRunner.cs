@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text.RegularExpressions;
+using SeudoBuild.Core;
+using SeudoBuild.Core.FileSystems;
 
 namespace SeudoBuild.Pipeline
 {

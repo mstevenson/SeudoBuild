@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Modules.FTPDistribute
 {

@@ -1,4 +1,4 @@
-namespace SeudoBuild
+namespace SeudoBuild.Core
 {
     public interface ITargetWorkspace : IWorkspace<TargetDirectory>
     {

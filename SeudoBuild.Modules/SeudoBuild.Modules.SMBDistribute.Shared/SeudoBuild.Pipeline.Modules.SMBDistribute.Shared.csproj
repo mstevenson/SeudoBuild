@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3B3E5B4C-AB0F-48BA-B264-51E8C4E6324D}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.SMBDistribute</RootNamespace>
+    <RootNamespace>SeudoBuild.Pipeline.Modules.SMBDistribute</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.SMBDistribute.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>

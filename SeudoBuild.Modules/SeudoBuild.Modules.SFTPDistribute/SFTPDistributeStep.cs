@@ -2,6 +2,7 @@
 using System.IO;
 using Renci.SshNet;
 using Renci.SshNet.Common;
+using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Modules.SFTPDistribute
 {

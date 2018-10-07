@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{FB9D0644-FFDC-4C77-90BA-15EC44A333F5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Modules.GitSource</RootNamespace>
+    <RootNamespace>SeudoBuild.Pipeline.Modules.GitSource</RootNamespace>
     <AssemblyName>SeudoBuild.Pipeline.Modules.GitSource.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SeudoBuild
+namespace SeudoBuild.Core
 {
     public interface IFileSystem
     {

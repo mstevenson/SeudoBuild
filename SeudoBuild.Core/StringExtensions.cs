@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
 
-namespace SeudoBuild
+namespace SeudoBuild.Core
 {
     public static class StringExtensions
     {

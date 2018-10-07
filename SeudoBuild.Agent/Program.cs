@@ -2,6 +2,8 @@
 using CommandLine;
 using System.IO;
 using Nancy.Hosting.Self;
+using SeudoBuild.Core;
+using SeudoBuild.Core.FileSystems;
 using SeudoBuild.Pipeline;
 using SeudoBuild.Net;
 
