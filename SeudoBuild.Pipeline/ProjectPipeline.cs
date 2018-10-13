@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using SeudoBuild.Core;
 
@@ -16,7 +17,7 @@ namespace SeudoBuild.Pipeline
             where T : IPipelineStep
         {
             _stepTypeMap.TryGetValue(typeof(T), out var steps);
-            return steps.Cast<T>().ToList();
+            return steps == null ? new List<T>() : steps.Cast<T>().ToList();
         }
 
         public ProjectPipeline (ProjectConfig config, string buildTargetName)
@@ -34,67 +35,37 @@ namespace SeudoBuild.Pipeline
             _stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, workspace, logger);
         }
 
-        private IEnumerable<T> CreatePipelineSteps<T>(IModuleLoader loader, ITargetWorkspace workspace, ILogger logger)
+        public IEnumerable<T> CreatePipelineSteps<T>(IModuleLoader loader, ITargetWorkspace workspace, ILogger logger)
             where T : class, IPipelineStep
         {
             var pipelineSteps = new List<T>();
 
-            if (typeof(T) == typeof(ISourceStep))
+            void RegisterSteps<T2>(IEnumerable<T2> targetStepConfigs) where T2 : StepConfig
             {
-                foreach (var stepConfig in TargetConfig.SourceSteps)
-                {
-                    T step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
-                    if (step != null)
-                    {
-                        pipelineSteps.Add(step);
-                    }
-                }
+                pipelineSteps.AddRange(targetStepConfigs
+                    .Select(config => loader.CreatePipelineStep<T>(config, workspace, logger))
+                    .Where(step => step != null));
             }
-            else if (typeof(T) == typeof(IBuildStep))
+            
+            switch (typeof(T))
             {
-                foreach (var stepConfig in TargetConfig.BuildSteps)
-                {
-                    var step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
-                    if (step != null)
-                    {
-                        pipelineSteps.Add(step);
-                    }
-                }
+                case ISourceStep _:
+                    RegisterSteps(TargetConfig.SourceSteps);
+                    break;
+                case IBuildStep _:
+                    RegisterSteps(TargetConfig.BuildSteps);
+                    break;
+                case IArchiveStep _:
+                    RegisterSteps(TargetConfig.ArchiveSteps);
+                    break;
+                case IDistributeStep _:
+                    RegisterSteps(TargetConfig.DistributeSteps);
+                    break;
+                case INotifyStep _:
+                    RegisterSteps(TargetConfig.NotifySteps);
+                    break;
             }
-            else if (typeof(T) == typeof(IArchiveStep))
-            {
-                foreach (var stepConfig in TargetConfig.ArchiveSteps)
-                {
-                    var step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
-                    if (step != null)
-                    {
-                        pipelineSteps.Add(step);
-                    }
-                }
-            }
-            else if (typeof(T) == typeof(IDistributeStep))
-            {
-                foreach (var stepConfig in TargetConfig.DistributeSteps)
-                {
-                    var step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
-                    if (step != null)
-                    {
-                        pipelineSteps.Add(step);
-                    }
-                }
-            }
-            else if (typeof(T) == typeof(INotifyStep))
-            {
-                foreach (var stepConfig in TargetConfig.NotifySteps)
-                {
-                    var step = loader.CreatePipelineStep<T>(stepConfig, workspace, logger);
-                    if (step != null)
-                    {
-                        pipelineSteps.Add(step);
-                    }
-                }
-            }
-
+            
             return pipelineSteps.AsReadOnly();
         }
     }
