@@ -28,11 +28,16 @@ namespace SeudoBuild.Pipeline
 
         public void LoadBuildStepModules(IModuleLoader moduleLoader, ITargetWorkspace workspace, ILogger logger)
         {
-            _stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, workspace, logger);
-            _stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, workspace, logger);
-            _stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(moduleLoader, workspace, logger);
-            _stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(moduleLoader, workspace, logger);
-            _stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, workspace, logger);
+            void RegisterSteps<T>() where T : class, IPipelineStep
+            {
+                _stepTypeMap[typeof(T)] = CreatePipelineSteps<T>(moduleLoader, workspace, logger);
+            }
+            
+            RegisterSteps<ISourceStep>();
+            RegisterSteps<IBuildStep>();
+            RegisterSteps<IArchiveStep>();
+            RegisterSteps<IDistributeStep>();
+            RegisterSteps<INotifyStep>();
         }
 
         public IEnumerable<T> CreatePipelineSteps<T>(IModuleLoader loader, ITargetWorkspace workspace, ILogger logger)
