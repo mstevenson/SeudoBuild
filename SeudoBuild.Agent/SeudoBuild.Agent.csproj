@@ -53,20 +53,24 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AgentName.cs" />
-    <Compile Include="IReceiver.cs" />
     <Compile Include="API\AgentNancyModule.cs" />
-    <Compile Include="IBuildQueue.cs" />
     <Compile Include="BuildQueue.cs" />
     <Compile Include="Builder.cs" />
     <Compile Include="API\Bootstrapper.cs" />
     <Compile Include="BuildSubmitter.cs" />
-    <Compile Include="IBuilder.cs" />
-    <Compile Include="BuildResult.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SeudoBuild.Agent.Shared\SeudoBuild.Agent.Shared.csproj">
+      <Project>{9d88ecc6-dca7-4991-8e74-c58fb180304d}</Project>
+      <Name>SeudoBuild.Agent.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj">
       <Project>{96AEC5D7-D646-4A04-8624-383CC86C047C}</Project>
       <Name>SeudoBuild.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SeudoBuild.Net.Shared\SeudoBuild.Net.Shared.csproj">
+      <Project>{f9085390-bbc1-4027-be8c-58e4103241ce}</Project>
+      <Name>SeudoBuild.Net.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\SeudoBuild.Pipeline\SeudoBuild.Pipeline.csproj">
       <Project>{3682F0E1-DFF6-4C84-9DE2-0E9E9AE7933B}</Project>

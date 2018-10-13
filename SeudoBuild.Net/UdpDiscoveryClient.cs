@@ -11,7 +11,7 @@ namespace SeudoBuild.Net
     /// Listens for UDP beacon packets that are broadcast at regular intervals
     /// on the local network by a UdpDiscoveryServer.
     /// </summary>
-    public class UdpDiscoveryClient : IDisposable
+    public class UdpDiscoveryClient : IDiscoveryClient<UdpDiscoveryBeacon>, IDisposable
     {
         private const ushort MulticastPort = 6767;
         private const string MulticastAddress = "239.17.0.1";

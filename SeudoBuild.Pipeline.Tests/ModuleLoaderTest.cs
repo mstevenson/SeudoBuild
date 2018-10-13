@@ -1,10 +1,10 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace SeudoBuild.Agent.Tests
+namespace SeudoBuild.Pipeline.Tests
 {
     [TestFixture]
-    public class Tests
+    public class ModuleLoaderTest
     {
         [Test]
         public void Test1()

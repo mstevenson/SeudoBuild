@@ -191,10 +191,12 @@ namespace SeudoBuild.Agent
                 return 1;
             }
 
-            var submit = new BuildSubmitter(_logger);
+            var buildSubmitter = new BuildSubmitter(_logger);
             try
             {
-                submit.Submit(configJson, opts.BuildTarget, opts.AgentName);
+                // Find agent on the network, with timeout
+                var discoveryClient = new UdpDiscoveryClient();
+                buildSubmitter.Submit(discoveryClient, configJson, opts.BuildTarget, opts.AgentName);
             }
             catch (Exception e)
             {

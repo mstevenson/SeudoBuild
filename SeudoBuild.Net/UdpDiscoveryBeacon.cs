@@ -8,28 +8,28 @@ namespace SeudoBuild.Net
     /// UdpDiscoveryServer. A UdpDiscoveryClient listens for beacons, enabling
     /// automatic service discovery on the local network.
     /// </summary>
-    public class UdpDiscoveryBeacon
+    public class UdpDiscoveryBeacon : IDiscoveryBeacon
     {
         /// <summary>
         /// String identifier that begins each UDP server discovery message.
         /// </summary>
         public const string ServiceId = "SEUD";
 
-        public ushort Version = 1;
+        public ushort Version { get; set; } = 1;
 
-        public IPAddress Address;
+        public IPAddress Address { get; set; }
 
         /// <summary>
         /// Unique ID for a server.
         /// </summary>
-        public Guid Guid;
+        public Guid Guid { get; set; }
 
         /// <summary>
         /// Port for REST API.
         /// </summary>
-        public ushort Port;
+        public ushort Port { get; set; }
 
-        public DateTime LastSeen;
+        public DateTime LastSeen { get; set; }
 
         public UdpDiscoveryBeacon()
         {
@@ -40,7 +40,6 @@ namespace SeudoBuild.Net
 
         public static UdpDiscoveryBeacon FromBytes(byte[] data)
         {
-            var s = new UdpDiscoveryBeacon();
             var index = 0;
 
             // ASCII Service ID
@@ -57,20 +56,20 @@ namespace SeudoBuild.Net
 
             // Beacon version number
             byte[] versionBytes = Slice(data, index, 2);
-            s.Version = BitConverter.ToUInt16(versionBytes, 0);
+            var version = BitConverter.ToUInt16(versionBytes, 0);
             index += versionBytes.Length;
 
             // Server GUID
             byte[] guidBytes = Slice(data, index, 16);
-            s.Guid = new Guid(guidBytes);
+            var guid = new Guid(guidBytes);
             index += guidBytes.Length;
 
             // REST API port
             byte[] portBytes = Slice(data, index, 2);
-            s.Port = BitConverter.ToUInt16(portBytes, 0);
+            var port = BitConverter.ToUInt16(portBytes, 0);
             index += portBytes.Length;
 
-            return s;
+            return new UdpDiscoveryBeacon { Port = port, Version = version, Guid = guid };
         }
 
         private static byte[] Slice(byte[] source, int index, int length)

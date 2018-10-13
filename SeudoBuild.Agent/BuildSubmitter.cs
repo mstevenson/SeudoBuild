@@ -14,7 +14,7 @@ namespace SeudoBuild.Agent
     public class BuildSubmitter
     {
         // FIXME don't hard-code
-        private const int Port = 5511;
+        //private const int Port = 5511;
 
         private readonly ILogger _logger;
 
@@ -27,27 +27,20 @@ namespace SeudoBuild.Agent
         /// Submit the given project configuration and build target to a build
         /// agent on the network.
         /// </summary>
-        public void Submit(string projectJson, string target, string agentName)
+        public void Submit(IDiscoveryClient<IDiscoveryBeacon> discoveryClient, string projectJson, string target, string agentName)
         {
             _logger.Write("Submitting build to " + agentName);
-
-            // Find agent on the network, with timeout
-            var discovery = new UdpDiscoveryClient();
-            discovery.Start();
-
-            //while (!discovery.AvailableServers.Any (s => s.guid);
-
-            var client = new UdpDiscoveryClient();
+            
             try
             {
-                client.Start();
+                discoveryClient.Start();
             }
             catch (System.Net.Sockets.SocketException)
             {
                 throw new Exception("Could not start build agent discovery client");
             }
 
-            client.ServerFound += beacon =>
+            discoveryClient.ServerFound += beacon =>
             {
                 // Validate build agent name
                 var agentAddress = $"http://{beacon.Address}:{beacon.Port}/info";

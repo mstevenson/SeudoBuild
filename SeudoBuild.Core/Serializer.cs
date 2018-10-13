@@ -5,7 +5,7 @@ namespace SeudoBuild.Core
 {
     public class Serializer
     {
-        readonly IFileSystem _fileSystem;
+        private readonly IFileSystem _fileSystem;
 
         public string FileExtension { get; } = ".json";
 

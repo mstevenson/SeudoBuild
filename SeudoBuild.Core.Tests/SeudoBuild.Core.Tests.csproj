@@ -33,6 +33,8 @@
   <ItemGroup>
     <Compile Include="MacrosTest.cs" />
     <Compile Include="MockFileSystem.cs" />
+    <Compile Include="ProjectWorkspaceTest.cs" />
+    <Compile Include="StringExtensionsTest.cs" />
     <Compile Include="UnityInstallationTest.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -49,24 +48,18 @@ namespace SeudoBuild.Agent
             _tokenSource = new CancellationTokenSource();
 
             // Create output folder in user's documents folder
-            string outputPath = CreateOutputFolder(fileSystem);
-
-            Task.Factory.StartNew(() => TaskQueuePump(outputPath, _moduleLoader), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-        }
-
-        private static string CreateOutputFolder(IFileSystem fileSystem)
-        {
-            var directory = fileSystem.DocumentsPath;
-            if (!Directory.Exists(directory))
+            var outputPath = fileSystem.DocumentsPath;
+            if (!fileSystem.DirectoryExists(outputPath))
             {
                 throw new DirectoryNotFoundException("User documents folder not found");
             }
-            directory = Path.Combine(directory, OutputFolderName);
-            if (!Directory.Exists(directory))
+            outputPath = Path.Combine(outputPath, OutputFolderName);
+            if (!fileSystem.DirectoryExists(outputPath))
             {
-                Directory.CreateDirectory(directory);
+                fileSystem.CreateDirectory(outputPath);
             }
-            return directory;
+
+            Task.Factory.StartNew(() => TaskQueuePump(outputPath, _moduleLoader), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private void TaskQueuePump(string outputPath, IModuleLoader moduleLoader)

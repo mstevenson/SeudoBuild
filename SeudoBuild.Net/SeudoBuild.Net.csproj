@@ -43,5 +43,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SeudoBuild.Net.Shared\SeudoBuild.Net.Shared.csproj">
+      <Project>{f9085390-bbc1-4027-be8c-58e4103241ce}</Project>
+      <Name>SeudoBuild.Net.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

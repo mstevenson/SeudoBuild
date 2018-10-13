@@ -75,6 +75,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Net", "SeudoBuil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Agent.Tests", "SeudoBuild.Agent.Tests\SeudoBuild.Agent.Tests.csproj", "{6C63AC5D-BF62-4F5D-90A5-478E93CCB8DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Net.Shared", "SeudoBuild.Net.Shared\SeudoBuild.Net.Shared.csproj", "{F9085390-BBC1-4027-BE8C-58E4103241CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Agent.Shared", "SeudoBuild.Agent.Shared\SeudoBuild.Agent.Shared.csproj", "{9D88ECC6-DCA7-4991-8E74-C58FB180304D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Net.Tests", "SeudoBuild.Net.Tests\SeudoBuild.Net.Tests.csproj", "{F0536FD7-0207-49BE-A38F-43C2A691179F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Tests", "SeudoBuild.Pipeline.Tests\SeudoBuild.Pipeline.Tests.csproj", "{0AC47D40-84B6-45EC-A851-94D896B72EC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +205,22 @@ Global
 		{6C63AC5D-BF62-4F5D-90A5-478E93CCB8DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C63AC5D-BF62-4F5D-90A5-478E93CCB8DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C63AC5D-BF62-4F5D-90A5-478E93CCB8DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9085390-BBC1-4027-BE8C-58E4103241CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9085390-BBC1-4027-BE8C-58E4103241CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9085390-BBC1-4027-BE8C-58E4103241CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9085390-BBC1-4027-BE8C-58E4103241CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D88ECC6-DCA7-4991-8E74-C58FB180304D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D88ECC6-DCA7-4991-8E74-C58FB180304D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D88ECC6-DCA7-4991-8E74-C58FB180304D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D88ECC6-DCA7-4991-8E74-C58FB180304D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0536FD7-0207-49BE-A38F-43C2A691179F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0536FD7-0207-49BE-A38F-43C2A691179F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0536FD7-0207-49BE-A38F-43C2A691179F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0536FD7-0207-49BE-A38F-43C2A691179F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AC47D40-84B6-45EC-A851-94D896B72EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AC47D40-84B6-45EC-A851-94D896B72EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AC47D40-84B6-45EC-A851-94D896B72EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AC47D40-84B6-45EC-A851-94D896B72EC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -237,5 +261,7 @@ Global
 		{4A9529A8-F773-4827-BCF4-60B524E6CA52} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
 		{9BCE9E90-7578-47B6-830A-D98E6801041F} = {269F0074-8DDA-403B-811E-A8C9727AA5A5}
 		{6C63AC5D-BF62-4F5D-90A5-478E93CCB8DB} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
+		{F0536FD7-0207-49BE-A38F-43C2A691179F} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
+		{0AC47D40-84B6-45EC-A851-94D896B72EC4} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
 	EndGlobalSection
 EndGlobal
