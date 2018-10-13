@@ -130,7 +130,8 @@ namespace SeudoBuild.Agent
                 parentDirectory = new FileInfo(opts.ProjectConfigPath).Directory?.FullName;
             }
 
-            bool success = builder.Build(projectConfig, opts.BuildTarget, parentDirectory);
+            var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = parentDirectory }, _logger);
+            bool success = builder.Build(pipeline, projectConfig, opts.BuildTarget);
 
             return success ? 0 : 1;
         }

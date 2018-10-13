@@ -8,6 +8,7 @@ namespace SeudoBuild.Agent
     public interface IBuilder
     {
         bool IsRunning { get; }
-        bool Build(ProjectConfig projectConfig, string target, string parentDirectory);
+        
+        bool Build(IPipelineRunner pipeline, ProjectConfig projectConfig, string target);
     }
 }

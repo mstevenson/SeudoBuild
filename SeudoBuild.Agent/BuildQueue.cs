@@ -94,7 +94,8 @@ namespace SeudoBuild.Agent
                         _logger.QueueNotification($"Building project '{build.ProjectConfiguration.ProjectName}', {printableTarget}");
 
                         ActiveBuild = build;
-                        _builder.Build(ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName, outputPath);
+                        var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputPath }, _logger);
+                        _builder.Build(pipeline, ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName);
                     }
                 }
                 Thread.Sleep(200);

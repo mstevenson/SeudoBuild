@@ -27,7 +27,7 @@ namespace SeudoBuild.Agent
         /// <summary>
         /// Execute a build for the given project and target.
         /// </summary>
-        public bool Build(ProjectConfig projectConfig, string target, string outputDirectory)
+        public bool Build(IPipelineRunner pipeline, ProjectConfig projectConfig, string target)
         {
             if (projectConfig == null)
             {
@@ -49,7 +49,6 @@ namespace SeudoBuild.Agent
 
             // Execute build
             IsRunning = true;
-            var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputDirectory }, _logger);
             pipeline.ExecutePipeline(projectConfig, target, _moduleLoader);
             IsRunning = false;
             

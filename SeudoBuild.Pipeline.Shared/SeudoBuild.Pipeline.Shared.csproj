@@ -33,6 +33,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPipelineRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\ArchiveSequenceResults.cs" />
     <Compile Include="Results\ArchiveStepResults.cs" />

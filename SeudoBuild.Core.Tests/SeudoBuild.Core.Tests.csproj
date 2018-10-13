@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{4A9529A8-F773-4827-BCF4-60B524E6CA52}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SeudoBuild.Tests</RootNamespace>
+    <RootNamespace>SeudoBuild.Core.Tests</RootNamespace>
     <AssemblyName>SeudoBuild.Core.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
@@ -31,11 +31,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agent\AgentNameTest.cs" />
-    <Compile Include="Core\MockFileSystem.cs" />
-    <Compile Include="Core\UnityInstallationTest.cs" />
-    <Compile Include="Core\MacrosTest.cs" />
-    <Compile Include="Agent\AgentLocatorTest.cs" />
+    <Compile Include="MacrosTest.cs" />
+    <Compile Include="MockFileSystem.cs" />
+    <Compile Include="UnityInstallationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -53,10 +51,6 @@
       <Project>{64E2D8F1-B08C-4B87-A283-252C31693DC6}</Project>
       <Name>SeudoBuild.Agent</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core\" />
-    <Folder Include="Agent\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

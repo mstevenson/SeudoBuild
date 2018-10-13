@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
-using SeudoBuild.Core;
 
-namespace SeudoBuild.Tests
+namespace SeudoBuild.Core.Tests
 {
     [TestFixture]
     public class MacrosTest

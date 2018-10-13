@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
-using SeudoBuild;
 
-namespace SeudoBuild.Tests
+namespace SeudoBuild.Core.Tests
 {
     [TestFixture]
     public class UnityInstallationTest

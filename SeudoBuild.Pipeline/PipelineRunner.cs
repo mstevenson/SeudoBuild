@@ -10,15 +10,14 @@ namespace SeudoBuild.Pipeline
     /// <summary>
     /// Executes all pipeline steps in a given project for a given build target.
     /// </summary>
-    public class PipelineRunner
+    public class PipelineRunner : IPipelineRunner
     {
-        private readonly PipelineConfig _builderConfig;
-
+        private readonly PipelineConfig _config;
         private readonly ILogger _logger;
 
         public PipelineRunner(PipelineConfig config, ILogger logger)
         {
-            _builderConfig = config;
+            _config = config;
             _logger = logger;
         }
 
@@ -50,7 +49,7 @@ namespace SeudoBuild.Pipeline
 
             // Create project and target workspaces
             string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
-            string projectDirectory = $"{_builderConfig.BaseDirectory}/{projectNameSanitized}";
+            string projectDirectory = $"{_config.BaseDirectory}/{projectNameSanitized}";
             var filesystem = new WindowsFileSystem();
             var projectWorkspace = new ProjectWorkspace(projectDirectory, filesystem);
             projectWorkspace.InitializeDirectories();

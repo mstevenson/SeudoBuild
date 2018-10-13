@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using SeudoBuild.Core;
 
-namespace SeudoBuild.Tests
+namespace SeudoBuild.Core.Tests
 {
     /// <summary>
     /// A file stream that isn't closed after reading or writing, and flushes to a byte array.
