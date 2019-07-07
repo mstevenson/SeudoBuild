@@ -15,7 +15,7 @@ namespace SeudoBuild.Agent
 
         protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
         {
-            StaticConfiguration.DisableErrorTraces = false;
+//            StaticConfiguration.DisableErrorTraces = false;
 
             base.ConfigureApplicationContainer(container);
             // FIXME the entry point method also initializes a logger

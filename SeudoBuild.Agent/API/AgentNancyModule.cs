@@ -16,16 +16,16 @@ namespace SeudoBuild.Agent
         public AgentNancyModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem, ILogger logger)
         {
             // Build agent info
-            Get["/info"] = parameters =>
+            Get("/info", parameters =>
             {
                 //moduleLoader.Registry.
 
                 var proj = new AgentLocation { AgentName = AgentName.GetUniqueAgentName() };
                 return Response.AsJson(proj);
-            };
+            });
 
             // Build the default target in a project configuration
-            Post["/build"] = parameters =>
+            Post("/build", parameters =>
             {
                 try
                 {
@@ -39,10 +39,10 @@ namespace SeudoBuild.Agent
                     logger.Write(e.Message, LogType.Failure);
                     return HttpStatusCode.BadRequest;
                 }
-            };
+            });
 
             // Build a specific target within a given project configuration
-            Post["/build/{target}"] = parameters =>
+            Post("/build/{target}", parameters =>
             {
                 try
                 {
@@ -57,10 +57,10 @@ namespace SeudoBuild.Agent
                     logger.Write(e.Message, LogType.Failure);
                     return HttpStatusCode.BadRequest;
                 }
-            };
+            });
 
             // Get info for a specific build task
-            Get["/queue"] = parameters =>
+            Get("/queue", parameters =>
             {
                 try
                 {
@@ -71,10 +71,10 @@ namespace SeudoBuild.Agent
                 {
                     return HttpStatusCode.BadRequest;
                 }
-            };
+            });
 
             // Get info for a specific build task
-            Get["/queue/{id:int}"] = parameters =>
+            Get("/queue/{id:int}", parameters =>
             {
                 try
                 {
@@ -86,10 +86,10 @@ namespace SeudoBuild.Agent
                 {
                     return HttpStatusCode.BadRequest;
                 }
-            };
+            });
 
             // Cancel a build task
-            Post["/queue/{id:int}/cancel"] = parameters =>
+            Post("/queue/{id:int}/cancel", parameters =>
             {
                 try
                 {
@@ -101,7 +101,7 @@ namespace SeudoBuild.Agent
                 {
                     return HttpStatusCode.BadRequest;
                 }
-            };
+            });
         }
 
         ProjectConfig ProcessReceivedBuildRequest(Request request, string target, IModuleLoader moduleLoader, IFileSystem filesystem)
