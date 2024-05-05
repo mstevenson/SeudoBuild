@@ -1,60 +1,56 @@
-using System;
-using NUnit.Framework;
+namespace SeudoCI.Agent.Tests;
+
 using NSubstitute;
-using NUnit.Framework.Constraints;
-using SeudoCI.Pipeline;
-using SeudoCI.Core;
+using Pipeline;
+using Core;
 
-namespace SeudoCI.Agent.Tests
+[TestFixture]
+public class BuilderTest
 {
-    [TestFixture]
-    public class BuilderTest
+    private IModuleLoader _mockLoader;
+    private ILogger _mockLogger;
+    private IPipelineRunner _mockPipeline;
+        
+    [SetUp]
+    public void SetUp()
     {
-        private IModuleLoader _mockLoader;
-        private ILogger _mockLogger;
-        private IPipelineRunner _mockPipeline;
+        _mockLoader = Substitute.For<IModuleLoader>();
+        _mockLogger = Substitute.For<ILogger>();
+        _mockPipeline = Substitute.For<IPipelineRunner>();
+    }
         
-        [SetUp]
-        public void SetUp()
-        {
-            _mockLoader = Substitute.For<IModuleLoader>();
-            _mockLogger = Substitute.For<ILogger>();
-            _mockPipeline = Substitute.For<IPipelineRunner>();
-        }
-        
-        [Test]
-        public void Build_ProjectConfigIsNull_ThrowsException()
-        {
-            var builder = new Builder(_mockLoader, _mockLogger);
+    [Test]
+    public void Build_ProjectConfigIsNull_ThrowsException()
+    {
+        var builder = new Builder(_mockLoader, _mockLogger);
             
-            Assert.Throws<ArgumentException> (() =>
-            {
-                builder.Build(_mockPipeline, null, "target");
-            });
-        }
-
-        [Test]
-        public void Build_EmptyConfig_TargetIsNull_ThrowsException()
+        Assert.Throws<ArgumentException> (() =>
         {
-            var builder = new Builder(_mockLoader, _mockLogger);
-            var config = new ProjectConfig();
+            builder.Build(_mockPipeline, null, "target");
+        });
+    }
 
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                builder.Build(_mockPipeline, config, null);
-            });
-        }
+    [Test]
+    public void Build_EmptyConfig_TargetIsNull_ThrowsException()
+    {
+        var builder = new Builder(_mockLoader, _mockLogger);
+        var config = new ProjectConfig();
 
-        [Test]
-        public void Build_WithConfig_ExecutesPipeline()
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
-            var builder = new Builder(_mockLoader, _mockLogger);
-            var config = new ProjectConfig();
-            var target = "target";
+            builder.Build(_mockPipeline, config, null);
+        });
+    }
 
-            builder.Build(_mockPipeline, config, target);
+    [Test]
+    public void Build_WithConfig_ExecutesPipeline()
+    {
+        var builder = new Builder(_mockLoader, _mockLogger);
+        var config = new ProjectConfig();
+        var target = "target";
+
+        builder.Build(_mockPipeline, config, target);
             
-            _mockPipeline.Received().ExecutePipeline(config, target, _mockLoader);
-        }
+        _mockPipeline.Received().ExecutePipeline(config, target, _mockLoader);
     }
 }

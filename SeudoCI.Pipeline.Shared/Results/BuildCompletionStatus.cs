@@ -1,10 +1,9 @@
-﻿namespace SeudoCI.Pipeline
+﻿namespace SeudoCI.Pipeline;
+
+public enum BuildCompletionStatus
 {
-    public enum BuildCompletionStatus
-    {
-        None,
-        Running,
-        Completed,
-        Faulted
-    }
+    None,
+    Running,
+    Completed,
+    Faulted
 }

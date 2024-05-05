@@ -1,16 +1,12 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿namespace SeudoCI.Pipeline.Modules.UnityBuild;
 
-namespace SeudoCI.Pipeline.Modules.UnityBuild
+public class UnityStandardBuildModule : IBuildModule
 {
-    public class UnityStandardBuildModule : IBuildModule
-    {
-        public string Name { get; } = "Unity (Standard)";
+    public string Name => "Unity (Standard)";
 
-        public Type StepType { get; } = typeof(UnityStandardBuildStep);
+    public Type StepType { get; } = typeof(UnityStandardBuildStep);
 
-        public Type StepConfigType { get; } = typeof(UnityStandardBuildConfig);
+    public Type StepConfigType { get; } = typeof(UnityStandardBuildConfig);
 
-        public string StepConfigName { get; } = "Unity Standard Build";
-    }
+    public string StepConfigName => "Unity Standard Build";
 }

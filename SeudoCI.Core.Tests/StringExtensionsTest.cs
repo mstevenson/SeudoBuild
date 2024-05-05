@@ -1,20 +1,17 @@
-using NUnit.Framework;
+namespace SeudoCI.Core.Tests;
 
-namespace SeudoCI.Core.Tests
+[TestFixture]
+public class StringExtensionsTest
 {
-    [TestFixture]
-    public class StringExtensionsTest
+    [Test]
+    public void SanitizeFilename_ReplacesSpaces()
     {
-        [Test]
-        public void SanitizeFilename_ReplacesSpaces()
-        {
-            Assert.Fail();
-        }
+        Assert.Fail();
+    }
         
-        [Test]
-        public void SanitizeFilename_DoesNotContainInvalidCharacters()
-        {
-            Assert.Fail();
-        }
+    [Test]
+    public void SanitizeFilename_DoesNotContainInvalidCharacters()
+    {
+        Assert.Fail();
     }
 }

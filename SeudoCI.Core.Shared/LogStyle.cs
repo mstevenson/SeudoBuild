@@ -1,11 +1,10 @@
-﻿namespace SeudoCI.Core
+﻿namespace SeudoCI.Core;
+
+public enum LogStyle
 {
-    public enum LogStyle
-    {
-        None,
-        Bold,
-        Dim,
-        Underline,
-        Invert
-    }
+    None,
+    Bold,
+    Dim,
+    Underline,
+    Invert
 }

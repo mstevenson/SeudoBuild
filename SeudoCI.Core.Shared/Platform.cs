@@ -1,10 +1,9 @@
-﻿namespace SeudoCI.Core
+﻿namespace SeudoCI.Core;
+
+public enum Platform
 {
-    public enum Platform
-    {
-        None,
-        Mac,
-        Windows,
-        Linux
-    }
+    None,
+    Mac,
+    Windows,
+    Linux
 }

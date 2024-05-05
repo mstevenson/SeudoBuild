@@ -1,15 +1,12 @@
-﻿using System;
+﻿namespace SeudoCI.Pipeline.Modules.SMBDistribute;
 
-namespace SeudoCI.Pipeline.Modules.SMBDistribute
+public class SMBDistributeModule : IDistributeModule
 {
-    public class SMBDistributeModule : IDistributeModule
-    {
-        public string Name { get; } = "SMB";
+    public string Name => "SMB";
 
-        public Type StepType { get; } = typeof(SMBDistributeStep);
+    public Type StepType { get; } = typeof(SMBDistributeStep);
 
-        public Type StepConfigType { get; } = typeof(SMBDistributeConfig);
+    public Type StepConfigType { get; } = typeof(SMBDistributeConfig);
 
-        public string StepConfigName { get; } = "SMB Transfer";
-    }
+    public string StepConfigName => "SMB Transfer";
 }

@@ -1,10 +1,7 @@
-using NUnit.Framework;
+namespace SeudoCI.Net.Tests;
 
-namespace SeudoCI.Net.Tests
+[TestFixture]
+public class UdpDiscoveryServerTest
 {
-    [TestFixture]
-    public class UdpDiscoveryServerTest
-    {
         
-    }
 }

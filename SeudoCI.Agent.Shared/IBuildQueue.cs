@@ -1,21 +1,20 @@
-﻿using System.Collections.Generic;
-using SeudoCI.Pipeline;
+﻿namespace SeudoCI.Agent;
 
-namespace SeudoCI.Agent
+using System.Collections.Generic;
+using Pipeline;
+
+/// <summary>
+/// Queues projects and feeds them sequentially to a builder.
+/// </summary>
+public interface IBuildQueue
 {
-    /// <summary>
-    /// Queues projects and feeds them sequentially to a builder.
-    /// </summary>
-    public interface IBuildQueue
-    {
-        BuildResult ActiveBuild { get; }
+    BuildResult ActiveBuild { get; }
 
-        BuildResult EnqueueBuild(ProjectConfig config, string target = null);
+    BuildResult EnqueueBuild(ProjectConfig config, string target = null);
 
-        IEnumerable<BuildResult> GetAllBuildResults();
+    IEnumerable<BuildResult> GetAllBuildResults();
 
-        BuildResult GetBuildResult(int buildId);
+    BuildResult GetBuildResult(int buildId);
 
-        BuildResult CancelBuild(int buildId);
-    }
+    BuildResult CancelBuild(int buildId);
 }

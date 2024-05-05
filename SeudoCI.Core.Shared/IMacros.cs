@@ -1,9 +1,8 @@
-﻿namespace SeudoCI.Core
-{
-    public interface IMacros
-    {
-        string ReplaceVariablesInText(string source);
+﻿namespace SeudoCI.Core;
 
-        string this[string index] { get; set; }
-    }
+public interface IMacros
+{
+    string ReplaceVariablesInText(string source);
+
+    string this[string index] { get; set; }
 }

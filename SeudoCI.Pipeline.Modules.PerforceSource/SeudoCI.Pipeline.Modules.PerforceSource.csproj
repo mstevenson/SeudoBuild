@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.Perforce.Shared\SeudoCI.Pipeline.Modules.Perforce.Shared.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.PerforceSource.Shared\SeudoCI.Pipeline.Modules.PerforceSource.Shared.csproj" />
       <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
     </ItemGroup>
 

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SeudoCI.Pipeline.Modules.UnityBuild;
 
-namespace SeudoCI.Pipeline.Modules.UnityBuild
+public class UnityExecuteMethodBuildModule : IBuildModule
 {
-    public class UnityExecuteMethodBuildModule : IBuildModule
-    {
-        public string Name { get; } = "Unity (Execute Method)";
+    public string Name => "Unity (Execute Method)";
 
-        public Type StepType { get; } = typeof(UnityExecuteMethodBuildStep);
+    public Type StepType { get; } = typeof(UnityExecuteMethodBuildStep);
 
-        public Type StepConfigType { get; } = typeof(UnityExecuteMethodBuildConfig);
+    public Type StepConfigType { get; } = typeof(UnityExecuteMethodBuildConfig);
 
-        public string StepConfigName { get; } = "Unity Execute Method";
-    }
+    public string StepConfigName => "Unity Execute Method";
 }

@@ -1,4 +1,4 @@
-namespace SeudoCI.Pipeline.Modules.Perforce;
+namespace SeudoCI.Pipeline.Modules.PerforceSource;
 
 public class PerforceModule : ISourceModule
 {

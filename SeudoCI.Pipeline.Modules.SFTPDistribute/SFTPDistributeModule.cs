@@ -1,15 +1,12 @@
-﻿using System;
+﻿namespace SeudoCI.Pipeline.Modules.SFTPDistribute;
 
-namespace SeudoCI.Pipeline.Modules.SFTPDistribute
+public class SFTPDistributeModule : IDistributeModule
 {
-    public class SFTPDistributeModule : IDistributeModule
-    {
-        public string Name { get; } = "SFTP";
+    public string Name => "SFTP";
 
-        public Type StepType { get; } = typeof(SFTPDistributeStep);
+    public Type StepType { get; } = typeof(SFTPDistributeStep);
 
-        public Type StepConfigType { get; } = typeof(SFTPDistributeConfig);
+    public Type StepConfigType { get; } = typeof(SFTPDistributeConfig);
 
-        public string StepConfigName { get; } = "SFTP Upload";
-    }
+    public string StepConfigName => "SFTP Upload";
 }

@@ -1,10 +1,7 @@
-using NUnit.Framework;
+namespace SeudoCI.Pipeline.Tests;
 
-namespace SeudoCI.Pipeline.Tests
+[TestFixture]
+public class ModuleLoaderFactoryTest
 {
-    [TestFixture]
-    public class ModuleLoaderFactoryTest
-    {
         
-    }
 }

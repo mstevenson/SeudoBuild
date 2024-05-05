@@ -1,10 +1,9 @@
-﻿namespace SeudoCI.Pipeline
+﻿namespace SeudoCI.Pipeline;
+
+/// <inheritdoc />
+/// <summary>
+/// Results from building project files.
+/// </summary>
+public class BuildStepResults : PipelineStepResults
 {
-    /// <inheritdoc />
-    /// <summary>
-    /// Results from building project files.
-    /// </summary>
-    public class BuildStepResults : PipelineStepResults
-    {
-    }
 }

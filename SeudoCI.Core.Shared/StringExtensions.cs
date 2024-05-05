@@ -1,21 +1,19 @@
-﻿using System.IO;
+﻿namespace SeudoCI.Core;
+
 using System.Text.RegularExpressions;
 
-namespace SeudoCI.Core
+public static class StringExtensions
 {
-    public static class StringExtensions
+    private static readonly Regex Regex;
+
+    static StringExtensions()
     {
-        private static readonly Regex Regex;
+        var regexString = new string(Path.GetInvalidFileNameChars());
+        Regex = new Regex($"[{Regex.Escape(regexString)}]");
+    }
 
-        static StringExtensions()
-        {
-            var regexString = new string(Path.GetInvalidFileNameChars());
-            Regex = new Regex($"[{Regex.Escape(regexString)}]");
-        }
-
-        public static string SanitizeFilename(this string filename)
-        {
-            return Regex.Replace(filename, "").Replace(' ', '_');
-        }
+    public static string SanitizeFilename(this string filename)
+    {
+        return Regex.Replace(filename, "").Replace(' ', '_');
     }
 }

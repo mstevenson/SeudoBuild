@@ -1,10 +1,9 @@
-﻿namespace SeudoCI.Pipeline
+﻿namespace SeudoCI.Pipeline;
+
+/// <inheritdoc />
+/// <summary>
+/// A pipeline module that retrieves project source files from a repository.
+/// </summary>
+public interface ISourceModule : IModule
 {
-    /// <inheritdoc />
-    /// <summary>
-    /// A pipeline module that retrieves project source files from a repository.
-    /// </summary>
-    public interface ISourceModule : IModule
-    {
-    }
 }

@@ -83,9 +83,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoCI.Net.Tests", "SeudoC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoCI.Pipeline.Tests", "SeudoCI.Pipeline.Tests\SeudoCI.Pipeline.Tests.csproj", "{09AA4E61-759A-4840-9E0A-49692E995780}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoCI.Pipeline.Modules.Perforce", "SeudoCI.Pipeline.Modules.Perforce\SeudoCI.Pipeline.Modules.Perforce.csproj", "{C3A5E86C-947D-47E5-8A1D-66DDADD4900C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoCI.Pipeline.Modules.PerforceSource", "SeudoCI.Pipeline.Modules.PerforceSource\SeudoCI.Pipeline.Modules.PerforceSource.csproj", "{C3A5E86C-947D-47E5-8A1D-66DDADD4900C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoCI.Pipeline.Modules.Perforce.Shared", "SeudoCI.Pipeline.Modules.Perforce.Shared\SeudoCI.Pipeline.Modules.Perforce.Shared.csproj", "{D747B71E-B94B-4219-BC13-23167C1C7BA7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoCI.Pipeline.Modules.PerforceSource.Shared", "SeudoCI.Pipeline.Modules.PerforceSource.Shared\SeudoCI.Pipeline.Modules.PerforceSource.Shared.csproj", "{D747B71E-B94B-4219-BC13-23167C1C7BA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

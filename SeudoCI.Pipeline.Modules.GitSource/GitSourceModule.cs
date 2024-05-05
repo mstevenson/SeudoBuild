@@ -1,15 +1,12 @@
-﻿using System;
+﻿namespace SeudoCI.Pipeline.Modules.GitSource;
 
-namespace SeudoCI.Pipeline.Modules.GitSource
+public class GitSourceModule : ISourceModule
 {
-    public class GitSourceModule : ISourceModule
-    {
-        public string Name { get; } = "Git";
+    public string Name => "Git";
 
-        public Type StepType { get; } = typeof(GitSourceStep);
+    public Type StepType { get; } = typeof(GitSourceStep);
 
-        public Type StepConfigType { get; } = typeof(GitSourceConfig);
+    public Type StepConfigType { get; } = typeof(GitSourceConfig);
 
-        public string StepConfigName { get; } = "Git";
-    }
+    public string StepConfigName => "Git";
 }

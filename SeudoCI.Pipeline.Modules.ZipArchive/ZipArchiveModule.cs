@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿namespace SeudoCI.Pipeline.Modules.ZipArchive;
 
-namespace SeudoCI.Pipeline.Modules.ZipArchive
+public class ZipArchiveModule : IArchiveModule
 {
-    public class ZipArchiveModule : IArchiveModule
-    {
-        public string Name { get; } = "Zip";
+    public string Name => "Zip";
 
-        public Type StepType { get; } = typeof(ZipArchiveStep);
+    public Type StepType { get; } = typeof(ZipArchiveStep);
 
-        public Type StepConfigType { get; } = typeof(ZipArchiveConfig);
+    public Type StepConfigType { get; } = typeof(ZipArchiveConfig);
 
-        public string StepConfigName { get; } = "Zip File";
-
-    }
+    public string StepConfigName => "Zip File";
 }

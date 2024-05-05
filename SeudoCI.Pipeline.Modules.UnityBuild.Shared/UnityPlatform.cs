@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿namespace SeudoCI.Pipeline.Modules.UnityBuild;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace SeudoCI.Pipeline.Modules.UnityBuild
+[JsonConverter(typeof(StringEnumConverter))]
+public enum UnityPlatform
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum UnityPlatform
-    {
-        Mac,
-        Windows,
-        Linux
-    }
+    Mac,
+    Windows,
+    Linux
 }

@@ -1,11 +1,10 @@
-﻿namespace SeudoCI.Pipeline
+﻿namespace SeudoCI.Pipeline;
+
+/// <inheritdoc />
+/// <summary>
+/// Results from creating an archive from a build product.
+/// </summary>
+public class ArchiveStepResults : PipelineStepResults
 {
-    /// <inheritdoc />
-    /// <summary>
-    /// Results from creating an archive from a build product.
-    /// </summary>
-    public class ArchiveStepResults : PipelineStepResults
-    {
-        public string ArchiveFileName { get; set; }
-    }
+    public string ArchiveFileName { get; set; }
 }

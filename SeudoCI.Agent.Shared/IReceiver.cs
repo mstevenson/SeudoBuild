@@ -1,7 +1,6 @@
-﻿namespace SeudoCI.Agent
+﻿namespace SeudoCI.Agent;
+
+public interface IReceiver
 {
-    public interface IReceiver
-    {
-        void Subscribe();
-    }
+    void Subscribe();
 }

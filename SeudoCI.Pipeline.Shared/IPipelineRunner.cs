@@ -1,7 +1,6 @@
-﻿namespace SeudoCI.Pipeline
+﻿namespace SeudoCI.Pipeline;
+
+public interface IPipelineRunner
 {
-    public interface IPipelineRunner
-    {
-        void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, IModuleLoader moduleLoader);
-    }
+    void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, IModuleLoader moduleLoader);
 }

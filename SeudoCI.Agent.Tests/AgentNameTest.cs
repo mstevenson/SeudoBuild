@@ -1,19 +1,16 @@
-using System;
-using NUnit.Framework;
-using SeudoCI.Agent;
+namespace SeudoCI.Tests;
 
-namespace SeudoCI.Tests
+using Agent;
+
+[TestFixture]
+public class AgentNameTest
 {
-    [TestFixture]
-    public class AgentNameTest
+    [Test]
+    public void GetRandomName_ReturnsName()
     {
-        [Test]
-        public void GetRandomName_ReturnsName()
-        {
-            var rand = new Random(1000);
-            var name = AgentName.GetRandomName(rand);
+        var rand = new Random(1000);
+        var name = AgentName.GetRandomName(rand);
             
-            Assert.That("cheerful-dragonfly", Is.EqualTo(name));
-        }
+        Assert.That("cheerful-dragonfly", Is.EqualTo(name));
     }
 }

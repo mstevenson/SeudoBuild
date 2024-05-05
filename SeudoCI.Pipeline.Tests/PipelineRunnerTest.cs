@@ -1,10 +1,7 @@
-using NUnit.Framework;
+namespace SeudoCI.Pipeline.Tests;
 
-namespace SeudoCI.Pipeline.Tests
+[TestFixture]
+public class PipelineRunnerTest
 {
-    [TestFixture]
-    public class PipelineRunnerTest
-    {
         
-    }
 }

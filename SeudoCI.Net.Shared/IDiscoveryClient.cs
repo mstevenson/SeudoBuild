@@ -1,16 +1,15 @@
-﻿using System;
+﻿namespace SeudoCI.Net;
 
-namespace SeudoCI.Net
+using System;
+
+public interface IDiscoveryClient<out T>
+    where T : IDiscoveryBeacon
 {
-    public interface IDiscoveryClient<out T>
-        where T : IDiscoveryBeacon
-    {
-        event Action<T> ServerFound;
-        event Action<T> ServerLost;
+    event Action<T> ServerFound;
+    event Action<T> ServerLost;
         
-        bool IsRunning { get; }
+    bool IsRunning { get; }
 
-        void Start();
-        void Stop();
-    }
+    void Start();
+    void Stop();
 }

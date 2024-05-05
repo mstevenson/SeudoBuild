@@ -1,4 +1,4 @@
-namespace SeudoCI.Pipeline.Modules.Perforce.Shared;
+namespace SeudoCI.Pipeline.Modules.PerforceSource.Shared;
 
 public class PerforceConfig : SourceStepConfig
 {

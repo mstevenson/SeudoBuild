@@ -1,49 +1,40 @@
-﻿using System.IO;
+﻿namespace SeudoCI.Core;
+
 using Newtonsoft.Json;
 
-namespace SeudoCI.Core
+public class Serializer(IFileSystem fileSystem)
 {
-    public class Serializer
+    public string FileExtension { get; } = ".json";
+
+    public T Deserialize<T>(string json, JsonConverter[] converters)
     {
-        private readonly IFileSystem _fileSystem;
+        var settings = new JsonSerializerSettings { Converters = converters };
+        T obj = JsonConvert.DeserializeObject<T>(json, settings);
+        return obj;
+    }
 
-        public string FileExtension { get; } = ".json";
-
-        public Serializer(IFileSystem fileSystem)
+    public T DeserializeFromFile<T>(string path, JsonConverter[] converters)
+    {
+        using (TextReader tr = new StreamReader(fileSystem.OpenRead(path)))
         {
-            _fileSystem = fileSystem;
+            var json = tr.ReadToEnd();
+            return Deserialize<T>(json, converters);
         }
+    }
 
-        public T Deserialize<T>(string json, JsonConverter[] converters)
-        {
-            var settings = new JsonSerializerSettings { Converters = converters };
-            T obj = JsonConvert.DeserializeObject<T>(json, settings);
-            return obj;
-        }
+    public string Serialize<T>(T obj)
+    {
+        var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+        return json;
+    }
 
-        public T DeserializeFromFile<T>(string path, JsonConverter[] converters)
+    public void SerializeToFile<T>(T obj, string path)
+    {
+        if (fileSystem.FileExists(path))
         {
-            using (TextReader tr = new StreamReader(_fileSystem.OpenRead(path)))
-            {
-                var json = tr.ReadToEnd();
-                return Deserialize<T>(json, converters);
-            }
+            fileSystem.DeleteFile(path);
         }
-
-        public string Serialize<T>(T obj)
-        {
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            return json;
-        }
-
-        public void SerializeToFile<T>(T obj, string path)
-        {
-            if (_fileSystem.FileExists(path))
-            {
-                _fileSystem.DeleteFile(path);
-            }
-            var json = Serialize(obj);
-            _fileSystem.WriteAllText(path, json);
-        }
+        var json = Serialize(obj);
+        fileSystem.WriteAllText(path, json);
     }
 }

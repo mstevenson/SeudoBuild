@@ -1,15 +1,14 @@
-﻿namespace SeudoCI.Core
+﻿namespace SeudoCI.Core;
+
+public enum LogType
 {
-    public enum LogType
-    {
-        Header,
-        None,
-        Plus,
-        Bullet,
-        SmallBullet,
-        Success,
-        Failure,
-        Alert,
-        Debug
-    }
+    Header,
+    None,
+    Plus,
+    Bullet,
+    SmallBullet,
+    Success,
+    Failure,
+    Alert,
+    Debug
 }

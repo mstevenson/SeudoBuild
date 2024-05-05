@@ -1,6 +1,5 @@
-namespace SeudoCI.Core
+namespace SeudoCI.Core;
+
+public interface ITargetWorkspace : IWorkspace<TargetDirectory>
 {
-    public interface ITargetWorkspace : IWorkspace<TargetDirectory>
-    {
-    }
 }

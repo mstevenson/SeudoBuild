@@ -1,7 +1,6 @@
-﻿namespace SeudoCI.Core
+﻿namespace SeudoCI.Core;
+
+public interface IProjectWorkspace : IWorkspace<ProjectDirectory>
 {
-    public interface IProjectWorkspace : IWorkspace<ProjectDirectory>
-    {
-        ITargetWorkspace CreateTarget(string targetName);
-    }
+    ITargetWorkspace CreateTarget(string targetName);
 }

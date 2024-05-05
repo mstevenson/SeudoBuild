@@ -1,8 +1,8 @@
-using SeudoCI.Core;
-using SeudoCI.Pipeline.Modules.Perforce.Shared;
-using Perforce.P4;
+namespace SeudoCI.Pipeline.Modules.PerforceSource;
 
-namespace SeudoCI.Pipeline.Modules.Perforce;
+using Core;
+using Shared;
+using Perforce.P4;
 
 public class PerforceStep : ISourceStep<PerforceConfig>
 {
