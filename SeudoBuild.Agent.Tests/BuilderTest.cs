@@ -39,7 +39,7 @@ namespace SeudoBuild.Agent.Tests
             var builder = new Builder(_mockLoader, _mockLogger);
             var config = new ProjectConfig();
 
-            Assert.Throws<IndexOutOfRangeException>(() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 builder.Build(_mockPipeline, config, null);
             });
