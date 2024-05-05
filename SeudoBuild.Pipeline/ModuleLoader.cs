@@ -23,22 +23,27 @@ namespace SeudoBuild.Pipeline
             _logger = logger;
         }
 
-        private void LoadAssembly(string file)
+        private static Assembly[] PreloadAssemblies(string[] files)
         {
-            // Absolute path
-            file = Path.GetFullPath(file);
-
-            if (!File.Exists(file))
+            var assemblies = new Assembly[files.Length];
+            for (var i = 0; i < files.Length; i++)
             {
-                return;
+                var file = files[i];
+                try
+                {
+                    var assembly = Assembly.LoadFile(file);
+                    assemblies[i] = assembly;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Could not load assembly {file}: {e.Message}");
+                }
             }
-            if (!file.EndsWith(".dll", true, null))
-            {
-                return;
-            }
+            return assemblies;
+        }
 
-            Assembly moduleAssembly = Assembly.LoadFile(file);
-
+        private bool TryLoadModuleAssembly(Assembly assembly)
+        {
             string[] moduleBaseTypeNames = {
                 nameof(ISourceModule),
                 nameof(IBuildModule),
@@ -51,7 +56,7 @@ namespace SeudoBuild.Pipeline
             {
                 // Locate all types in the assembly that inherit from IModule
                 Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals(PipelineAssemblyName));
-                Type[] allTypesInAssembly = moduleAssembly.GetTypes();
+                Type[] allTypesInAssembly = assembly.GetTypes();
 
                 var moduleTypesInAssembly = (
                     from baseTypeName in moduleBaseTypeNames
@@ -61,16 +66,19 @@ namespace SeudoBuild.Pipeline
                 );
 
                 // Instantiate each IModule type
+                bool found = false;
                 foreach (Type moduleType in moduleTypesInAssembly)
                 {
+                    found = true;
                     DebugWrite($"       Activating type:  {moduleType}");
                     object obj = Activator.CreateInstance(moduleType);
                     Registry.RegisterModule((IModule)obj);
                 }
+                return found;
             }
             catch (Exception e)
             {
-                throw new Exception($"Could not load module {file}: {e.Message}");
+                throw new Exception($"Could not load module {assembly.FullName}: {e.Message}");
             }
         }
 
@@ -83,20 +91,24 @@ namespace SeudoBuild.Pipeline
             {
                 DebugWrite($"[Started module {Path.GetFileName(moduleDirectory)}]");
                 string[] files = Directory.GetFiles(moduleDirectory, "*.dll");
-                foreach (var file in files)
+                var assemblies = PreloadAssemblies(files);
+                foreach (var assembly in assemblies)
                 {
                     try
                     {
-                        LoadAssembly(file);
-                        DebugWrite($"    {Path.GetFileName(Path.GetDirectoryName(file))}/{Path.GetFileName(file)}");
+                        var loaded = TryLoadModuleAssembly(assembly);
+                        if (loaded)
+                        {
+                            DebugWrite($"    {Path.GetFileName(assembly.Location)}");
+                        }
                     }
                     catch (FileLoadException e)
                     {
-                        throw new ModuleLoadException($"Assembly for module {Path.GetFileName(moduleDirectory)} could not be loaded at {file}", e);
+                        throw new ModuleLoadException($"Assembly for module {Path.GetFileName(moduleDirectory)} could not be loaded at {assembly.Location}", e);
                     }
                     catch (FileNotFoundException e)
                     {
-                        throw new ModuleLoadException($"Assembly for module {Path.GetFileName(moduleDirectory)} was not found at {file}", e);
+                        throw new ModuleLoadException($"Assembly for module {Path.GetFileName(moduleDirectory)} was not found at {assembly.Location}", e);
                     }
                     catch
                     {
