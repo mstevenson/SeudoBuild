@@ -83,6 +83,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Net.Tests", "Seu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Tests", "SeudoBuild.Pipeline.Tests\SeudoBuild.Pipeline.Tests.csproj", "{09AA4E61-759A-4840-9E0A-49692E995780}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.Perforce", "SeudoBuild.Pipeline.Modules.Perforce\SeudoBuild.Pipeline.Modules.Perforce.csproj", "{C3A5E86C-947D-47E5-8A1D-66DDADD4900C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeudoBuild.Pipeline.Modules.Perforce.Shared", "SeudoBuild.Pipeline.Modules.Perforce.Shared\SeudoBuild.Pipeline.Modules.Perforce.Shared.csproj", "{D747B71E-B94B-4219-BC13-23167C1C7BA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -221,6 +225,14 @@ Global
 		{09AA4E61-759A-4840-9E0A-49692E995780}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09AA4E61-759A-4840-9E0A-49692E995780}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09AA4E61-759A-4840-9E0A-49692E995780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3A5E86C-947D-47E5-8A1D-66DDADD4900C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3A5E86C-947D-47E5-8A1D-66DDADD4900C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3A5E86C-947D-47E5-8A1D-66DDADD4900C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3A5E86C-947D-47E5-8A1D-66DDADD4900C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D747B71E-B94B-4219-BC13-23167C1C7BA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D747B71E-B94B-4219-BC13-23167C1C7BA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D747B71E-B94B-4219-BC13-23167C1C7BA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D747B71E-B94B-4219-BC13-23167C1C7BA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -263,5 +275,7 @@ Global
 		{A5392A40-0370-4C46-A1FD-ED70377C60B3} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
 		{F11D7C29-55AB-4642-BF87-4DB87C76C0A1} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
 		{09AA4E61-759A-4840-9E0A-49692E995780} = {C56A876C-C89F-41CA-A853-D3CBAD5FDF7B}
+		{C3A5E86C-947D-47E5-8A1D-66DDADD4900C} = {900780D6-2BCF-45B8-AA48-C03CF745621E}
+		{D747B71E-B94B-4219-BC13-23167C1C7BA7} = {900780D6-2BCF-45B8-AA48-C03CF745621E}
 	EndGlobalSection
 EndGlobal

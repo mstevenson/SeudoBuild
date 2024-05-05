@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="p4api.net" Version="2023.2.258.5793" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SeudoBuild.Pipeline.Modules.Perforce.Shared\SeudoBuild.Pipeline.Modules.Perforce.Shared.csproj" />
+      <ProjectReference Include="..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj" />
+    </ItemGroup>
+
+</Project>
