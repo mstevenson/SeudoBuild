@@ -7,7 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SeudoBuild.Core.Shared\SeudoBuild.Core.Shared.csproj" />
       <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj" />
+      <ProjectReference Include="..\SeudoBuild.Pipeline.Modules.UnityBuild.Shared\SeudoBuild.Pipeline.Modules.UnityBuild.Shared.csproj" />
       <ProjectReference Include="..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj" />
     </ItemGroup>
 

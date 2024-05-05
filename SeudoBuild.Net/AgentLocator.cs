@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace SeudoBuild.Net
 {
@@ -122,7 +123,7 @@ namespace SeudoBuild.Net
                 var readStream = new StreamReader(resultStream, System.Text.Encoding.UTF8);
                 var json = readStream.ReadToEnd();
 
-                var agent = Newtonsoft.Json.JsonConvert.DeserializeObject<AgentLocation>(json);
+                var agent = JsonConvert.DeserializeObject<AgentLocation>(json);
                 // FIXME should the agent have set its own address before responding? Does it even know its own address?
                 agent.Address = beacon.Address.ToString();
                 //logger.WriteBullet($"{agentInfo.AgentName} ({beacon.address.ToString()})");

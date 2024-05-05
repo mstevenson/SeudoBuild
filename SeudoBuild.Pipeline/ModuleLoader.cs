@@ -13,8 +13,8 @@ namespace SeudoBuild.Pipeline
     {
         public IModuleRegistry Registry { get; } = new ModuleRegistry();
 
-        private const string PipelineNamespace = "SeudoBuild.Pipeline";
-        private const string PipelineAssemblyName = "SeudoBuild.Pipeline.Shared";
+        private const string PipelineNamespace = "SeudoBuild.Pipeline-old";
+        private const string PipelineAssemblyName = "SeudoBuild.Pipeline-old.Shared-old";
 
         private readonly ILogger _logger;
 
@@ -61,7 +61,7 @@ namespace SeudoBuild.Pipeline
                 var moduleTypesInAssembly = (
                     from baseTypeName in moduleBaseTypeNames
                     from type in allTypesInAssembly
-                    where coreAssembly.GetType($"SeudoBuild.Pipeline.{baseTypeName}").IsAssignableFrom(type)
+                    where coreAssembly.GetType($"SeudoBuild.Pipeline-old.{baseTypeName}").IsAssignableFrom(type)
                     select type
                 );
 

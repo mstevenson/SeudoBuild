@@ -7,8 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj" />
+      <ProjectReference Include="..\SeudoBuild.Pipeline.Modules.EmailNotify.Shared\SeudoBuild.Pipeline.Modules.EmailNotify.Shared.csproj" />
       <ProjectReference Include="..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MailKit" Version="4.5.0" />
     </ItemGroup>
 
 </Project>

@@ -7,8 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj" />
+      <ProjectReference Include="..\SeudoBuild.Pipeline.Modules.ZipArchive.Shared\SeudoBuild.Pipeline.Modules.ZipArchive.Shared.csproj" />
       <ProjectReference Include="..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DotNetZip" Version="1.16.0" />
     </ItemGroup>
 
 </Project>

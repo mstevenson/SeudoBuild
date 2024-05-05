@@ -4,10 +4,11 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SeudoBuild.Core\SeudoBuild.Core.csproj" />
+      <ProjectReference Include="..\SeudoBuild.Pipeline.Modules.FolderArchive.Shared\SeudoBuild.Pipeline.Modules.FolderArchive.Shared.csproj" />
       <ProjectReference Include="..\SeudoBuild.Pipeline.Shared\SeudoBuild.Pipeline.Shared.csproj" />
     </ItemGroup>
 
