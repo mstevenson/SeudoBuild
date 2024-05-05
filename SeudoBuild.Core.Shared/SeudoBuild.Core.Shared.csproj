@@ -7,7 +7,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SeudoBuild.Core</RootNamespace>
     <AssemblyName>SeudoBuild.Core.Shared</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

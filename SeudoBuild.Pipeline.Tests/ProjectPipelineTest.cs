@@ -1,5 +1,6 @@
 using NSubstitute;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using SeudoBuild.Core;
 
 namespace SeudoBuild.Pipeline.Tests

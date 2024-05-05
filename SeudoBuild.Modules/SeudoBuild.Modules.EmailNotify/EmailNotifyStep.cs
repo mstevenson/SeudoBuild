@@ -37,7 +37,7 @@ namespace SeudoBuild.Pipeline.Modules.EmailNotify
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("SeudoBuild", fromAddress));
-            message.To.Add(new MailboxAddress(toAddress));
+            message.To.Add(new MailboxAddress("recipient", toAddress));
             message.Subject = subject;
             message.Body = new TextPart("plain")
             {

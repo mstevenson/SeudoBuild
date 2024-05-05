@@ -13,7 +13,7 @@ namespace SeudoBuild.Tests
             var rand = new Random(1000);
             var name = AgentName.GetRandomName(rand);
             
-            Assert.AreEqual("cheerful-dragonfly", name);
+            Assert.That("cheerful-dragonfly", Is.EqualTo(name));
         }
     }
 }
