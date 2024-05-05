@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>SeudoCI.Pipeline.Modules.FolderArchive</AssemblyName>
+        <RootNamespace>SeudoCI.Pipeline.Modules.FolderArchive</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.FolderArchive.Shared\SeudoCI.Pipeline.Modules.FolderArchive.Shared.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

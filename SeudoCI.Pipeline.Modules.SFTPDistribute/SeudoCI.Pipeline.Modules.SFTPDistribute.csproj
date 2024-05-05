@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.SFTPDistribute.Shared\SeudoCI.Pipeline.Modules.SFTPDistribute.Shared.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SSH.NET" Version="2024.0.0" />
+    </ItemGroup>
+
+</Project>

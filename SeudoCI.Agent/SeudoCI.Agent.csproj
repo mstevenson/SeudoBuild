@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>SeudoCI</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SeudoCI.Agent.Shared\SeudoCI.Agent.Shared.csproj" />
+      <ProjectReference Include="..\SeudoCI.Net.Shared\SeudoCI.Net.Shared.csproj" />
+      <ProjectReference Include="..\SeudoCI.Net\SeudoCI.Net.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline\SeudoCI.Pipeline.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
+      <PackageReference Include="Nancy.Hosting.Kestrel" Version="1.0.1" />
+    </ItemGroup>
+
+</Project>
