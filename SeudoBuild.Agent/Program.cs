@@ -1,7 +1,5 @@
-﻿using System;
-using CommandLine;
-using System.IO;
-using Nancy.Hosting.Self;
+﻿using CommandLine;
+using Microsoft.AspNetCore.Hosting;
 using SeudoBuild.Core;
 using SeudoBuild.Core.FileSystems;
 using SeudoBuild.Pipeline;
@@ -224,9 +222,17 @@ namespace SeudoBuild.Agent
                 port = opts.Port.Value;
             }
 
+            // Example:
+            // https://github.com/NancyFx/Nancy/tree/master/samples/Nancy.Demo.Hosting.Kestrel
+            
             // Starting the Nancy server will automatically execute the Bootstrapper class
             var uri = new Uri($"http://localhost:{port}");
-            using (var host = new NancyHost(uri))
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseStartup<Startup>()
+                .UseUrls(uri.ToString())
+                .Build();
+            using (host)
             {
                 _logger.Write("");
                 try
