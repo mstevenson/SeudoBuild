@@ -15,14 +15,15 @@ public class AgentNancyModule : NancyModule
 {
     public AgentNancyModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem, ILogger logger)
     {
+        // TODO remove, this is handled by mDNS now
         // Build agent info
-        Get("/info", parameters =>
-        {
-            //moduleLoader.Registry.
-
-            var proj = new AgentLocation { AgentName = AgentName.GetUniqueAgentName() };
-            return Response.AsJson(proj);
-        });
+        // Get("/info", parameters =>
+        // {
+        //     //moduleLoader.Registry.
+        //
+        //     var proj = new Agent { Name = AgentName.GetUniqueAgentName() };
+        //     return Response.AsJson(proj);
+        // });
 
         // Build the default target in a project configuration
         Post("/build", parameters =>

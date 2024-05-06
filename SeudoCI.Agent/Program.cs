@@ -144,10 +144,10 @@ internal static class Program
 
         Console.WriteLine("Looking for build agents. Press any key to exit.");
         // FIXME fill in port from command line argument
-        var locator = new AgentLocator(5511);
+        var client = new AgentDiscoveryClient();
         try
         {
-            locator.Start();
+            client.Start();
         }
         catch
         {
@@ -157,14 +157,14 @@ internal static class Program
             return 1;
         }
         // FIXME don't hard-code port
-        locator.AgentFound += (agent) =>
-        {
-            _logger.Write($"{agent.AgentName} ({agent.Address})", LogType.Bullet);
-        };
-        locator.AgentLost += (agent) =>
-        {
-            _logger.Write($"Lost agent: {agent.AgentName} ({agent.Address})", LogType.Bullet);
-        };
+        // locator.AgentFound += (agent) =>
+        // {
+        //     _logger.Write($"{agent.AgentName} ({agent.Address})", LogType.Bullet);
+        // };
+        // locator.AgentLost += (agent) =>
+        // {
+        //     _logger.Write($"Lost agent: {agent.AgentName} ({agent.Address})", LogType.Bullet);
+        // };
         Console.WriteLine();
         Console.ReadKey();
         return 0;
@@ -193,7 +193,7 @@ internal static class Program
         try
         {
             // Find agent on the network, with timeout
-            var discoveryClient = new UdpDiscoveryClient();
+            var discoveryClient = new AgentDiscoveryClient();
             buildSubmitter.Submit(discoveryClient, configJson, opts.BuildTarget, opts.AgentName);
         }
         catch (Exception e)
@@ -216,10 +216,10 @@ internal static class Program
 
         //string agentName = string.IsNullOrEmpty(opts.AgentName) ? AgentName.GetUniqueAgentName() : opts.AgentName;
         // FIXME pull port from command line argument, and incorporate into ServerBeacon object
-        int port = 5511;
+        ushort port = 5511;
         if (opts.Port.HasValue)
         {
-            port = opts.Port.Value;
+            port = (ushort)opts.Port.Value;
         }
 
         // Example:
@@ -245,15 +245,14 @@ internal static class Program
 
                 try
                 {
-                    // FIXME configure the port from a command line argument
-                    var serverInfo = new UdpDiscoveryBeacon { Port = 5511 };
-                    var discovery = new UdpDiscoveryServer(serverInfo);
+                    var name = AgentName.GetUniqueAgentName();
+                    var discovery = new AgentDiscoveryServer(name, port);
                     discovery.Start();
-                    _logger.Write("Build agent discovery beacon started", LogType.Bullet);
+                    _logger.Write($"Build agent server started: {name} {port}", LogType.Bullet);
                 }
                 catch
                 {
-                    _logger.Write("Could not initialize build agent discovery beacon", LogType.Alert);
+                    _logger.Write("Could not initialize build agent server", LogType.Alert);
                 }
             }
             catch (Exception e)

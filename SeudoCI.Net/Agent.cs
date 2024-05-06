@@ -3,25 +3,25 @@
 /// <summary>
 /// Describes a running build agent process.
 /// </summary>
-public class AgentLocation
+public class Agent
 {
-    public string AgentName { get; set; }
+    public string Name { get; set; }
     public string Address { get; set; }
 
     public override int GetHashCode()
     {
-        return AgentName.GetHashCode() * 17 + Address.GetHashCode();
+        return Name.GetHashCode() * 17 + Address.GetHashCode();
     }
 
     public override bool Equals(object obj)
     {
-        var item = obj as AgentLocation;
+        var item = obj as Agent;
 
         if (item == null)
         {
             return false;
         }
 
-        return AgentName.Equals(item.AgentName) && Address.Equals(item.Address);
+        return Name.Equals(item.Name) && Address.Equals(item.Address);
     }
 }
