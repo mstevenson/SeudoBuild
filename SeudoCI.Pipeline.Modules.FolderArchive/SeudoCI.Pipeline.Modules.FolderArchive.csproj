@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>default</LangVersion>
+        <LangVersion>12</LangVersion>
         <AssemblyName>SeudoCI.Pipeline.Modules.FolderArchive</AssemblyName>
         <RootNamespace>SeudoCI.Pipeline.Modules.FolderArchive</RootNamespace>
     </PropertyGroup>
