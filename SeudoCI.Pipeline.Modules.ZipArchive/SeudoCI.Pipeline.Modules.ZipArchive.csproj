@@ -11,8 +11,5 @@
       <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="DotNetZip" Version="1.16.0" />
-    </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿namespace SeudoCI.Pipeline.Modules.ZipArchive;
 
-using Ionic.Zip;
+using System.IO.Compression;
 using SeudoCI.Core;
 using Path = System.IO.Path;
 
@@ -40,12 +40,7 @@ public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
             _logger.Write($"Creating zip file {filename}", LogType.SmallBullet);
 
             // Save zip file
-            using (var zipFile = new ZipFile())
-            using (var stream = fs.OpenWrite(filepath))
-            {
-                zipFile.AddDirectory(workspace.GetDirectory(TargetDirectory.Output));
-                zipFile.Save(stream);
-            }
+            ZipFile.CreateFromDirectory(workspace.GetDirectory(TargetDirectory.Output), filepath);
 
             _logger.Write("Zip file saved", LogType.SmallBullet);
 
