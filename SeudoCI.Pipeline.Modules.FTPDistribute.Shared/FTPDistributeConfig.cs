@@ -7,9 +7,9 @@
 public class FTPDistributeConfig : DistributeStepConfig
 {
     public override string Name => "FTP Upload";
-    public string URL { get; set; }
+    public string URL { get; set; } = string.Empty;
     public int Port { get; set; } = 21;
-    public string BasePath { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public string BasePath { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

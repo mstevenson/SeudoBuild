@@ -6,8 +6,8 @@ using SeudoCI.Core;
 public abstract class UnityBuildStep<T> : IBuildStep<T>
     where T : UnityBuildConfig
 {
-    private T _config;
-    private ILogger _logger;
+    private T _config = null!;
+    private ILogger _logger = null!;
 
     public void Initialize(T config, ITargetWorkspace workspace, ILogger logger)
     {

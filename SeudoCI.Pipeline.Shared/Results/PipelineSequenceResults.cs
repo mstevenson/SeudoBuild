@@ -20,7 +20,7 @@ public abstract class PipelineSequenceResults
     /// </summary>
     public bool IsMandatory { get; set; }
 
-    public Exception Exception { get; set; }
+    public Exception? Exception { get; set; }
 
     public TimeSpan Duration { get; set; }
 }

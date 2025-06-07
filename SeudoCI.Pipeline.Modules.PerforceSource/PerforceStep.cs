@@ -6,10 +6,10 @@ using Perforce.P4;
 
 public class PerforceStep : ISourceStep<PerforceConfig>
 {
-    private PerforceConfig _config;
-    private ITargetWorkspace _workspace;
-    private ILogger _logger;
-    private P4Server _server;
+    private PerforceConfig _config = null!;
+    private ITargetWorkspace _workspace = null!;
+    private ILogger _logger = null!;
+    private P4Server _server = null!;
     
     public SourceStepResults ExecuteStep(ITargetWorkspace workspace)
     {
@@ -20,7 +20,7 @@ public class PerforceStep : ISourceStep<PerforceConfig>
     
     public bool IsWorkingCopyInitialized { get; }
     
-    public string CurrentCommit { get; }
+    public string CurrentCommit { get; } = string.Empty;
     
     public void Initialize(PerforceConfig config, ITargetWorkspace workspace, ILogger logger)
     {

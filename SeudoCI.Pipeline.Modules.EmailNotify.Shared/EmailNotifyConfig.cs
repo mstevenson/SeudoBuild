@@ -7,10 +7,10 @@
 public class EmailNotifyConfig : NotifyStepConfig
 {
     public override string Name { get; } = "Email Notification";
-    public string FromAddress { get; set; }
-    public string ToAddress { get; set; }
+    public string FromAddress { get; set; } = string.Empty;
+    public string ToAddress { get; set; } = string.Empty;
     public string Host { get; set; } = "smtp.google.com";
     public int Port { get; set; } = 587;
-    public string SMTPUser { get; set; }
-    public string SMTPPassword { get; set; }
+    public string SMTPUser { get; set; } = string.Empty;
+    public string SMTPPassword { get; set; } = string.Empty;
 }

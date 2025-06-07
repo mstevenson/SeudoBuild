@@ -9,11 +9,11 @@ public class UnityParameterizedBuildConfig : UnityBuildConfig
     public override string Name { get; } = "Unity Parameterized Build";
 
     public UnityPlatform TargetPlatform { get; set; }
-    public string ExecutableName { get; set; }
-    public string PreBuildMethod { get; set; }
+    public string ExecutableName { get; set; } = string.Empty;
+    public string PreBuildMethod { get; set; } = string.Empty;
     public bool DevelopmentBuild { get; set; }
-    public string PreExportMethod { get; set; }
-    public string PostExportMethod { get; set; }
+    public string PreExportMethod { get; set; } = string.Empty;
+    public string PostExportMethod { get; set; } = string.Empty;
     public List<string> CustomDefines { get; set; } = new List<string>();
     public List<string> SceneList { get; set; } = new List<string>();
     public bool BuildAssetBundles { get; set; }

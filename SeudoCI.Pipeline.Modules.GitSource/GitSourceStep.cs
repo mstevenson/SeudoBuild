@@ -7,9 +7,9 @@ using Core;
 
 public class GitSourceStep : ISourceStep<GitSourceConfig>
 {
-    private GitSourceConfig _config;
-    private ITargetWorkspace _workspace;
-    private ILogger _logger;
+    private GitSourceConfig _config = null!;
+    private ITargetWorkspace _workspace = null!;
+    private ILogger _logger = null!;
 
     public string Type => "Git";
 
@@ -76,10 +76,10 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     }
 
 
-    private UsernamePasswordCredentials _credentials;
-    private FilterRegistration _lfsFilter;
-    private Signature _signature;
-    private CredentialsHandler _credentialsHandler;
+    private UsernamePasswordCredentials _credentials = null!;
+    private FilterRegistration? _lfsFilter;
+    private Signature _signature = null!;
+    private CredentialsHandler _credentialsHandler = null!;
 
     public bool IsWorkingCopyInitialized => Repository.IsValid(_workspace.GetDirectory(TargetDirectory.Source));
 
@@ -144,11 +144,11 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
 
             var cloneOptions = new CloneOptions
             {
-                CredentialsProvider = _credentialsHandler,
                 BranchName = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "master" : _config.RepositoryBranchName,
                 Checkout = true,
                 RecurseSubmodules = true
             };
+            cloneOptions.FetchOptions.CredentialsProvider = _credentialsHandler;
 
             Repository.Clone(_config.RepositoryURL, _workspace.GetDirectory(TargetDirectory.Source), cloneOptions);
         }

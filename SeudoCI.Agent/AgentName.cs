@@ -11,7 +11,7 @@ public static class AgentName
     /// <summary>
     /// Produces a random human-readable agent identifier, for debugging purposes.
     /// </summary>
-    public static string GetRandomName(Random random = null)
+    public static string GetRandomName(Random? random = null)
     {
         var rand = random ?? new Random();
         return GetName(rand);

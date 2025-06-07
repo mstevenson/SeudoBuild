@@ -13,9 +13,9 @@ using Core;
 /// </summary>
 public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
 {
-    private ShellBuildStepConfig _config;
-    private ITargetWorkspace _workspace;
-    private ILogger _logger;
+    private ShellBuildStepConfig _config = null!;
+    private ITargetWorkspace _workspace = null!;
+    private ILogger _logger = null!;
 
     public string Type => "Shell Script";
 
@@ -52,8 +52,11 @@ public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
 
             while (!process.StandardOutput.EndOfStream)
             {
-                string line = process.StandardOutput.ReadLine();
-                _logger.Write(line);
+                string? line = process.StandardOutput.ReadLine();
+                if (line != null)
+                {
+                    _logger.Write(line);
+                }
             }
 
             process.WaitForExit();

@@ -8,13 +8,13 @@ using Pipeline;
 /// </summary>
 public interface IBuildQueue
 {
-    BuildResult ActiveBuild { get; }
+    BuildResult? ActiveBuild { get; }
 
-    BuildResult EnqueueBuild(ProjectConfig config, string target = null);
+    BuildResult EnqueueBuild(ProjectConfig config, string? target = null);
 
     IEnumerable<BuildResult> GetAllBuildResults();
 
-    BuildResult GetBuildResult(int buildId);
+    BuildResult? GetBuildResult(int buildId);
 
-    BuildResult CancelBuild(int buildId);
+    BuildResult? CancelBuild(int buildId);
 }

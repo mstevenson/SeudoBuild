@@ -16,11 +16,11 @@ public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger lo
 {
     private const string OutputFolderName = "SeudoCI";
 
-    private CancellationTokenSource _tokenSource;
+    private CancellationTokenSource? _tokenSource;
     private int _buildIndex;
     private bool _isQueueRunning;
 
-    public BuildResult ActiveBuild { get; private set; }
+    public BuildResult? ActiveBuild { get; private set; }
     private ConcurrentQueue<BuildResult> QueuedBuilds { get; } = new ConcurrentQueue<BuildResult>();
     private ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
 
@@ -57,7 +57,7 @@ public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger lo
         while (true)
         {
             // Clean up and bail out
-            if (_tokenSource.IsCancellationRequested)
+            if (_tokenSource?.IsCancellationRequested == true)
             {
                 ActiveBuild = null;
                 return;
@@ -78,7 +78,7 @@ public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger lo
 
                     ActiveBuild = build;
                     var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputPath }, logger);
-                    builder.Build(pipeline, ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName);
+                    builder.Build(pipeline, ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName ?? string.Empty);
                 }
             }
             Thread.Sleep(200);
@@ -89,7 +89,7 @@ public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger lo
     /// Queues a project for building.
     /// If target is null, the default target in the given ProjectConfig will be used.
     /// </summary>
-    public BuildResult EnqueueBuild(ProjectConfig config, string target = null)
+    public BuildResult EnqueueBuild(ProjectConfig config, string? target = null)
     {
         _buildIndex++;
         var result = new BuildResult
@@ -116,7 +116,7 @@ public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger lo
     /// <summary>
     /// Return the result for a specific build.
     /// </summary>
-    public BuildResult GetBuildResult(int buildId)
+    public BuildResult? GetBuildResult(int buildId)
     {
         Builds.TryGetValue(buildId, out var result);
         return result;
@@ -125,7 +125,7 @@ public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger lo
     /// <summary>
     /// Stop a given build. If the build is in progress it will be halted, otherwise it will be removed from the queue.
     /// </summary>
-    public BuildResult CancelBuild(int buildId)
+    public BuildResult? CancelBuild(int buildId)
     {
         if (ActiveBuild != null && ActiveBuild.Id == buildId)
         {

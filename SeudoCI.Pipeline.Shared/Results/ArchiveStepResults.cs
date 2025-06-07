@@ -6,5 +6,5 @@
 /// </summary>
 public class ArchiveStepResults : PipelineStepResults
 {
-    public string ArchiveFileName { get; set; }
+    public string ArchiveFileName { get; set; } = string.Empty;
 }

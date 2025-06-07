@@ -7,5 +7,5 @@
 public class ZipArchiveConfig : ArchiveStepConfig
 {
     public override string Name => "Zip File";
-    public string Filename { get; set; }
+    public string Filename { get; set; } = string.Empty;
 }

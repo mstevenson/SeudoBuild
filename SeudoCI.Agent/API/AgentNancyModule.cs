@@ -105,7 +105,7 @@ public class AgentNancyModule : NancyModule
         });
     }
 
-    ProjectConfig ProcessReceivedBuildRequest(Request request, string target, IModuleLoader moduleLoader, IFileSystem filesystem)
+    ProjectConfig ProcessReceivedBuildRequest(Request request, string? target, IModuleLoader moduleLoader, IFileSystem filesystem)
     {
         // We'd ordinarily use Nancy's Bind method, but we need to use custom
         // JSON converters to properly deserialize the ProjectConfig object

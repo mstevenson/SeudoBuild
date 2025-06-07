@@ -6,5 +6,5 @@
 public class FolderArchiveConfig : ArchiveStepConfig
 {
     public override string Name => "Folder";
-    public string FolderName { get; set; }
+    public string FolderName { get; set; } = string.Empty;
 }

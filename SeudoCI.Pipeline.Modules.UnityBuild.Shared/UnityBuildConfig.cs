@@ -9,7 +9,7 @@ public abstract class UnityBuildConfig : BuildStepConfig
     /// <summary>
     /// The installed Unity executable to build with.
     /// </summary>
-    public VersionNumber UnityVersionNumber { get; set; }
+    public VersionNumber UnityVersionNumber { get; set; } = new();
 
     /// <summary>
     /// A path relative to the working directory that contains a Unity project.

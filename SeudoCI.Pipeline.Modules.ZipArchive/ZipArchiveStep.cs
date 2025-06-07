@@ -6,8 +6,8 @@ using Path = System.IO.Path;
 
 public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
 {
-    private ZipArchiveConfig _config;
-    private ILogger _logger;
+    private ZipArchiveConfig _config = null!;
+    private ILogger _logger = null!;
         
     public string Type => "Zip File";
 

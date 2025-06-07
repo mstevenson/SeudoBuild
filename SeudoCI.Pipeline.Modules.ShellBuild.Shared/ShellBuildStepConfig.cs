@@ -7,5 +7,5 @@ public class ShellBuildStepConfig : BuildStepConfig
 {
     public override string Name => "Shell Script";
 
-    public string Command { get; set; }
+    public string Command { get; set; } = string.Empty;
 }

@@ -9,8 +9,8 @@ public class Serializer(IFileSystem fileSystem)
     public T Deserialize<T>(string json, JsonConverter[] converters)
     {
         var settings = new JsonSerializerSettings { Converters = converters };
-        T obj = JsonConvert.DeserializeObject<T>(json, settings);
-        return obj;
+        T? obj = JsonConvert.DeserializeObject<T>(json, settings);
+        return obj ?? throw new InvalidOperationException("Failed to deserialize JSON");
     }
 
     public T DeserializeFromFile<T>(string path, JsonConverter[] converters)

@@ -11,7 +11,7 @@ public interface IFileSystem
 
     string DocumentsPath { get; }
         
-    IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null);
+    IEnumerable<string> GetFiles(string directoryPath, string? searchPattern = null);
 
     bool FileExists(string path);
 
@@ -23,7 +23,7 @@ public interface IFileSystem
 
     void ReplaceFile(string source, string destination, string backupDestination);
 
-    IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null);
+    IEnumerable<string> GetDirectories(string directoryPath, string? searchPattern = null);
 
     bool DirectoryExists(string path);
 

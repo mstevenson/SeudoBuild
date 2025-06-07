@@ -12,7 +12,7 @@ public class WindowsFileSystem : IFileSystem
         
     public virtual string DocumentsPath => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-    public IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null)
+    public IEnumerable<string> GetFiles(string directoryPath, string? searchPattern = null)
     {
         // Handle missing directory
         if (!System.IO.Directory.Exists(directoryPath))
@@ -54,7 +54,7 @@ public class WindowsFileSystem : IFileSystem
         System.IO.File.Replace(source, destination, backupDestination);
     }
 
-    public IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null)
+    public IEnumerable<string> GetDirectories(string directoryPath, string? searchPattern = null)
     {
         // Handle missing directory
         if (!System.IO.Directory.Exists(directoryPath))

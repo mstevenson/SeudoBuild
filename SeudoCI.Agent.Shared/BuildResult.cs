@@ -23,12 +23,12 @@ public class BuildResult
     /// <summary>
     /// Configuration settings for the build process.
     /// </summary>
-    public ProjectConfig ProjectConfiguration { get; init; }
+    public ProjectConfig ProjectConfiguration { get; init; } = null!;
 
     /// <summary>
     /// The active target for the build process.
     /// </summary>
-    public string TargetName { get; init; }
+    public string? TargetName { get; init; }
 
     /// <summary>
     /// The status of the build process for the current project and target.

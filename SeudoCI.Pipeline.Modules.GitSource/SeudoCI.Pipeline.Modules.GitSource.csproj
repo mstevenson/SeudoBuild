@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="LibGit2Sharp-SSH" Version="1.0.22" />
+      <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
     </ItemGroup>
 
 </Project>

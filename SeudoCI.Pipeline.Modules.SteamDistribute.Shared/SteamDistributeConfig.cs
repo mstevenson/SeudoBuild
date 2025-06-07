@@ -8,7 +8,7 @@
 public class SteamDistributeConfig : DistributeStepConfig
 {
     public override string Name => "Steam Upload";
-    public string PublishToBranch { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public string PublishToBranch { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

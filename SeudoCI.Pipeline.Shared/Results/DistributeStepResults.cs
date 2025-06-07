@@ -8,9 +8,9 @@ public class DistributeStepResults : PipelineStepResults
 {
     public class FileResult
     {
-        public ArchiveStepResults ArchiveInfo { get; set; }
+        public ArchiveStepResults ArchiveInfo { get; set; } = null!;
         public bool Success { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
     }
 
     /// <summary>

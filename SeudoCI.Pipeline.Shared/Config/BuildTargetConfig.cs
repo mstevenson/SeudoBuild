@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// </summary>
 public class BuildTargetConfig
 {
-    public string TargetName { get; set; }
+    public string TargetName { get; set; } = string.Empty;
     public VersionNumber Version = new VersionNumber();
     public List<SourceStepConfig> SourceSteps { get; set; } = [];
     public List<BuildStepConfig> BuildSteps { get; set; } = [];

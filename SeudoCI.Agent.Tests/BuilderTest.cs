@@ -7,9 +7,9 @@ using Core;
 [TestFixture]
 public class BuilderTest
 {
-    private IModuleLoader _mockLoader;
-    private ILogger _mockLogger;
-    private IPipelineRunner _mockPipeline;
+    private IModuleLoader _mockLoader = null!;
+    private ILogger _mockLogger = null!;
+    private IPipelineRunner _mockPipeline = null!;
         
     [SetUp]
     public void SetUp()
@@ -26,7 +26,7 @@ public class BuilderTest
             
         Assert.Throws<ArgumentException> (() =>
         {
-            builder.Build(_mockPipeline, null, "target");
+            builder.Build(_mockPipeline, null!, "target");
         });
     }
 
@@ -38,7 +38,7 @@ public class BuilderTest
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
-            builder.Build(_mockPipeline, config, null);
+            builder.Build(_mockPipeline, config, null!);
         });
     }
 

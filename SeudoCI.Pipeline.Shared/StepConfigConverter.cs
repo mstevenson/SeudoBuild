@@ -37,15 +37,19 @@ public class StepConfigConverter : JsonConverter
         return (objectType == _configBaseType);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         JObject jobj = JObject.Load(reader);
-        string jsonType = jobj["Type"].Value<string>();
+        string? jsonType = jobj["Type"]?.Value<string>();
+        if (jsonType == null)
+        {
+            throw new Exception("Missing 'Type' property in step configuration");
+        }
         bool found = _configTypeMap.TryGetValue(jsonType, out var configType);
 
         if (found)
         {
-            return jobj.ToObject(configType, serializer);
+            return jobj.ToObject(configType, serializer) ?? throw new Exception($"Failed to deserialize step configuration of type '{jsonType}'");
         }
         else
         {
@@ -58,7 +62,7 @@ public class StepConfigConverter : JsonConverter
         get { return false; }
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         throw new NotImplementedException();
     }

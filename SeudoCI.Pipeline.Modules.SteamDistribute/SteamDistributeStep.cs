@@ -4,8 +4,8 @@ using Core;
 
 public class SteamDistributeStep : IDistributeStep<SteamDistributeConfig>
 {
-    private SteamDistributeConfig _config;
-    private ILogger _logger;
+    private SteamDistributeConfig _config = null!;
+    private ILogger _logger = null!;
 
     public string Type => "Steam Upload";
 

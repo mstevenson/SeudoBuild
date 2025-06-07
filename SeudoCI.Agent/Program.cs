@@ -17,19 +17,19 @@ internal static class Program
                                       
 ";
 
-    private static ILogger _logger;
+    private static ILogger _logger = null!;
 
     [Verb("build", HelpText = "Create a local build.")]
     private class BuildSubOptions
     {
         [Option('t', "build-target", HelpText = "Name of the build target as specified in the project configuration file. If no build target is specified, the first target will be used.")]
-        public string BuildTarget { get; set; }
+        public string BuildTarget { get; set; } = string.Empty;
 
         [Option('o', "output-folder", HelpText = "Path to the build output folder.")]
-        public string OutputPath { get; set; }
+        public string OutputPath { get; set; } = string.Empty;
 
         [Value(0, MetaName = "project", HelpText = "Path to a project configuration file.", Required = true)]
-        public string ProjectConfigPath { get; set; }
+        public string ProjectConfigPath { get; set; } = string.Empty;
     }
 
     [Verb("scan", HelpText = "List build agents found on the local network.")]
@@ -41,20 +41,20 @@ internal static class Program
     private class SubmitSubOptions
     {
         [Option('p', "project-config", HelpText = "Path to a project configuration file.", Required = true)]
-        public string ProjectConfigPath { get; set; }
+        public string ProjectConfigPath { get; set; } = string.Empty;
 
         [Option('t', "build-target", HelpText = "Name of the target to build as specified in the project configuration file.")]
-        public string BuildTarget { get; set; }
+        public string BuildTarget { get; set; } = string.Empty;
 
         [Option('a', "agent-name", HelpText = "The unique name of a specific build agent. If not set, the job will be broadcast to all available agents.")]
-        public string AgentName { get; set; }
+        public string AgentName { get; set; } = string.Empty;
     }
 
     [Verb("queue", HelpText = "Queue build requests received over the network.")]
     private class QueueSubOptions
     {
         [Option('n', "agent-name", HelpText = "A unique name for the build agent. If not set, a name will be generated.")]
-        public string AgentName { get; set; }
+        public string AgentName { get; set; } = string.Empty;
 
         [Option('p', "port", HelpText = "Port on which to listen for build queue messages.")]
         public int? Port { get; set; }
@@ -103,7 +103,7 @@ internal static class Program
         IModuleLoader moduleLoader = factory.Create(_logger);
 
         // Load project config
-        ProjectConfig projectConfig = null;
+        ProjectConfig? projectConfig = null;
         try
         {
             var fs = new WindowsFileSystem();
@@ -126,6 +126,12 @@ internal static class Program
         {
             // Config file's directory
             parentDirectory = new FileInfo(opts.ProjectConfigPath).Directory?.FullName;
+        }
+
+        if (string.IsNullOrEmpty(parentDirectory))
+        {
+            Console.WriteLine("Could not determine output directory");
+            return 1;
         }
 
         var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = parentDirectory }, _logger);
@@ -178,7 +184,7 @@ internal static class Program
         Console.Title = "SeudoCI • Submit";
         Console.WriteLine(Header);
 
-        string configJson = null;
+        string? configJson = null;
         try
         {
             configJson = File.ReadAllText(opts.ProjectConfigPath);

@@ -6,7 +6,7 @@
 /// </summary>
 public class ProjectConfig
 {
-    public string ProjectName { get; set; }
+    public string ProjectName { get; set; } = string.Empty;
         
     public List<BuildTargetConfig> BuildTargets { get; } = [];
 }

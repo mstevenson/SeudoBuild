@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 public class Startup
 {
-    private readonly IConfiguration config;
+    // private readonly IConfiguration? config;
         
     public Startup(IHostingEnvironment env)
     {

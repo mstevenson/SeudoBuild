@@ -5,7 +5,7 @@ using LibGit2Sharp;
 
 public class LFSFilter : Filter
 {
-    private Process _process;
+    private Process _process = null!;
     private readonly string _repoPath;
 
     private FilterMode _mode;

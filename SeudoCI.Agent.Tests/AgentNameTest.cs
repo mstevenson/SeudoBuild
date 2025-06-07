@@ -11,6 +11,6 @@ public class AgentNameTest
         var rand = new Random(1000);
         var name = AgentName.GetRandomName(rand);
             
-        Assert.That("cheerful-dragonfly", Is.EqualTo(name));
+        Assert.That(name, Is.EqualTo("cheerful-dragonfly"));
     }
 }

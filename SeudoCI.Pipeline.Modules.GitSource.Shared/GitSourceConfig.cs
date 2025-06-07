@@ -6,9 +6,9 @@
 public class GitSourceConfig : SourceStepConfig
 {
     public override string Name => "Git";
-    public string RepositoryURL { get; set; }
-    public string RepositoryBranchName { get; set; }
+    public string RepositoryURL { get; set; } = string.Empty;
+    public string RepositoryBranchName { get; set; } = string.Empty;
     public bool UseLFS { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

@@ -6,5 +6,5 @@
 /// </summary>
 public class SourceStepResults : PipelineStepResults
 {
-    public string CommitIdentifier { get; set; }
+    public string CommitIdentifier { get; set; } = string.Empty;
 }

@@ -8,5 +8,5 @@ public class PipelineConfig
     /// <summary>
     /// Base directory used by each pipeline step.
     /// </summary>
-    public string BaseDirectory { get; set; }
+    public string BaseDirectory { get; set; } = string.Empty;
 }
