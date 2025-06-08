@@ -18,12 +18,12 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         {
             throw new ArgumentNullException(nameof(projectConfig), "A project configuration definition must be specified.");
         }
-        if (string.IsNullOrEmpty (buildTargetName))
+        if (string.IsNullOrEmpty(buildTargetName))
         {
-            throw new ArgumentNullException(nameof(buildTargetName), "A project configuration definition must be specified.");
+            throw new ArgumentNullException(nameof(buildTargetName), "A build target name must be specified.");
         }
 
-        BuildTargetConfig targetConfig = projectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
+        BuildTargetConfig? targetConfig = projectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
         if (targetConfig == null)
         {
             throw new ArgumentException("The specified build target could not be found in the project.", nameof(buildTargetName));
@@ -41,7 +41,7 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         // Create project and target workspaces
         string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
         string projectDirectory = $"{config.BaseDirectory}/{projectNameSanitized}";
-        var filesystem = new WindowsFileSystem();
+        var filesystem = PlatformUtils.RunningPlatform == Platform.Windows ? new WindowsFileSystem() : new MacFileSystem();
         var projectWorkspace = new ProjectWorkspace(projectDirectory, filesystem);
         projectWorkspace.InitializeDirectories();
         var targetWorkspace = projectWorkspace.CreateTarget(buildTargetName);
@@ -66,18 +66,36 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
 
         // Run pipeline
         var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), targetWorkspace);
-        if (sourceResults.StepResults.Count > 0) {
-            // fixme don't hard-code step results index
+        if (sourceResults.StepResults.Count > 0 && sourceResults.StepResults[0] != null && !string.IsNullOrEmpty(sourceResults.StepResults[0].CommitIdentifier)) 
+        {
             macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier;
         }
+        
         var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, targetWorkspace);
         var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, targetWorkspace);
         var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, targetWorkspace);
         var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, targetWorkspace);
 
+        // Determine overall pipeline success
+        bool overallSuccess = sourceResults.IsSuccess && buildResults.IsSuccess && archiveResults.IsSuccess && distributeResults.IsSuccess && notifyResults.IsSuccess;
+
         // Done
         logger.IndentLevel = 0;
-        logger.Write("\nBuild process completed.", logStyle: LogStyle.Bold);
+        if (overallSuccess)
+        {
+            logger.Write("\nBuild process completed successfully.", LogType.Success, LogStyle.Bold);
+        }
+        else
+        {
+            logger.Write("\nBuild process failed.", LogType.Failure, LogStyle.Bold);
+            
+            // Log which sequence failed
+            if (!sourceResults.IsSuccess) logger.Write("Source sequence failed", LogType.Failure);
+            if (!buildResults.IsSuccess) logger.Write("Build sequence failed", LogType.Failure);
+            if (!archiveResults.IsSuccess) logger.Write("Archive sequence failed", LogType.Failure);
+            if (!distributeResults.IsSuccess) logger.Write("Distribute sequence failed", LogType.Failure);
+            if (!notifyResults.IsSuccess) logger.Write("Notify sequence failed", LogType.Failure);
+        }
     }
 
     private TOutSeq InitializeSequence<TOutSeq>(string? sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
@@ -89,11 +107,12 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
 
         if (sequenceSteps.Count == 0)
         {
-            logger.Write($"No {sequenceName} steps.", LogType.Alert);
+            logger.Write($"No {sequenceName} steps configured, skipping sequence.", LogType.Alert);
+            logger.IndentLevel--;
             return new TOutSeq {
-                IsSuccess = true,
+                IsSuccess = true,  // Skipped sequences are considered successful
                 IsSkipped = true,
-                Exception = new Exception($"No {sequenceName} steps.")
+                Exception = null   // No exception for skipped sequences
             };
         }
         return new TOutSeq { IsSuccess = true };
@@ -156,31 +175,47 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         where TPipeStep : class, IPipelineStep
     {
         // Pipeline sequence result
-        var results = new TOutSeq();
-
-        //const int startIndex = -1;
-        //int stepIndex = startIndex;
+        var results = new TOutSeq { IsSuccess = true }; // Start optimistic, set to false on any failure
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
         foreach (var step in sequenceSteps)
         {
-            //stepIndex++;
-            var currentStep = step;
-
             logger.Write(step.Type, LogType.Bullet);
             logger.IndentLevel++;
 
-            var stepResult = stepExecuteCallback.Invoke(step);
+            try
+            {
+                var stepResult = stepExecuteCallback.Invoke(step);
+                
+                if (stepResult == null)
+                {
+                    results.IsSuccess = false;
+                    results.Exception = new InvalidOperationException($"Step {step.Type} returned null result");
+                    logger.Write($"Step {step.Type} returned null result", LogType.Failure);
+                    logger.IndentLevel--;
+                    break;
+                }
 
-            results.StepResults.Add(stepResult);
-            if (!stepResult.IsSuccess)
+                results.StepResults.Add(stepResult);
+                
+                if (!stepResult.IsSuccess)
+                {
+                    results.IsSuccess = false;
+                    results.Exception = stepResult.Exception;
+                    string error = $"{sequenceName} sequence failed on step {step.Type}:\n      {results.Exception?.Message ?? "Unknown error"}";
+                    logger.Write(error, LogType.Failure);
+                    logger.IndentLevel--;
+                    break;
+                }
+            }
+            catch (Exception ex)
             {
                 results.IsSuccess = false;
-                results.Exception = stepResult.Exception;
-                string error = $"{sequenceName} sequence failed on step {currentStep.Type}:\n      {results.Exception.Message}";
-                logger.Write(error, LogType.Failure);
+                results.Exception = ex;
+                logger.Write($"Exception in step {step.Type}: {ex.Message}", LogType.Failure);
+                logger.IndentLevel--;
                 break;
             }
 
@@ -190,7 +225,12 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         stopwatch.Stop();
         results.Duration = stopwatch.Elapsed;
 
-        results.IsSuccess = true;
+        // Only set success if no failures occurred and we have the expected results
+        if (results.IsSuccess && results.StepResults.Count == sequenceSteps.Count)
+        {
+            logger.Write($"{sequenceName} sequence completed successfully", LogType.Success);
+        }
+
         return results;
     }
 }
