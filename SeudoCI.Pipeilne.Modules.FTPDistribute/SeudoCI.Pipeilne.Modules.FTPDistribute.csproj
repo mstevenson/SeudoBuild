@@ -8,6 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="FluentFTP" Version="50.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\SeudoCI.Pipeline.Modules.FTPDistribute.Shared\SeudoCI.Pipeline.Modules.FTPDistribute.Shared.csproj" />
       <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
     </ItemGroup>

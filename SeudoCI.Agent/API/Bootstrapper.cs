@@ -4,6 +4,8 @@ using Nancy;
 using Core;
 using Core.FileSystems;
 using Pipeline;
+using System.Net.Http;
+using Services;
 
 /// <inheritdoc />
 /// <summary>
@@ -18,15 +20,27 @@ public class Bootstrapper : DefaultNancyBootstrapper
 //            StaticConfiguration.DisableErrorTraces = false;
 
         base.ConfigureApplicationContainer(container);
+        
         // FIXME the entry point method also initializes a logger
         var logger = new Logger();
         container.Register<ILogger>(logger);
+        
         var moduleLoader = new ModuleLoaderFactory().Create(logger);
         container.Register(moduleLoader);
 
         // TODO support Linux
         IFileSystem fileSystem = PlatformUtils.RunningPlatform == Platform.Windows ? new WindowsFileSystem() : new MacFileSystem();
         container.Register(fileSystem);
+
+        // Configure HttpClient with proper settings
+        var httpClient = new HttpClient();
+        httpClient.Timeout = TimeSpan.FromSeconds(30);
+        httpClient.DefaultRequestHeaders.Add("User-Agent", "SeudoCI-Agent/1.0");
+        container.Register(httpClient);
+
+        // Register HTTP service abstraction
+        var httpService = new HttpService(httpClient);
+        container.Register<IHttpService>(httpService);
 
         var builder = new Builder(moduleLoader, logger);
         var queue = new BuildQueue(builder, moduleLoader, logger);

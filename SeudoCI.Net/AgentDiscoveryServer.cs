@@ -17,7 +17,6 @@ public class AgentDiscoveryServer(string serverName, ushort port) : IDisposable
         var serviceName = $"SeudoCI-{serverName.Replace(' ', '-')}";
         var service = new ServiceProfile(serviceName, "_seudoci._tcp", port);
         _serviceDiscovery.Advertise(service);
-        _serviceDiscovery.Mdns.Start();
     }
 
     public void Stop()

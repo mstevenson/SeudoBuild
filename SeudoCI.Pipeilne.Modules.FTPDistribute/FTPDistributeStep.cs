@@ -1,14 +1,14 @@
 ﻿namespace SeudoCI.Pipeline.Modules.FTPDistribute;
 
-using System.Net;
+using FluentFTP;
 using SeudoCI.Core;
 
 public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
 {
-    private FTPDistributeConfig _config;
-    private ILogger _logger;
+    private FTPDistributeConfig _config = null!;
+    private ILogger _logger = null!;
 
-    public string Type => "FTP Upload";
+    public string? Type => "FTP Upload";
 
     public void Initialize(FTPDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
     {
@@ -22,27 +22,12 @@ public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
 
         try
         {
-            // Upload all archived files
-            foreach (var archiveInfo in archiveResults.StepResults)
-            {
-                var stepResult = new DistributeStepResults.FileResult { ArchiveInfo = archiveInfo };
-                try
-                {
-                    Upload(archiveInfo, workspace);
-                    stepResult.Success = true;
-                    results.FileResults.Add(stepResult);
-                }
-                catch (Exception e)
-                {
-                    stepResult.Success = false;
-                    stepResult.Message = e.Message;
-                    results.FileResults.Add(stepResult);
-                    throw new Exception("File upload failed");
-                }
-            }
+            // Upload all archived files using modern async FTP client
+            var uploadTask = UploadFilesAsync(archiveResults, workspace, results);
+            uploadTask.GetAwaiter().GetResult();
+            
             return new DistributeStepResults { IsSuccess = true };
         }
-        // One or more archived files failed to upload
         catch (Exception e)
         {
             results.IsSuccess = false;
@@ -51,36 +36,79 @@ public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
         }
     }
 
-    private void Upload (ArchiveStepResults archiveInfo, ITargetWorkspace workspace)
+    private async Task UploadFilesAsync(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace, DistributeStepResults results)
     {
-        // Get the object used to communicate with the server.
-        FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{_config.URL}:{_config.Port}/{_config.BasePath}/{archiveInfo.ArchiveFileName}");
-        request.Credentials = new NetworkCredential(_config.Username, _config.Password);
-        request.Method = WebRequestMethods.Ftp.UploadFile;
-        request.UseBinary = true;
-        request.KeepAlive = true;
-
-        // FIXME abstract IO using IFileSystem
-
-        var file = new FileInfo($"{workspace.GetDirectory(TargetDirectory.Archives)}/{archiveInfo.ArchiveFileName}");
-        request.ContentLength = file.Length;
-
-        int bufferLength = 16 * 1024;
-        byte[] buffer = new byte[bufferLength];
-
-        FileStream fileStream = file.OpenRead();
-
-        Stream stream = request.GetRequestStream();
-        int length = 0;
-        while ((length = fileStream.Read(buffer, 0, bufferLength)) != 0)
+        using var ftpClient = new AsyncFtpClient(_config.URL, _config.Username, _config.Password, _config.Port);
+        
+        try
         {
-            stream.Write(buffer, 0, length);
-        }
-        stream.Close();
-        fileStream.Close();
+            // Configure FTP client settings
+            ftpClient.Config.ConnectTimeout = 30000; // 30 second timeout
+            ftpClient.Config.DataConnectionType = FtpDataConnectionType.AutoPassive;
+            ftpClient.Config.EncryptionMode = FtpEncryptionMode.None; // Plain FTP for compatibility
+            
+            _logger.Write($"Connecting to FTP server {_config.URL}:{_config.Port}", LogType.SmallBullet);
+            await ftpClient.Connect();
+            
+            _logger.Write("FTP connection established", LogType.SmallBullet);
 
-        FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-        _logger.Write($"Upload File Complete, status {response.StatusDescription}", LogType.SmallBullet);
-        response.Close();
+            // Ensure remote directory exists
+            if (!string.IsNullOrEmpty(_config.BasePath))
+            {
+                await ftpClient.CreateDirectory(_config.BasePath);
+            }
+
+            // Upload all archived files
+            foreach (var archiveInfo in archiveResults.StepResults)
+            {
+                var stepResult = new DistributeStepResults.FileResult { ArchiveInfo = archiveInfo };
+                try
+                {
+                    await UploadFileAsync(ftpClient, archiveInfo, workspace);
+                    stepResult.Success = true;
+                    stepResult.Message = "Upload completed successfully";
+                    results.FileResults.Add(stepResult);
+                }
+                catch (Exception e)
+                {
+                    stepResult.Success = false;
+                    stepResult.Message = e.Message;
+                    results.FileResults.Add(stepResult);
+                    throw new Exception($"File upload failed for {archiveInfo.ArchiveFileName}: {e.Message}");
+                }
+            }
+        }
+        finally
+        {
+            if (ftpClient.IsConnected)
+            {
+                await ftpClient.Disconnect();
+                _logger.Write("FTP connection closed", LogType.SmallBullet);
+            }
+        }
+    }
+
+    private async Task UploadFileAsync(AsyncFtpClient ftpClient, ArchiveStepResults archiveInfo, ITargetWorkspace workspace)
+    {
+        var localFilePath = Path.Combine(workspace.GetDirectory(TargetDirectory.Archives), archiveInfo.ArchiveFileName);
+        var remoteFilePath = string.IsNullOrEmpty(_config.BasePath) 
+            ? archiveInfo.ArchiveFileName 
+            : $"{_config.BasePath.TrimEnd('/')}/{archiveInfo.ArchiveFileName}";
+
+        _logger.Write($"Uploading {archiveInfo.ArchiveFileName} to {remoteFilePath}", LogType.SmallBullet);
+
+        // Use workspace file system abstraction
+        using var fileStream = workspace.FileSystem.OpenRead(localFilePath);
+        
+        var uploadResult = await ftpClient.UploadStream(fileStream, remoteFilePath, FtpRemoteExists.Overwrite, true);
+        
+        if (uploadResult == FtpStatus.Success)
+        {
+            _logger.Write($"Successfully uploaded {archiveInfo.ArchiveFileName}", LogType.SmallBullet);
+        }
+        else
+        {
+            throw new Exception($"FTP upload failed with status: {uploadResult}");
+        }
     }
 }

@@ -13,11 +13,9 @@ public class Agent
         return Name.GetHashCode() * 17 + Address.GetHashCode();
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        var item = obj as Agent;
-
-        if (item == null)
+        if (obj is not Agent item)
         {
             return false;
         }

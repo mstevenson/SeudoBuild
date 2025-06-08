@@ -15,8 +15,6 @@ public class AgentDiscoveryClient : IDisposable
         Console.WriteLine("starting...");
         _serviceDiscovery.ServiceInstanceDiscovered += OnServiceInstanceDiscovered;
         _serviceDiscovery.ServiceInstanceShutdown += OnServiceInstanceShutdown;
-        
-        _serviceDiscovery.Mdns.Start();
     }
 
     private void OnServiceInstanceDiscovered(object? s, ServiceInstanceDiscoveryEventArgs serviceInstance)
@@ -32,7 +30,6 @@ public class AgentDiscoveryClient : IDisposable
     public void Stop()
     {
         Console.WriteLine("Server Discovery Stopped");
-        _serviceDiscovery.Mdns.Stop();
         _serviceDiscovery.ServiceInstanceDiscovered -= OnServiceInstanceDiscovered;
         _serviceDiscovery.ServiceInstanceShutdown -= OnServiceInstanceShutdown;
     }
@@ -40,7 +37,6 @@ public class AgentDiscoveryClient : IDisposable
     public void Dispose()
     {
         Stop();
-        _serviceDiscovery.Mdns.Dispose();
         _serviceDiscovery.Dispose();
     }
 }

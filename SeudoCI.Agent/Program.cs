@@ -195,20 +195,22 @@ internal static class Program
             return 1;
         }
 
-        var buildSubmitter = new BuildSubmitter(_logger);
+        using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        httpClient.DefaultRequestHeaders.Add("User-Agent", "SeudoCI-Agent/1.0");
+        var httpService = new Services.HttpService(httpClient);
+        var buildSubmitter = new BuildSubmitter(_logger, httpService);
         try
         {
             // Find agent on the network, with timeout
             var discoveryClient = new AgentDiscoveryClient();
-            buildSubmitter.Submit(discoveryClient, configJson, opts.BuildTarget, opts.AgentName);
+            var success = buildSubmitter.SubmitAsync(discoveryClient, configJson, opts.BuildTarget, opts.AgentName).GetAwaiter().GetResult();
+            return success ? 0 : 1;
         }
         catch (Exception e)
         {
             _logger.Write("Could not submit job: " + e.Message, LogType.Failure);
             return 1;
         }
-
-        return 0;
     }
 
     /// <summary>
