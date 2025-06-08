@@ -31,9 +31,9 @@ public interface IFileSystem
 
     void DeleteDirectory(string path);
 
-    System.IO.Stream OpenRead(string path);
+    Stream OpenRead(string path);
 
-    System.IO.Stream OpenWrite(string path);
+    Stream OpenWrite(string path);
 
     void WriteAllText(string path, string contents);
 }

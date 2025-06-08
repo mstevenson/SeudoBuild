@@ -1,15 +1,18 @@
-﻿namespace SeudoCI.Pipeline.Modules.FolderArchive;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.FolderArchive;
 
 using Core;
 
 public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
 {
-    private FolderArchiveConfig _config;
-    private ITargetWorkspace _workspace;
-    private ILogger _logger;
+    private FolderArchiveConfig _config = null!;
+    private ITargetWorkspace _workspace = null!;
+    private ILogger _logger = null!;
 
-    public string Type => "Folder";
+    public string? Type => "Folder";
 
+    [UsedImplicitly]
     public void Initialize(FolderArchiveConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;
@@ -36,7 +39,7 @@ public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
             var results = new ArchiveStepResults { ArchiveFileName = folderName, IsSuccess = true };
             return results;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             return new ArchiveStepResults { IsSuccess = false, Exception = e };
         }

@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
       <PackageReference Include="p4api.net" Version="2023.2.258.5793" />
     </ItemGroup>
 

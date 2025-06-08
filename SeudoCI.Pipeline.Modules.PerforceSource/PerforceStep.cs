@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+
 namespace SeudoCI.Pipeline.Modules.PerforceSource;
 
 using Core;
@@ -16,12 +18,13 @@ public class PerforceStep : ISourceStep<PerforceConfig>
         throw new NotImplementedException();
     }
 
-    public string Type => "Perforce";
+    public string? Type => "Perforce";
     
     public bool IsWorkingCopyInitialized { get; }
     
     public string CurrentCommit { get; } = string.Empty;
     
+    [UsedImplicitly]
     public void Initialize(PerforceConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;

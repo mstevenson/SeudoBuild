@@ -55,7 +55,7 @@ public static class AgentName
     }
 
     private static readonly string[] Adjectives =
-    {
+    [
         "abiding",
         "academic",
         "accepting",
@@ -275,10 +275,10 @@ public static class AgentName
         "well-spoken",
         "whimsical",
         "witty"
-    };
+    ];
 
     private static readonly string[] Modifiers =
-    {
+    [
         "asian",
         "australian",
         "african",
@@ -317,11 +317,11 @@ public static class AgentName
         "western",
         "eastern",
         "hibernating"
-    };
+    ];
 
     // Based on https://github.com/hzlzh/Domain-Name-List/blob/master/Animal-words.txt
     private static readonly string[] Animals =
-    {
+    [
         "Aardvark",
         "Albatross",
         "Alligator",
@@ -492,5 +492,5 @@ public static class AgentName
         "Worm",
         "Yak",
         "Zebra"
-    };
+    ];
 }

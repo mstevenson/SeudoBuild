@@ -1,5 +1,6 @@
 ﻿using Path = System.IO.Path;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using SeudoCI.Core;
 
 namespace SeudoCI.Pipeline.Modules.SMBDistribute;
@@ -9,8 +10,9 @@ public class SMBDistributeStep : IDistributeStep<SMBDistributeConfig>
     private SMBDistributeConfig _config;
     private ILogger _logger;
 
-    public string Type => "SMB Transfer";
+    public string? Type => "SMB Transfer";
 
+    [UsedImplicitly]
     public void Initialize(SMBDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;

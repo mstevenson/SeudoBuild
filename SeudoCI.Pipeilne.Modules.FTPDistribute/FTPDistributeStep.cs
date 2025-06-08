@@ -1,7 +1,9 @@
-﻿namespace SeudoCI.Pipeline.Modules.FTPDistribute;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.FTPDistribute;
 
 using FluentFTP;
-using SeudoCI.Core;
+using Core;
 
 public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
 {
@@ -10,6 +12,7 @@ public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
 
     public string? Type => "FTP Upload";
 
+    [UsedImplicitly]
     public void Initialize(FTPDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;
@@ -38,7 +41,7 @@ public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
 
     private async Task UploadFilesAsync(ArchiveSequenceResults archiveResults, ITargetWorkspace workspace, DistributeStepResults results)
     {
-        using var ftpClient = new AsyncFtpClient(_config.URL, _config.Username, _config.Password, _config.Port);
+        await using var ftpClient = new AsyncFtpClient(_config.URL, _config.Username, _config.Password, _config.Port);
         
         try
         {
@@ -98,7 +101,7 @@ public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
         _logger.Write($"Uploading {archiveInfo.ArchiveFileName} to {remoteFilePath}", LogType.SmallBullet);
 
         // Use workspace file system abstraction
-        using var fileStream = workspace.FileSystem.OpenRead(localFilePath);
+        await using var fileStream = workspace.FileSystem.OpenRead(localFilePath);
         
         var uploadResult = await ftpClient.UploadStream(fileStream, remoteFilePath, FtpRemoteExists.Overwrite, true);
         

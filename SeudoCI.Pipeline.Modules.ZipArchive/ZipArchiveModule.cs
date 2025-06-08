@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.ZipArchive;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.ZipArchive;
+
+[UsedImplicitly]
 public class ZipArchiveModule : IArchiveModule
 {
     public string Name => "Zip";

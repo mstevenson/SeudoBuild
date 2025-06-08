@@ -9,17 +9,15 @@ public class Serializer(IFileSystem fileSystem)
     public T Deserialize<T>(string json, JsonConverter[] converters)
     {
         var settings = new JsonSerializerSettings { Converters = converters };
-        T? obj = JsonConvert.DeserializeObject<T>(json, settings);
+        var obj = JsonConvert.DeserializeObject<T>(json, settings);
         return obj ?? throw new InvalidOperationException("Failed to deserialize JSON");
     }
 
     public T DeserializeFromFile<T>(string path, JsonConverter[] converters)
     {
-        using (TextReader tr = new StreamReader(fileSystem.OpenRead(path)))
-        {
-            var json = tr.ReadToEnd();
-            return Deserialize<T>(json, converters);
-        }
+        using TextReader tr = new StreamReader(fileSystem.OpenRead(path));
+        var json = tr.ReadToEnd();
+        return Deserialize<T>(json, converters);
     }
 
     public string Serialize<T>(T obj)

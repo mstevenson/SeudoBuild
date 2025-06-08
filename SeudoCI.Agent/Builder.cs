@@ -23,7 +23,7 @@ public class Builder(IModuleLoader moduleLoader, ILogger logger) : IBuilder
     {
         if (projectConfig == null)
         {
-            throw new System.ArgumentException("Could not execute build, projectConfig is null");
+            throw new ArgumentException("Could not execute build, projectConfig is null");
         }
 
         // Find a valid target
@@ -33,7 +33,7 @@ public class Builder(IModuleLoader moduleLoader, ILogger logger) : IBuilder
             {
                 target = projectConfig.BuildTargets[0].TargetName;
             }
-            catch (System.IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 throw new InvalidProjectConfigException("ProjectConfig does not contain a build target.");
             }

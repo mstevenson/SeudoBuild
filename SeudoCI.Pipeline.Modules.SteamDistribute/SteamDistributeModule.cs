@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.SteamDistribute;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.SteamDistribute;
+
+[UsedImplicitly]
 public class SteamDistributeModule : IDistributeModule
 {
     public string Name => "Steam";

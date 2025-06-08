@@ -1,7 +1,9 @@
-﻿namespace SeudoCI.Pipeline.Modules.UnityBuild;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.UnityBuild;
 
 using System.Diagnostics;
-using SeudoCI.Core;
+using Core;
 
 public abstract class UnityBuildStep<T> : IBuildStep<T>
     where T : UnityBuildConfig
@@ -9,13 +11,14 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
     private T _config = null!;
     private ILogger _logger = null!;
 
+    [UsedImplicitly]
     public void Initialize(T config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;
         _logger = logger;
     }
 
-    public abstract string Type { get; }
+    public abstract string? Type { get; }
 
     protected abstract string GetBuildArgs(T config, ITargetWorkspace workspace);
 
@@ -23,9 +26,9 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
     {
         var unityVersion = _config.UnityVersionNumber;
         string unityDirName = "Unity";
-        if (unityVersion != null && unityVersion.IsValid)
+        if (unityVersion.IsValid)
         {
-            unityDirName = $"{unityDirName} {unityVersion.ToString()}";
+            unityDirName = $"{unityDirName} {unityVersion}";
         }
 
         var platform = PlatformUtils.RunningPlatform;
@@ -70,55 +73,54 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
             UseShellExecute = false
         };
 
-        using (var unityProcess = new Process { StartInfo = startInfo })
+        using var unityProcess = new Process();
+        unityProcess.StartInfo = startInfo;
+        var logParser = new UnityLogParser();
+                
+        string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+        string logPath = $"{workspace.GetDirectory(TargetDirectory.Logs)}/Unity_Build_Log_{now}.txt";
+                
+        var writer = new StreamWriter(logPath);
+        try
         {
-            var logParser = new UnityLogParser();
-                
-            string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-            string logPath = $"{workspace.GetDirectory(TargetDirectory.Logs)}/Unity_Build_Log_{now}.txt";
-                
-            var writer = new StreamWriter(logPath);
-            try
+            unityProcess.OutputDataReceived += (sender, e) =>
             {
-                unityProcess.OutputDataReceived += (sender, e) =>
+                //Console.WriteLine(e.Data);
+                writer.WriteLine(e.Data);
+                writer.Flush();
+                string? logOutput = logParser.ProcessLogLine(e.Data);
+                if (logOutput != null)
                 {
-                    //Console.WriteLine(e.Data);
-                    writer.WriteLine(e.Data);
-                    writer.Flush();
-                    string logOutput = logParser.ProcessLogLine(e.Data);
-                    if (logOutput != null)
-                    {
-                        _logger.Write(logOutput, LogType.SmallBullet);
-                    }
-                };
+                    _logger.Write(logOutput, LogType.SmallBullet);
+                }
+            };
                     
-                //unityProcess.ErrorDataReceived += (sender, e) =>
-                //{
-                //    // TODO return error
-                //};
+            //unityProcess.ErrorDataReceived += (sender, e) =>
+            //{
+            //    // TODO return error
+            //};
                     
-                unityProcess.Start();
-                unityProcess.BeginOutputReadLine();
-                unityProcess.WaitForExit();
-            }
-            finally
-            {
-                writer.Close();
-            }
-
-            var results = new BuildStepResults();
-
-            if (unityProcess.ExitCode == 0)
-            {
-                results.IsSuccess = true;
-            }
-            else
-            {
-                results.IsSuccess = false;
-                results.Exception = new Exception("Build process exited abnormally");
-            }
-
-            return results;
+            unityProcess.Start();
+            unityProcess.BeginOutputReadLine();
+            unityProcess.WaitForExit();
         }
+        finally
+        {
+            writer.Close();
+        }
+
+        var results = new BuildStepResults();
+
+        if (unityProcess.ExitCode == 0)
+        {
+            results.IsSuccess = true;
+        }
+        else
+        {
+            results.IsSuccess = false;
+            results.Exception = new Exception("Build process exited abnormally");
+        }
+
+        return results;
     }
 }

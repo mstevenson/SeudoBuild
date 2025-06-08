@@ -1,6 +1,6 @@
-namespace SeudoCI.Net;
-
 using Makaretu.Dns;
+
+namespace SeudoCI.Net;
 
 /// <summary>
 /// Advertises an mDNS service on the local network.

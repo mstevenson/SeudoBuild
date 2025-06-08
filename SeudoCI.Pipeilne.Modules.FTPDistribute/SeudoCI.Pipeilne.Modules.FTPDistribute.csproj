@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="FluentFTP" Version="50.0.1" />
+      <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
     </ItemGroup>
 
     <ItemGroup>

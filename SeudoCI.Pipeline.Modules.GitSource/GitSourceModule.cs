@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.GitSource;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.GitSource;
+
+[UsedImplicitly]
 public class GitSourceModule : ISourceModule
 {
     public string Name => "Git";

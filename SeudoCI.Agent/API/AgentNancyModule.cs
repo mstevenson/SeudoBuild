@@ -5,13 +5,12 @@ using Nancy;
 using System.IO;
 using Core;
 using Pipeline;
-using Net;
 
 /// <inheritdoc />
 /// <summary>
 /// RESTful API for controlling an Agent via HTTP requests.
 /// </summary>
-public class AgentNancyModule : NancyModule
+public sealed class AgentNancyModule : NancyModule
 {
     public AgentNancyModule(IBuildQueue buildQueue, IModuleLoader moduleLoader, IFileSystem filesystem, ILogger logger)
     {
@@ -105,7 +104,7 @@ public class AgentNancyModule : NancyModule
         });
     }
 
-    ProjectConfig ProcessReceivedBuildRequest(Request request, string? target, IModuleLoader moduleLoader, IFileSystem filesystem)
+    private static ProjectConfig ProcessReceivedBuildRequest(Request request, string? target, IModuleLoader moduleLoader, IFileSystem filesystem)
     {
         // We'd ordinarily use Nancy's Bind method, but we need to use custom
         // JSON converters to properly deserialize the ProjectConfig object

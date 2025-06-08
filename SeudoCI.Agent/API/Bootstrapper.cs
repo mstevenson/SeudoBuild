@@ -25,7 +25,7 @@ public class Bootstrapper : DefaultNancyBootstrapper
         var logger = new Logger();
         container.Register<ILogger>(logger);
         
-        var moduleLoader = new ModuleLoaderFactory().Create(logger);
+        var moduleLoader = ModuleLoaderFactory.Create(logger);
         container.Register(moduleLoader);
 
         // TODO support Linux

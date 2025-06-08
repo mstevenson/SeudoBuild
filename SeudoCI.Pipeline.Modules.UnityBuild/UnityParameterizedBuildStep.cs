@@ -4,7 +4,7 @@ using Core;
 
 public class UnityParameterizedBuildStep : UnityBuildStep<UnityParameterizedBuildConfig>
 {
-    public override string Type => "Unity Parameterized Build";
+    public override string? Type => "Unity Parameterized Build";
 
     protected override string GetBuildArgs(UnityParameterizedBuildConfig config, ITargetWorkspace workspace)
     {
@@ -12,26 +12,25 @@ public class UnityParameterizedBuildStep : UnityBuildStep<UnityParameterizedBuil
         const string methodName = "Builder.RemoteBuild";
 
         // Use System.Environment.GetCommandLineArgs in Unity to get custom arguments
-        var args = new List<string>();
-        args.Add("-quit");
-        args.Add("-batchmode");
-        args.Add("-executeMethod");
-        args.Add(methodName);
-        args.Add("-projectPath");
-        args.Add(Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory));
-        args.Add("-logfile");
-        args.Add(workspace.FileSystem.StandardOutputPath);
-
-        // Custom args
-
-        args.Add("-executableName");
-        args.Add(config.ExecutableName);
-
-        args.Add("-targetPlatform");
-        args.Add(System.Enum.GetName(typeof(UnityPlatform), config.TargetPlatform));
-
-        args.Add("-outputDirectory");
-        args.Add(workspace.GetDirectory(TargetDirectory.Output));
+        var args = new List<string>
+        {
+            "-quit",
+            "-batchmode",
+            "-executeMethod",
+            methodName,
+            "-projectPath",
+            Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory),
+            "-logfile",
+            workspace.FileSystem.StandardOutputPath,
+            
+            // Custom args
+            "-executableName",
+            config.ExecutableName,
+            "-targetPlatform",
+            Enum.GetName(config.TargetPlatform)!,
+            "-outputDirectory",
+            workspace.GetDirectory(TargetDirectory.Output)
+        };
 
         if (config.DevelopmentBuild)
         {

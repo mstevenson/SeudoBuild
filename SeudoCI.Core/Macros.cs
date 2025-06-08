@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 /// Macro variables begin and end with the % character.
 /// Example: %project_name% variable could be replaced with the string MyProject.
 /// </summary>
-public class Macros : Dictionary<string, string>, IMacros
+public partial class Macros : Dictionary<string, string>, IMacros
 {
     public string ReplaceVariablesInText(string source)
     {
@@ -18,7 +18,10 @@ public class Macros : Dictionary<string, string>, IMacros
             source = source.Replace($"%{kvp.Key}%", kvp.Value);
         }
         // Remove any variables that were not matched
-        source = Regex.Replace(source, "%.*?%", string.Empty, RegexOptions.Multiline);
+        source = MyRegex().Replace(source, string.Empty);
         return source;
     }
+
+    [GeneratedRegex("%.*?%", RegexOptions.Multiline)]
+    private static partial Regex MyRegex();
 }

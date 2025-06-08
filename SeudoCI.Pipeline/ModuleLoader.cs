@@ -34,13 +34,14 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
 
     private bool TryLoadModuleAssembly(Assembly assembly)
     {
-        string[] moduleBaseTypeNames = {
+        string[] moduleBaseTypeNames =
+        [
             nameof(ISourceModule),
             nameof(IBuildModule),
             nameof(IArchiveModule),
             nameof(IDistributeModule),
             nameof(INotifyModule)
-        };
+        ];
 
         try
         {
@@ -61,7 +62,7 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
             {
                 found = true;
                 DebugWrite($"       Activating type:  {moduleType}");
-                object obj = Activator.CreateInstance(moduleType);
+                object obj = Activator.CreateInstance(moduleType) ?? throw new InvalidOperationException();
                 Registry.RegisterModule((IModule)obj);
             }
             return found;
@@ -142,7 +143,7 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
 
                 // Initialize the pipeline step with the config object
                 var method = pipelineStepWithConfigType.GetMethod("Initialize");
-                method?.Invoke(pipelineStepObj, new object[] { config, workspace, logger });
+                method?.Invoke(pipelineStepObj, [config, workspace, logger]);
 
                 var step = (T)pipelineStepObj;
                 return step;
@@ -156,7 +157,7 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
     }
 
     [Conditional("DEBUG_ASSEMBLIES")]
-    private void DebugWrite(string message)
+    private void DebugWrite(string? message)
     {
         logger.Write(message, LogType.Debug);
     }

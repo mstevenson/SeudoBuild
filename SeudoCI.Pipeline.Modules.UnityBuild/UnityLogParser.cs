@@ -20,9 +20,9 @@ public class UnityLogParser
     public class Match
     {
         public readonly string text;
-        public readonly Func<string, string> output;
+        public readonly Func<string?, string?> output;
 
-        public Match(string text, Func<string, string> output)
+        public Match(string text, Func<string?, string?> output)
         {
             this.text = text;
             this.output = output;
@@ -33,7 +33,7 @@ public class UnityLogParser
     {
         readonly List<Match> matches = new List<Match>();
 
-        public void Add(string text, Func<string, string> output)
+        public void Add(string text, Func<string?, string?> output)
         {
             matches.Add(new Match(text, output));
         }
@@ -80,7 +80,7 @@ public class UnityLogParser
         };
     }
 
-    public string ProcessLogLine(string line)
+    public string? ProcessLogLine(string? line)
     {
         if (line == null)
         {
@@ -91,7 +91,7 @@ public class UnityLogParser
         {
             if (line.Contains(match.text))
             {
-                string result = match.output.Invoke(line);
+                string? result = match.output.Invoke(line);
                 return result;
             }
         }
@@ -102,7 +102,7 @@ public class UnityLogParser
             {
                 if (line.Contains(match.text))
                 {
-                    string result = match.output.Invoke(line);
+                    string? result = match.output.Invoke(line);
                     return result;
                 }
             }

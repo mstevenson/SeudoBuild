@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Pipeline.Modules.SFTPDistribute;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.SFTPDistribute;
 
 using Renci.SshNet;
 using Renci.SshNet.Common;
@@ -9,8 +11,9 @@ public class SFTPDistributeStep : IDistributeStep<SFTPDistributeConfig>
     private SFTPDistributeConfig _config;
     private ILogger _logger;
 
-    public string Type => "SFTP Upload";
+    public string? Type => "SFTP Upload";
 
+    [UsedImplicitly]
     public void Initialize(SFTPDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;

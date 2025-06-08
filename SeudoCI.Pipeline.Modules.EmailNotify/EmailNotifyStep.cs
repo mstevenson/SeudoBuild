@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Pipeline.Modules.EmailNotify;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.EmailNotify;
 
 using MailKit.Net.Smtp;
 using MimeKit;
@@ -9,8 +11,9 @@ public class EmailNotifyStep : INotifyStep<EmailNotifyConfig>
     private EmailNotifyConfig _config;
     private ILogger _logger;
 
-    public string Type => "Email Notification";
+    public string? Type => "Email Notification";
 
+    [UsedImplicitly]
     public void Initialize(EmailNotifyConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;
@@ -32,7 +35,7 @@ public class EmailNotifyStep : INotifyStep<EmailNotifyConfig>
         }
     }
 
-    void SendMessage(string fromAddress, string toAddress, string subject, string body)
+    private void SendMessage(string fromAddress, string toAddress, string subject, string body)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress("SeudoCI", fromAddress));

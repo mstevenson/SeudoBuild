@@ -7,7 +7,7 @@ using Core;
 
 public class ProjectPipeline
 {
-    private readonly Dictionary<Type, IEnumerable<IPipelineStep>> _stepTypeMap = new Dictionary<Type, IEnumerable<IPipelineStep>>();
+    private readonly Dictionary<Type, IEnumerable<IPipelineStep>> _stepTypeMap = new();
 
     public ProjectConfig ProjectConfig { get; }
     public BuildTargetConfig TargetConfig { get; }
@@ -16,27 +16,23 @@ public class ProjectPipeline
         where T : IPipelineStep
     {
         _stepTypeMap.TryGetValue(typeof(T), out var steps);
-        return steps == null ? new List<T>() : steps.Cast<T>().ToList();
+        return steps == null ? [] : steps.Cast<T>().ToList();
     }
 
-    public ProjectPipeline (ProjectConfig config, string buildTargetName)
+    public ProjectPipeline(ProjectConfig config, string buildTargetName)
     {
         ProjectConfig = config;
-        TargetConfig = ProjectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
+        TargetConfig = ProjectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName) ?? 
+                        throw new ArgumentException($"Build target '{buildTargetName}' not found in project '{ProjectConfig.ProjectName}'.");
     }
 
     public void LoadBuildStepModules(IModuleLoader moduleLoader, ITargetWorkspace workspace, ILogger logger)
     {
-        void RegisterSteps<T>() where T : class, IPipelineStep
-        {
-            _stepTypeMap[typeof(T)] = CreatePipelineSteps<T>(moduleLoader, workspace, logger);
-        }
-            
-        RegisterSteps<ISourceStep>();
-        RegisterSteps<IBuildStep>();
-        RegisterSteps<IArchiveStep>();
-        RegisterSteps<IDistributeStep>();
-        RegisterSteps<INotifyStep>();
+        _stepTypeMap[typeof(ISourceStep)] = CreatePipelineSteps<ISourceStep>(moduleLoader, workspace, logger);
+        _stepTypeMap[typeof(IBuildStep)] = CreatePipelineSteps<IBuildStep>(moduleLoader, workspace, logger);
+        _stepTypeMap[typeof(IArchiveStep)] = CreatePipelineSteps<IArchiveStep>(moduleLoader, workspace, logger);
+        _stepTypeMap[typeof(IDistributeStep)] = CreatePipelineSteps<IDistributeStep>(moduleLoader, workspace, logger);
+        _stepTypeMap[typeof(INotifyStep)] = CreatePipelineSteps<INotifyStep>(moduleLoader, workspace, logger);
     }
 
     public IEnumerable<T> CreatePipelineSteps<T>(IModuleLoader loader, ITargetWorkspace workspace, ILogger logger)
@@ -47,29 +43,20 @@ public class ProjectPipeline
         void RegisterSteps<T2>(IEnumerable<T2> targetStepConfigs) where T2 : StepConfig
         {
             pipelineSteps.AddRange(targetStepConfigs
-                .Select(config => loader.CreatePipelineStep<T>(config, workspace, logger))
-                .Where(step => step != null));
+                .Select(config => loader.CreatePipelineStep<T>(config, workspace, logger)));
         }
-            
-        switch (typeof(T))
-        {
-            case ISourceStep _:
-                RegisterSteps(TargetConfig.SourceSteps);
-                break;
-            case IBuildStep _:
-                RegisterSteps(TargetConfig.BuildSteps);
-                break;
-            case IArchiveStep _:
-                RegisterSteps(TargetConfig.ArchiveSteps);
-                break;
-            case IDistributeStep _:
-                RegisterSteps(TargetConfig.DistributeSteps);
-                break;
-            case INotifyStep _:
-                RegisterSteps(TargetConfig.NotifySteps);
-                break;
-        }
-            
+
+        if (typeof(T).IsSubclassOf(typeof(ISourceStep)))
+            RegisterSteps(TargetConfig.SourceSteps);
+        else if (typeof(T).IsSubclassOf(typeof(IBuildStep)))
+            RegisterSteps(TargetConfig.BuildSteps);
+        else if (typeof(T).IsSubclassOf(typeof(IArchiveStep)))
+            RegisterSteps(TargetConfig.ArchiveSteps);
+        else if (typeof(T).IsSubclassOf(typeof(IDistributeStep)))
+            RegisterSteps(TargetConfig.DistributeSteps);
+        else if (typeof(T).IsSubclassOf(typeof(INotifyStep)))
+            RegisterSteps(TargetConfig.NotifySteps);
+
         return pipelineSteps.AsReadOnly();
     }
 }

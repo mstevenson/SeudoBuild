@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.FolderArchive;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.FolderArchive;
+
+[UsedImplicitly]
 public class FolderArchiveModule : IArchiveModule
 {
     public string Name => "Folder";

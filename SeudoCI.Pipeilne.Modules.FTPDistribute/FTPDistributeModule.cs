@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.FTPDistribute;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.FTPDistribute;
+
+[UsedImplicitly]
 public class FTPDistributeModule : IDistributeModule
 {
     public string Name => "FTP";

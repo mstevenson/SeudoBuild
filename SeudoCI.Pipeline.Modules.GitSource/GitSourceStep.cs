@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Pipeline.Modules.GitSource;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.GitSource;
 
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
@@ -11,8 +13,9 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     private ITargetWorkspace _workspace = null!;
     private ILogger _logger = null!;
 
-    public string Type => "Git";
+    public string? Type => "Git";
 
+    [UsedImplicitly]
     public void Initialize(GitSourceConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;
@@ -87,12 +90,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
         get
         {
-            string result;
-            using (var repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source)))
-            {
-                result = repo.Head.Tip.Sha;
-            }
-            return result;
+            using var repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source));
+            return repo.Head.Tip.Sha;
         }
     }
 
@@ -101,7 +100,7 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         get
         {
             string commit = CurrentCommit;
-            return commit.Length == 0 ? "" : commit.Substring(0, 7);
+            return commit.Length == 0 ? "" : commit[..7];
         }
     }
 

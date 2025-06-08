@@ -5,14 +5,9 @@ using System.Text;
 /// <summary>
 /// Default HTTP service implementation using HttpClient.
 /// </summary>
-public class HttpService : IHttpService
+public class HttpService(HttpClient httpClient) : IHttpService
 {
-    private readonly HttpClient _httpClient;
-
-    public HttpService(HttpClient httpClient)
-    {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-    }
+    private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     public async Task<string> GetStringAsync(string requestUri, CancellationToken cancellationToken = default)
     {

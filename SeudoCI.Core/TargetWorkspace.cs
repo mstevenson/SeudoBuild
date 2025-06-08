@@ -31,19 +31,14 @@ public class TargetWorkspace : ITargetWorkspace
         
     public string GetDirectory(TargetDirectory directory)
     {
-        switch (directory)
+        return directory switch
         {
-            case TargetDirectory.Source:
-                return $"{_baseDirectory}/Workspace";
-            case TargetDirectory.Output:
-                return $"{_baseDirectory}/Output";
-            case TargetDirectory.Archives:
-                return $"{_baseDirectory}/Archives";
-            case TargetDirectory.Logs:
-                return $"{_baseDirectory}/Logs";
-            default:
-                throw new ArgumentOutOfRangeException(nameof(directory), directory, null);
-        }
+            TargetDirectory.Source => $"{_baseDirectory}/Workspace",
+            TargetDirectory.Output => $"{_baseDirectory}/Output",
+            TargetDirectory.Archives => $"{_baseDirectory}/Archives",
+            TargetDirectory.Logs => $"{_baseDirectory}/Logs",
+            _ => throw new ArgumentOutOfRangeException(nameof(directory), directory, null)
+        };
     }
 
     public void CleanDirectory(TargetDirectory directory)

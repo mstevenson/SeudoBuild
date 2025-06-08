@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.ShellBuild;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.ShellBuild;
+
+[UsedImplicitly]
 public class ShellBuildModule : IBuildModule
 {
     public string Name => "Shell";

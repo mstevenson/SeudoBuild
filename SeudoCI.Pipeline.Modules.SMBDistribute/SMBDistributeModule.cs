@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.SMBDistribute;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.SMBDistribute;
+
+[UsedImplicitly]
 public class SMBDistributeModule : IDistributeModule
 {
     public string Name => "SMB";

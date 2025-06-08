@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.UnityBuild;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.UnityBuild;
+
+[UsedImplicitly]
 public class UnityExecuteMethodBuildModule : IBuildModule
 {
     public string Name => "Unity (Execute Method)";

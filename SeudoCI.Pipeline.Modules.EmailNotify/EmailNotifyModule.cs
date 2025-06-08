@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.EmailNotify;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.EmailNotify;
+
+[UsedImplicitly]
 public class EmailNotifyModule : INotifyModule
 {
     public string Name => "Email";

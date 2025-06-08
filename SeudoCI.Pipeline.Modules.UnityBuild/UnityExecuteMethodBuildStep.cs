@@ -4,7 +4,7 @@ using Core;
 
 public class UnityExecuteMethodBuildStep : UnityBuildStep<UnityExecuteMethodBuildConfig>
 {
-    public override string Type => "Unity Execute Method";
+    public override string? Type => "Unity Execute Method";
 
     protected override string GetBuildArgs(UnityExecuteMethodBuildConfig config, ITargetWorkspace workspace)
     {

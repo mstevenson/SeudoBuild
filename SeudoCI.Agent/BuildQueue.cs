@@ -1,8 +1,4 @@
-using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
-using System.IO;
 using SeudoCI.Core;
 using SeudoCI.Pipeline;
 
@@ -21,8 +17,8 @@ public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger lo
     private bool _isQueueRunning;
 
     public BuildResult? ActiveBuild { get; private set; }
-    private ConcurrentQueue<BuildResult> QueuedBuilds { get; } = new ConcurrentQueue<BuildResult>();
-    private ConcurrentDictionary<int, BuildResult> Builds { get; } = new ConcurrentDictionary<int, BuildResult>();
+    private ConcurrentQueue<BuildResult> QueuedBuilds { get; } = new();
+    private ConcurrentDictionary<int, BuildResult> Builds { get; } = new();
 
     /// <summary>
     /// Begin executing builds in the queue. Builds will continue until the queue has been exhausted.

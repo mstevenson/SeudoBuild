@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Pipeline.Modules.ShellBuild;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.ShellBuild;
 
 using System.Diagnostics;
 using Core;
@@ -17,8 +19,9 @@ public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
     private ITargetWorkspace _workspace = null!;
     private ILogger _logger = null!;
 
-    public string Type => "Shell Script";
+    public string? Type => "Shell Script";
 
+    [UsedImplicitly]
     public void Initialize(ShellBuildStepConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;

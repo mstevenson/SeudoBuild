@@ -5,7 +5,7 @@ namespace SeudoCI.Core.FileSystems;
 /// </summary>
 public class MacFileSystem : WindowsFileSystem
 {
-    public override string StandardOutputPath { get; } = "/dev/stdout";
-        
-    public override string DocumentsPath => base.DocumentsPath + "/Documents";
+    public override string StandardOutputPath => "/dev/stdout";
+
+    public override string DocumentsPath => $"{base.DocumentsPath}/Documents";
 }

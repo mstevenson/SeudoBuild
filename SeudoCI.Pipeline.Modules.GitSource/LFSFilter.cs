@@ -3,22 +3,12 @@
 using System.Diagnostics;
 using LibGit2Sharp;
 
-public class LFSFilter : Filter
+public class LFSFilter(string name, string repoPath, IEnumerable<FilterAttributeEntry> attributes)
+    : Filter(name, attributes)
 {
     private Process _process = null!;
-    private readonly string _repoPath;
 
     private FilterMode _mode;
-
-    public LFSFilter(string name, string repoPath, IEnumerable<FilterAttributeEntry> attributes) : base(name, attributes)
-    {
-        _repoPath = repoPath;
-    }
-
-    protected override void Initialize()
-    {
-        base.Initialize();
-    }
 
     protected override void Create(string path, string root, FilterMode mode)
     {
@@ -31,7 +21,7 @@ public class LFSFilter : Filter
         {
             FileName = "git-lfs",
             Arguments = $"{modeArg} {path}",
-            WorkingDirectory = _repoPath,
+            WorkingDirectory = repoPath,
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
             CreateNoWindow = true,

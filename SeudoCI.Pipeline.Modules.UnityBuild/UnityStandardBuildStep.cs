@@ -5,7 +5,7 @@ using Path = System.IO.Path;
 
 public class UnityStandardBuildStep : UnityBuildStep<UnityStandardBuildConfig>
 {
-    public override string Type => "Unity Standard Build";
+    public override string? Type => "Unity Standard Build";
 
     protected override string GetBuildArgs(UnityStandardBuildConfig config, ITargetWorkspace workspace)
     {

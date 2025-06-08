@@ -26,7 +26,7 @@ public class UnityInstallation
     /// the folder name ending with the given version number.
     /// Example:  /Applications/Unity 5.3.4f2/Unity.app
     /// </summary>
-    public static UnityInstallation FindUnityInstallation (VersionNumber version, Platform platform)
+    public static UnityInstallation FindUnityInstallation(VersionNumber version, Platform platform)
     {
         switch (platform)
         {

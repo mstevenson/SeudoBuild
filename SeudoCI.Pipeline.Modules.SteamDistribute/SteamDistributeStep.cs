@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Pipeline.Modules.SteamDistribute;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.SteamDistribute;
 
 using Core;
 
@@ -7,8 +9,9 @@ public class SteamDistributeStep : IDistributeStep<SteamDistributeConfig>
     private SteamDistributeConfig _config = null!;
     private ILogger _logger = null!;
 
-    public string Type => "Steam Upload";
+    public string? Type => "Steam Upload";
 
+    [UsedImplicitly]
     public void Initialize(SteamDistributeConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;

@@ -24,17 +24,13 @@ public class ProjectWorkspace(string projectDirectory, IFileSystem fileSystem) :
 
     public string GetDirectory(ProjectDirectory directory)
     {
-        switch (directory)
+        return directory switch
         {
-            case ProjectDirectory.Project:
-                return projectDirectory;
-            case ProjectDirectory.Targets:
-                return $"{projectDirectory}/Targets";
-            case ProjectDirectory.Logs:
-                return $"{projectDirectory}/Logs";
-            default:
-                throw new ArgumentOutOfRangeException(nameof(directory), directory, null);
-        }
+            ProjectDirectory.Project => projectDirectory,
+            ProjectDirectory.Targets => $"{projectDirectory}/Targets",
+            ProjectDirectory.Logs => $"{projectDirectory}/Logs",
+            _ => throw new ArgumentOutOfRangeException(nameof(directory), directory, null)
+        };
     }
         
     public void CleanDirectory(ProjectDirectory directory)

@@ -17,13 +17,18 @@ public static class PlatformUtils
                         & Directory.Exists("/Users")
                         & Directory.Exists("/Volumes"))
                         return Platform.Mac;
-                    else
-                        return Platform.Linux;
+                    return Platform.Linux;
                 case PlatformID.MacOSX:
                     return Platform.Mac;
-
-                default:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.Win32NT:
+                case PlatformID.WinCE:
                     return Platform.Windows;
+                case PlatformID.Xbox:
+                case PlatformID.Other:
+                default:
+                    throw new PlatformNotSupportedException("The current platform is not supported by SeudoCI.");
             }
         }
     }

@@ -1,6 +1,7 @@
-namespace SeudoCI.Net;
 
 using Makaretu.Dns;
+
+namespace SeudoCI.Net;
 
 /// <summary>
 /// Discovers build agents on the local network.

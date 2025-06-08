@@ -10,7 +10,7 @@ public interface IInitializable<in T>
 
 public interface IPipelineStep
 {
-    string Type { get; }
+    string? Type { get; }
 }
 
 public interface IPipelineStepWithConfig<in T> : IPipelineStep

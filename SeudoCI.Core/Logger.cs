@@ -30,22 +30,16 @@ public class Logger : ILogger
     public const string InvertOn = "\x1b[7m";
     //public const string InvertOff = "\x1b[27m";
 
-    public void Write(string value, LogType logType = LogType.None, LogStyle logStyle = LogStyle.None)
+    public void Write(string? value, LogType logType = LogType.None, LogStyle logStyle = LogStyle.None)
     {
-        switch (logStyle) {
-            case LogStyle.Bold:
-                value = $"{BoldOn}{value}{Normal}";
-                break;
-            case LogStyle.Dim:
-                value = $"{DimOn}{value}{Normal}";
-                break;
-            case LogStyle.Underline:
-                value = $"{UnderlineOn}{value}{Normal}";
-                break;
-            case LogStyle.Invert:
-                value = $"{InvertOn}{value}{Normal}";
-                break;
-        }
+        value = logStyle switch
+        {
+            LogStyle.Bold => $"{BoldOn}{value}{Normal}",
+            LogStyle.Dim => $"{DimOn}{value}{Normal}",
+            LogStyle.Underline => $"{UnderlineOn}{value}{Normal}",
+            LogStyle.Invert => $"{InvertOn}{value}{Normal}",
+            _ => value
+        };
 
         switch (logType)
         {

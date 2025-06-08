@@ -5,7 +5,7 @@
 /// </summary>
 public class MockFile
 {
-    public class MockMemoryStream : System.IO.MemoryStream
+    public class MockMemoryStream : MemoryStream
     {
         private readonly Action<byte[]> _flushCallback;
 
@@ -38,7 +38,7 @@ public class MockFile
 
     public MockFile()
     {
-        Data = new byte[0];
+        Data = [];
     }
 
     public MockFile(byte[] data)
@@ -46,27 +46,22 @@ public class MockFile
         Data = data;
     }
 
-    public System.IO.Stream OpenRead()
+    public Stream OpenRead()
     {
-        if (_writeStream != null)
-        {
-            _writeStream.Flush();
-            Data = _writeStream.ToArray();
-        }
+        _writeStream.Flush();
+        Data = _writeStream.ToArray();
         var readStream = new MockMemoryStream(Data, OnFlush);
         return readStream;
     }
 
-    public System.IO.Stream OpenWrite()
+    public Stream OpenWrite()
     {
-        if (_writeStream != null && _writeStream.CanWrite)
+        if (_writeStream.CanWrite)
         {
-            throw new System.IO.IOException("Can't write to mock file, the mock file stream is already open");
+            throw new IOException("Can't write to mock file, the mock file stream is already open");
         }
-        else
-        {
-            _writeStream = new MockMemoryStream(OnFlush);
-        }
+
+        _writeStream = new MockMemoryStream(OnFlush);
         return _writeStream;
     }
 
@@ -89,7 +84,7 @@ public class MockFileSystem : IFileSystem
 
     public string DocumentsPath => "/documents";
 
-    public IEnumerable<string> GetFiles(string directoryPath, string searchPattern = null)
+    public IEnumerable<string> GetFiles(string directoryPath, string? searchPattern = null)
     {
         var foundFiles = new List<string>();
         foreach (var file in _allFiles.Keys)
@@ -112,11 +107,11 @@ public class MockFileSystem : IFileSystem
     {
         if (!_allFiles.ContainsKey(source))
         {
-            throw new System.IO.FileNotFoundException("Couldn't move file, source file does not exist: " + source);
+            throw new FileNotFoundException("Couldn't move file, source file does not exist: " + source);
         }
         if (_allFiles.ContainsKey(destination))
         {
-            throw new System.IO.IOException("Destination exists, could not move file");
+            throw new IOException("Destination exists, could not move file");
         }
         var data = _allFiles[source];
         _allFiles.Remove(source);
@@ -127,7 +122,7 @@ public class MockFileSystem : IFileSystem
     {
         if (!_allFiles.ContainsKey(source))
         {
-            throw new System.IO.FileNotFoundException("Could not copy file, it does not exist: " + source);
+            throw new FileNotFoundException("Could not copy file, it does not exist: " + source);
         }
         // Overwrite old file
         if (_allFiles.ContainsKey(destination))
@@ -158,40 +153,39 @@ public class MockFileSystem : IFileSystem
         _allFiles[destination] = _allFiles[source];
     }
 
-    public IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null)
+    public IEnumerable<string> GetDirectories(string directoryPath, string? searchPattern = null)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public bool DirectoryExists(string directoryPath)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public void CreateDirectory(string directoryPath)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public void DeleteDirectory(string directoryPath)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
-    public System.IO.Stream OpenRead(string path)
+    public Stream OpenRead(string path)
     {
         if (!_allFiles.ContainsKey(path))
         {
-            throw new System.IO.FileNotFoundException("File not found: " + path);
+            throw new FileNotFoundException("File not found: " + path);
         }
         var file = _allFiles[path].OpenRead();
         return file;
     }
 
-    public System.IO.Stream OpenWrite(string path)
+    public Stream OpenWrite(string path)
     {
-        MockFile file = null;
-        if (!_allFiles.TryGetValue(path, out file))
+        if (!_allFiles.TryGetValue(path, out var file))
         {
             file = new MockFile();
             _allFiles.Add(path, file);
@@ -201,6 +195,6 @@ public class MockFileSystem : IFileSystem
 
     public void WriteAllText(string path, string contents)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

@@ -10,17 +10,8 @@ using Core.FileSystems;
 /// <summary>
 /// Executes all pipeline steps in a given project for a given build target.
 /// </summary>
-public class PipelineRunner : IPipelineRunner
+public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRunner
 {
-    private readonly PipelineConfig _config;
-    private readonly ILogger _logger;
-
-    public PipelineRunner(PipelineConfig config, ILogger logger)
-    {
-        _config = config;
-        _logger = logger;
-    }
-
     public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, IModuleLoader moduleLoader)
     {
         if (projectConfig == null)
@@ -39,17 +30,17 @@ public class PipelineRunner : IPipelineRunner
         }
 
         Console.WriteLine("");
-        _logger.Write("Running Pipeline\n", LogType.Header);
-        _logger.IndentLevel++;
-        _logger.Write($"Project:  {projectConfig.ProjectName}", LogType.Plus);
-        _logger.Write($"Target:   {buildTargetName}", LogType.Plus);
+        logger.Write("Running Pipeline\n", LogType.Header);
+        logger.IndentLevel++;
+        logger.Write($"Project:  {projectConfig.ProjectName}", LogType.Plus);
+        logger.Write($"Target:   {buildTargetName}", LogType.Plus);
         //logger.WritePlus($"Location: {projectsBaseDirectory}/{projectNameSanitized}"); 
-        _logger.IndentLevel--;
+        logger.IndentLevel--;
         Console.WriteLine("");
 
         // Create project and target workspaces
         string projectNameSanitized = projectConfig.ProjectName.SanitizeFilename();
-        string projectDirectory = $"{_config.BaseDirectory}/{projectNameSanitized}";
+        string projectDirectory = $"{config.BaseDirectory}/{projectNameSanitized}";
         var filesystem = new WindowsFileSystem();
         var projectWorkspace = new ProjectWorkspace(projectDirectory, filesystem);
         projectWorkspace.InitializeDirectories();
@@ -62,7 +53,7 @@ public class PipelineRunner : IPipelineRunner
 
         // Setup build pipeline
         var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
-        pipeline.LoadBuildStepModules(moduleLoader, targetWorkspace, _logger);
+        pipeline.LoadBuildStepModules(moduleLoader, targetWorkspace, logger);
 
         var macros = projectWorkspace.Macros;
         macros["project_name"] = pipeline.ProjectConfig.ProjectName;
@@ -85,20 +76,20 @@ public class PipelineRunner : IPipelineRunner
         var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, targetWorkspace);
 
         // Done
-        _logger.IndentLevel = 0;
-        _logger.Write("\nBuild process completed.", logStyle: LogStyle.Bold);
+        logger.IndentLevel = 0;
+        logger.Write("\nBuild process completed.", logStyle: LogStyle.Bold);
     }
 
-    private TOutSeq InitializeSequence<TOutSeq>(string sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
+    private TOutSeq InitializeSequence<TOutSeq>(string? sequenceName, IReadOnlyCollection<IPipelineStep> sequenceSteps)
         where TOutSeq : PipelineSequenceResults, new()
     {
-        _logger.IndentLevel = 1;
-        _logger.Write(sequenceName, LogType.Bullet);
-        _logger.IndentLevel++;
+        logger.IndentLevel = 1;
+        logger.Write(sequenceName, LogType.Bullet);
+        logger.IndentLevel++;
 
         if (sequenceSteps.Count == 0)
         {
-            _logger.Write($"No {sequenceName} steps.", LogType.Alert);
+            logger.Write($"No {sequenceName} steps.", LogType.Alert);
             return new TOutSeq {
                 IsSuccess = true,
                 IsSkipped = true,
@@ -109,7 +100,7 @@ public class PipelineRunner : IPipelineRunner
     }
 
     // First step of pipeline execution
-    private TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, ITargetWorkspace workspace)
+    private TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string? sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, ITargetWorkspace workspace)
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
     {
@@ -129,7 +120,7 @@ public class PipelineRunner : IPipelineRunner
     }
 
     // Pipeline execution step that had a step before it
-    private TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, ITargetWorkspace workspace)
+    private TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string? sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, ITargetWorkspace workspace)
         where TInSeq : PipelineSequenceResults // previous sequence results
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
@@ -144,7 +135,7 @@ public class PipelineRunner : IPipelineRunner
         // Verify that the pipeline has not previously failed
         if (!previousSequence.IsSuccess)
         {
-            _logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
+            logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
             results = new TOutSeq
             {
                 IsSuccess = false,
@@ -159,7 +150,7 @@ public class PipelineRunner : IPipelineRunner
         return results;
     }
 
-    private TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string sequenceName, IReadOnlyCollection<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep> stepExecuteCallback)
+    private TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string? sequenceName, IReadOnlyCollection<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep?> stepExecuteCallback)
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
         where TPipeStep : class, IPipelineStep
@@ -178,11 +169,10 @@ public class PipelineRunner : IPipelineRunner
             //stepIndex++;
             var currentStep = step;
 
-            _logger.Write(step.Type, LogType.Bullet);
-            _logger.IndentLevel++;
+            logger.Write(step.Type, LogType.Bullet);
+            logger.IndentLevel++;
 
-            TOutStep stepResult = null;
-            stepResult = stepExecuteCallback.Invoke(step);
+            var stepResult = stepExecuteCallback.Invoke(step);
 
             results.StepResults.Add(stepResult);
             if (!stepResult.IsSuccess)
@@ -190,11 +180,11 @@ public class PipelineRunner : IPipelineRunner
                 results.IsSuccess = false;
                 results.Exception = stepResult.Exception;
                 string error = $"{sequenceName} sequence failed on step {currentStep.Type}:\n      {results.Exception.Message}";
-                _logger.Write(error, LogType.Failure);
+                logger.Write(error, LogType.Failure);
                 break;
             }
 
-            _logger.IndentLevel--;
+            logger.IndentLevel--;
         }
 
         stopwatch.Stop();

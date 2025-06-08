@@ -100,10 +100,10 @@ internal static class Program
 
         // Load pipeline modules
         var factory = new ModuleLoaderFactory();
-        IModuleLoader moduleLoader = factory.Create(_logger);
+        IModuleLoader moduleLoader = ModuleLoaderFactory.Create(_logger);
 
         // Load project config
-        ProjectConfig? projectConfig = null;
+        ProjectConfig projectConfig;
         try
         {
             var fs = new WindowsFileSystem();

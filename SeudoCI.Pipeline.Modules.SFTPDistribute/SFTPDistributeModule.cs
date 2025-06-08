@@ -1,5 +1,8 @@
-﻿namespace SeudoCI.Pipeline.Modules.SFTPDistribute;
+﻿using JetBrains.Annotations;
 
+namespace SeudoCI.Pipeline.Modules.SFTPDistribute;
+
+[UsedImplicitly]
 public class SFTPDistributeModule : IDistributeModule
 {
     public string Name => "SFTP";

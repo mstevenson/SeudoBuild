@@ -1,16 +1,19 @@
-﻿namespace SeudoCI.Pipeline.Modules.ZipArchive;
+﻿using JetBrains.Annotations;
+
+namespace SeudoCI.Pipeline.Modules.ZipArchive;
 
 using System.IO.Compression;
-using SeudoCI.Core;
-using Path = System.IO.Path;
+using Core;
+using Path = Path;
 
 public class ZipArchiveStep : IArchiveStep<ZipArchiveConfig>
 {
     private ZipArchiveConfig _config = null!;
     private ILogger _logger = null!;
         
-    public string Type => "Zip File";
+    public string? Type => "Zip File";
 
+    [UsedImplicitly]
     public void Initialize(ZipArchiveConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;

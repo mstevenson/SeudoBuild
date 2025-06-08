@@ -9,7 +9,7 @@ using Core;
 /// </summary>
 public class ModuleLoaderFactory
 {
-    public IModuleLoader Create(ILogger logger)
+    public static IModuleLoader Create(ILogger logger)
     {
         logger.Write("Loading Modules\n", LogType.Header);
         var loader = new ModuleLoader(logger);
@@ -26,7 +26,7 @@ public class ModuleLoaderFactory
 
         logger.IndentLevel++;
 
-        string line = "";
+        string line;
 
         line = "    Source:  " + string.Join(", ", loader.Registry.GetModules<ISourceModule>().Select(m => m.Name).ToArray());
         logger.Write(line);

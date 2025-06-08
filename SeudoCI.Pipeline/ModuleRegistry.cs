@@ -11,7 +11,7 @@ public class ModuleRegistry : IModuleRegistry
         public readonly Type ModuleBaseType;
         public readonly Type ModuleStepBaseType;
         public readonly Type StepConfigBaseType;
-        public readonly List<IModule> LoadedModules = new List<IModule>();
+        public readonly List<IModule> LoadedModules = [];
 
         protected ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
         {
@@ -21,21 +21,19 @@ public class ModuleRegistry : IModuleRegistry
         }
     }
 
-    private class ModuleCategory<T, U, V> : ModuleCategory
+    private class ModuleCategory<T, U, V>() : ModuleCategory(typeof(T), typeof(U), typeof(V))
         where T : IModule
         where U : IPipelineStep
-        where V : StepConfig
-    {
-        public ModuleCategory() : base(typeof(T), typeof(U), typeof(V)) { }
-    }
+        where V : StepConfig;
 
-    private readonly ModuleCategory[] _moduleCategories = {
+    private readonly ModuleCategory[] _moduleCategories =
+    [
         new ModuleCategory<ISourceModule, ISourceStep, SourceStepConfig>(),
         new ModuleCategory<IBuildModule, IBuildStep, BuildStepConfig>(),
         new ModuleCategory<IArchiveModule, IArchiveStep, ArchiveStepConfig>(),
         new ModuleCategory<IDistributeModule, IDistributeStep, DistributeStepConfig>(),
         new ModuleCategory<INotifyModule, INotifyStep, NotifyStepConfig>()
-    };
+    ];
 
     public IEnumerable<IModule> GetAllModules()
     {
