@@ -3,37 +3,44 @@ namespace SeudoCI.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using SeudoCI.Pipeline.Shared;
 
 public class ModuleRegistry : IModuleRegistry
 {
-    private class ModuleCategory
+    private record ModuleCategory(
+        Type ModuleBaseType,
+        Type ModuleStepBaseType,
+        Type StepConfigBaseType,
+        string CategoryName)
     {
-        public readonly Type ModuleBaseType;
-        public readonly Type ModuleStepBaseType;
-        public readonly Type StepConfigBaseType;
         public readonly List<IModule> LoadedModules = [];
-
-        protected ModuleCategory(Type moduleBaseType, Type moduleStepBaseType, Type stepConfigBaseType)
-        {
-            ModuleBaseType = moduleBaseType;
-            ModuleStepBaseType = moduleStepBaseType;
-            StepConfigBaseType = stepConfigBaseType;
-        }
     }
 
-    private class ModuleCategory<T, U, V>() : ModuleCategory(typeof(T), typeof(U), typeof(V))
-        where T : IModule
-        where U : IPipelineStep
-        where V : StepConfig;
+    private readonly ModuleCategory[] _moduleCategories = DiscoverModuleCategories();
 
-    private readonly ModuleCategory[] _moduleCategories =
-    [
-        new ModuleCategory<ISourceModule, ISourceStep, SourceStepConfig>(),
-        new ModuleCategory<IBuildModule, IBuildStep, BuildStepConfig>(),
-        new ModuleCategory<IArchiveModule, IArchiveStep, ArchiveStepConfig>(),
-        new ModuleCategory<IDistributeModule, IDistributeStep, DistributeStepConfig>(),
-        new ModuleCategory<INotifyModule, INotifyStep, NotifyStepConfig>()
-    ];
+    private static ModuleCategory[] DiscoverModuleCategories()
+    {
+        var categories = new List<ModuleCategory>();
+        
+        // Get all types that implement IModule and have the ModuleCategoryAttribute
+        var moduleTypes = Assembly.GetAssembly(typeof(IModule))!
+            .GetTypes()
+            .Where(t => t.IsInterface && typeof(IModule).IsAssignableFrom(t) && t != typeof(IModule))
+            .Where(t => t.GetCustomAttribute<ModuleCategoryAttribute>() != null);
+
+        foreach (var moduleType in moduleTypes)
+        {
+            var attribute = moduleType.GetCustomAttribute<ModuleCategoryAttribute>()!;
+            categories.Add(new ModuleCategory(
+                moduleType,
+                attribute.StepInterfaceType,
+                attribute.ConfigBaseType,
+                attribute.CategoryName));
+        }
+
+        return categories.ToArray();
+    }
 
     public IEnumerable<IModule> GetAllModules()
     {

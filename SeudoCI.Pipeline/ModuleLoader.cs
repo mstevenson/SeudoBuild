@@ -5,6 +5,7 @@ namespace SeudoCI.Pipeline;
 using System.Reflection;
 using System.Diagnostics;
 using Core;
+using SeudoCI.Pipeline.Shared;
 
 public class ModuleLoader(ILogger logger) : IModuleLoader
 {
@@ -13,46 +14,22 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
     private const string PipelineNamespace = "SeudoCI.Pipeline";
     private const string PipelineAssemblyName = "SeudoCI.Pipeline.Shared";
 
-    private static IEnumerable<Assembly> PreloadAssemblies(IReadOnlyList<string> files)
-    {
-        var assemblies = new Assembly[files.Count];
-        for (var i = 0; i < files.Count; i++)
-        {
-            var file = files[i];
-            try
-            {
-                var assembly = Assembly.LoadFile(file);
-                assemblies[i] = assembly;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Could not load assembly {file}: {e.Message}");
-            }
-        }
-        return assemblies;
-    }
-
     private bool TryLoadModuleAssembly(Assembly assembly)
     {
-        string[] moduleBaseTypeNames =
-        [
-            nameof(ISourceModule),
-            nameof(IBuildModule),
-            nameof(IArchiveModule),
-            nameof(IDistributeModule),
-            nameof(INotifyModule)
-        ];
-
         try
         {
-            // Locate all types in the assembly that inherit from IModule
+            // Get all module interface types using reflection instead of hard-coded names
             Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals(PipelineAssemblyName));
+            var moduleInterfaceTypes = coreAssembly.GetTypes()
+                .Where(t => t.IsInterface && typeof(IModule).IsAssignableFrom(t) && t != typeof(IModule))
+                .Where(t => t.GetCustomAttribute<ModuleCategoryAttribute>() != null);
+
             Type[] allTypesInAssembly = assembly.GetTypes();
 
             var moduleTypesInAssembly = (
-                from baseTypeName in moduleBaseTypeNames
+                from moduleInterfaceType in moduleInterfaceTypes
                 from type in allTypesInAssembly
-                where coreAssembly.GetType($"{PipelineNamespace}.{baseTypeName}").IsAssignableFrom(type)
+                where moduleInterfaceType.IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract
                 select type
             );
 
@@ -82,9 +59,19 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
         {
             DebugWrite($"[Started module {Path.GetFileName(moduleDirectory)}]");
             string[] files = Directory.GetFiles(moduleDirectory, "*.dll");
-            var assemblies = PreloadAssemblies(files);
-            foreach (var assembly in assemblies)
+
+            foreach (var path in files)
             {
+                Assembly assembly;
+                try
+                {
+                    assembly = Assembly.LoadFile(path);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Could not load assembly {path}: {e.Message}");
+                }
+                
                 try
                 {
                     var loaded = TryLoadModuleAssembly(assembly);
