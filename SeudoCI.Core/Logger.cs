@@ -43,30 +43,27 @@ public class Logger : ILogger
 
     public void Write(string? value, LogType logType = LogType.None, LogStyle logStyle = LogStyle.None)
     {
-        // Apply text styling first
-        value = logStyle switch
+        if (value == null)
         {
-            LogStyle.Bold => $"{BoldOn}{value}{Normal}",
-            LogStyle.Dim => $"{DimOn}{value}{Normal}",
-            LogStyle.Underline => $"{UnderlineOn}{value}{Normal}",
-            LogStyle.Invert => $"{InvertOn}{value}{Normal}",
-            _ => value
-        };
-
-        // Get the current indent string in a thread-safe manner
-        string currentIndent;
-        lock (_lockObject)
-        {
-            currentIndent = _indentString;
+            return;
         }
 
-        // Protect all console operations with a lock to prevent interleaved output
         lock (_lockObject)
         {
+            // Apply text styling first
+            var styledValue = logStyle switch
+            {
+                LogStyle.Bold => $"{BoldOn}{value}{Normal}",
+                LogStyle.Dim => $"{DimOn}{value}{Normal}",
+                LogStyle.Underline => $"{UnderlineOn}{value}{Normal}",
+                LogStyle.Invert => $"{InvertOn}{value}{Normal}",
+                _ => value
+            };
+
             switch (logType)
             {
                 case LogType.None:
-                    Console.WriteLine($"{currentIndent}  {value}");
+                    Console.WriteLine($"{_indentString}  {styledValue}");
                     break;
 
                 case LogType.Header:
@@ -75,40 +72,40 @@ public class Logger : ILogger
 
                 case LogType.Plus:
                     Console.ResetColor();
-                    Console.WriteLine($"{currentIndent}‣ {value}");
+                    Console.WriteLine($"{_indentString}‣ {styledValue}");
                     break;
 
                 case LogType.Bullet:
                     Console.ResetColor();
-                    Console.WriteLine($"{currentIndent}• {value}");
+                    Console.WriteLine($"{_indentString}• {styledValue}");
                     break;
 
                 case LogType.SmallBullet:
                     Console.ResetColor();
-                    Console.WriteLine($"{currentIndent}◦ {value}");
+                    Console.WriteLine($"{_indentString}◦ {styledValue}");
                     break;
 
                 case LogType.Success:
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"{currentIndent}✔ {value}");
+                    Console.WriteLine($"{_indentString}✔ {styledValue}");
                     Console.ResetColor();
                     break;
 
                 case LogType.Failure:
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"{currentIndent}✘ {value}");
+                    Console.WriteLine($"{_indentString}✘ {styledValue}");
                     Console.ResetColor();
                     break;
 
                 case LogType.Alert:
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{currentIndent}! {value}");
+                    Console.WriteLine($"{_indentString}! {styledValue}");
                     Console.ResetColor();
                     break;
 
                 case LogType.Debug:
                     Console.ForegroundColor = ConsoleColor.Magenta;
-                    Console.WriteLine(value);
+                    Console.WriteLine(styledValue);
                     Console.ResetColor();
                     break;
 
