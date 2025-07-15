@@ -20,7 +20,7 @@
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="2.9.1" />
       <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
-      <PackageReference Include="Nancy.Hosting.Kestrel" Version="1.0.1" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     </ItemGroup>
 
 </Project>

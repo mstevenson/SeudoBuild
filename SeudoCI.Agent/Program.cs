@@ -1,5 +1,6 @@
 ﻿using CommandLine;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using SeudoCI.Core;
 using SeudoCI.Core.FileSystems;
 using SeudoCI.Pipeline;
@@ -7,7 +8,7 @@ using SeudoCI.Net;
 
 namespace SeudoCI.Agent;
 
-internal static class Program
+public static class Program
 {
     private const string Header = @"
                 _     _       _ _   _ 
@@ -72,21 +73,21 @@ internal static class Program
         public bool Random { get; set; }
     }
 
-    public static void Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         _logger = new Logger();
 
         Console.Title = "SeudoCI";
 
-        Parser.Default.ParseArguments<BuildSubOptions, ScanSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions, NameSubOptions>(args)
+        return await Parser.Default.ParseArguments<BuildSubOptions, ScanSubOptions, SubmitSubOptions, QueueSubOptions, DeploySubOptions, NameSubOptions>(args)
             .MapResult(
-                (BuildSubOptions opts) => Build(opts),
-                (ScanSubOptions opts) => Scan(opts),
-                (SubmitSubOptions opts) => Submit(opts),
+                (BuildSubOptions opts) => Task.FromResult(Build(opts)),
+                (ScanSubOptions opts) => Task.FromResult(Scan(opts)),
+                (SubmitSubOptions opts) => Task.FromResult(Submit(opts)),
                 (QueueSubOptions opts) => Queue(opts),
-                (DeploySubOptions opts) => Deploy(opts),
-                (NameSubOptions opts) => ShowAgentName(opts),
-                errs => 1
+                (DeploySubOptions opts) => Task.FromResult(Deploy(opts)),
+                (NameSubOptions opts) => Task.FromResult(ShowAgentName(opts)),
+                errs => Task.FromResult(1)
             );
     }
 
@@ -99,7 +100,6 @@ internal static class Program
         Console.WriteLine(Header);
 
         // Load pipeline modules
-        var factory = new ModuleLoaderFactory();
         IModuleLoader moduleLoader = ModuleLoaderFactory.Create(_logger);
 
         // Load project config
@@ -197,8 +197,7 @@ internal static class Program
 
         using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
         httpClient.DefaultRequestHeaders.Add("User-Agent", "SeudoCI-Agent/1.0");
-        var httpService = new Services.HttpService(httpClient);
-        var buildSubmitter = new BuildSubmitter(_logger, httpService);
+        var buildSubmitter = new BuildSubmitter(_logger, httpClient);
         try
         {
             // Find agent on the network, with timeout
@@ -217,7 +216,7 @@ internal static class Program
     /// Receive build jobs from other agents or clients, queue them, and execute them.
     /// Continue listening until user exits.
     /// </summary>
-    private static int Queue(QueueSubOptions opts)
+    private static async Task<int> Queue(QueueSubOptions opts)
     {
         Console.Title = "SeudoCI • Queue";
         Console.WriteLine(Header);
@@ -230,50 +229,100 @@ internal static class Program
             port = (ushort)opts.Port.Value;
         }
 
-        // Example:
-        // https://github.com/NancyFx/Nancy/tree/master/samples/Nancy.Demo.Hosting.Kestrel
-            
-        // Starting the Nancy server will automatically execute the Bootstrapper class
-        var uri = new Uri($"http://localhost:{port}");
-        var host = new WebHostBuilder()
-            .UseKestrel()
-            .UseStartup<Startup>()
-            .UseUrls(uri.ToString())
-            .Build();
-        using (host)
+        // Create ASP.NET Core web application
+        var builder = WebApplication.CreateBuilder();
+        
+        // Configure services
+        builder.Services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
         {
+            options.ListenLocalhost(port);
+        });
+        
+        builder.Services.AddControllers();
+        
+        // Register core services as singletons since they maintain state
+        builder.Services.AddSingleton<ILogger, Logger>();
+
+        // Register file system based on platform
+        builder.Services.AddSingleton<IFileSystem>(serviceProvider =>
+        {
+            return PlatformUtils.RunningPlatform == Platform.Windows 
+                ? new WindowsFileSystem() 
+                : new MacFileSystem();
+        });
+
+        // Register module loader as singleton
+        builder.Services.AddSingleton<IModuleLoader>(serviceProvider =>
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger>();
+            return ModuleLoaderFactory.Create(logger);
+        });
+
+        // Configure HttpClient
+        builder.Services.AddHttpClient();
+
+        // Register builder and build queue
+        builder.Services.AddSingleton<Builder>(serviceProvider =>
+        {
+            var moduleLoader = serviceProvider.GetRequiredService<IModuleLoader>();
+            var logger = serviceProvider.GetRequiredService<ILogger>();
+            return new Builder(moduleLoader, logger);
+        });
+
+        builder.Services.AddSingleton<IBuildQueue>(serviceProvider =>
+        {
+            var builderService = serviceProvider.GetRequiredService<Builder>();
+            var moduleLoader = serviceProvider.GetRequiredService<IModuleLoader>();
+            var logger = serviceProvider.GetRequiredService<ILogger>();
+            var fileSystem = serviceProvider.GetRequiredService<IFileSystem>();
+            
+            var queue = new BuildQueue(builderService, moduleLoader, logger);
+            queue.StartQueue(fileSystem);
+            return queue;
+        });
+        
+        var app = builder.Build();
+        
+        // Configure middleware pipeline
+        app.UseRouting();
+        app.MapControllers();
+
+        await using (app);
+        
+        _logger.Write("");
+        try
+        {
+            await app.StartAsync();
+
+            var uri = new Uri($"http://localhost:{port}");
+            _logger.Write("Build Queue", LogType.Header);
             _logger.Write("");
+            _logger.Write("Started build agent server: " + uri, LogType.Bullet);
+
             try
             {
-                host.Start();
-
-                _logger.Write("Build Queue", LogType.Header);
-                _logger.Write("");
-                _logger.Write("Started build agent server: " + uri, LogType.Bullet);
-
-                try
-                {
-                    var name = AgentName.GetUniqueAgentName();
-                    var discovery = new AgentDiscoveryServer(name, port);
-                    discovery.Start();
-                    _logger.Write($"Build agent server started: {name} {port}", LogType.Bullet);
-                }
-                catch
-                {
-                    _logger.Write("Could not initialize build agent server", LogType.Alert);
-                }
+                var name = AgentName.GetUniqueAgentName();
+                var discovery = new AgentDiscoveryServer(name, port);
+                discovery.Start();
+                _logger.Write($"Build agent server started: {name} {port}", LogType.Bullet);
             }
-            catch (Exception e)
+            catch
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Could not start build server: " + e.Message);
-                Console.ResetColor();
-                return 1;
+                _logger.Write("Could not initialize build agent server", LogType.Alert);
             }
-            Console.WriteLine("");
-            Console.WriteLine("Press any key to exit.");
-            Console.ReadKey();
         }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Could not start build server: " + e.Message);
+            Console.ResetColor();
+            return 1;
+        }
+        Console.WriteLine("");
+        Console.WriteLine("Press any key to exit.");
+        Console.ReadKey();
+        
+        await app.StopAsync();
 
         return 0;
     }
@@ -291,8 +340,7 @@ internal static class Program
     /// </summary>
     private static int ShowAgentName(NameSubOptions opts)
     {
-        string name;
-        name = opts.Random ? AgentName.GetRandomName() : AgentName.GetUniqueAgentName();
+        var name = opts.Random ? AgentName.GetRandomName() : AgentName.GetUniqueAgentName();
         Console.WriteLine();
         Console.WriteLine(name);
         Console.WriteLine();

@@ -7,7 +7,7 @@ namespace SeudoCI.Agent;
 /// <summary>
 /// Queues projects and feeds them sequentially to a builder.
 /// </summary>
-public class BuildQueue(IBuilder builder, IModuleLoader moduleLoader, ILogger logger)
+public class BuildQueue(Builder builder, IModuleLoader moduleLoader, ILogger logger)
     : IBuildQueue
 {
     private const string OutputFolderName = "SeudoCI";

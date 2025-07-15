@@ -3,11 +3,10 @@
 using Pipeline;
 using Core;
 
-/// <inheritdoc />
 /// <summary>
 /// Executes a build pipeline for a given project and target.
 /// </summary>
-public class Builder(IModuleLoader moduleLoader, ILogger logger) : IBuilder
+public class Builder(IModuleLoader moduleLoader, ILogger logger)
 {
     /// <summary>
     /// Indicates whether a build is current in-progress.

@@ -3,12 +3,11 @@
 using System.Text.Json;
 using Net;
 using Core;
-using Services;
 
 /// <summary>
 /// Submit a build process to an agent on the local network.
 /// </summary>
-public class BuildSubmitter(ILogger logger, IHttpService httpService)
+public class BuildSubmitter(ILogger logger, HttpClient httpClient)
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -64,7 +63,7 @@ public class BuildSubmitter(ILogger logger, IHttpService httpService)
     {
         try
         {
-            var json = await httpService.GetStringAsync(agentAddress, cancellationToken);
+            var json = await httpClient.GetStringAsync(agentAddress, cancellationToken);
             return JsonSerializer.Deserialize<Agent>(json, JsonOptions);
         }
         catch (HttpRequestException ex)
@@ -88,7 +87,8 @@ public class BuildSubmitter(ILogger logger, IHttpService httpService)
 
             logger.Write($"Sending build request to {requestUri}");
             
-            var response = await httpService.PostJsonAsync(requestUri, projectJson, cancellationToken);
+            var content = new StringContent(projectJson, System.Text.Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(requestUri, content, cancellationToken);
             
             if (response.IsSuccessStatusCode)
             {
