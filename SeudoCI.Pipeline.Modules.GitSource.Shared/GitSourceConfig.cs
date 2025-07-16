@@ -51,4 +51,25 @@ public class GitSourceConfig : SourceStepConfig
     /// Leave empty if the private key is not encrypted.
     /// </summary>
     public string Passphrase { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Depth for shallow clone operations. 
+    /// If set to a positive number, limits the number of commits to fetch.
+    /// 0 or negative values mean full clone (default behavior).
+    /// </summary>
+    public int ShallowCloneDepth { get; set; } = 0;
+    
+    /// <summary>
+    /// Enable sparse checkout to clone only specific directories/files.
+    /// When true, uses the paths specified in SparseCheckoutPaths.
+    /// </summary>
+    public bool EnableSparseCheckout { get; set; } = false;
+    
+    /// <summary>
+    /// List of paths to include in sparse checkout.
+    /// Paths are relative to the repository root.
+    /// Example: ["src/", "docs/", "README.md"]
+    /// Only used when EnableSparseCheckout is true.
+    /// </summary>
+    public List<string> SparseCheckoutPaths { get; set; } = new List<string>();
 }

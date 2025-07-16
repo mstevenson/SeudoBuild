@@ -248,7 +248,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
                 }
                 
                 var branchArg = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "" : $" -b {_config.RepositoryBranchName}";
-                ExecuteLFSCommand($"clone{branchArg} {cloneUrl} {_workspace.GetDirectory(TargetDirectory.Source)}");
+                var depthArg = _config.ShallowCloneDepth > 0 ? $" --depth {_config.ShallowCloneDepth}" : "";
+                ExecuteLFSCommand($"clone{branchArg}{depthArg} {cloneUrl} {_workspace.GetDirectory(TargetDirectory.Source)}");
                 _logger.Write("LFS clone completed successfully", LogType.Success);
             }
             else
@@ -264,8 +265,29 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
                 };
                 cloneOptions.FetchOptions.CredentialsProvider = _credentialsHandler;
 
-                Repository.Clone(_config.RepositoryURL, _workspace.GetDirectory(TargetDirectory.Source), cloneOptions);
+                // LibGit2Sharp doesn't support shallow clones directly, so we'll use command-line git for shallow clones
+                if (_config.ShallowCloneDepth > 0)
+                {
+                    _logger.Write($"Performing shallow clone with depth {_config.ShallowCloneDepth}", LogType.Debug);
+                    PerformShallowClone();
+                }
+                else if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
+                {
+                    // LibGit2Sharp doesn't support sparse checkout directly, use command-line git
+                    _logger.Write("Performing clone with sparse checkout", LogType.Debug);
+                    PerformShallowClone(); // This method handles both shallow and regular clones with sparse checkout
+                }
+                else
+                {
+                    Repository.Clone(_config.RepositoryURL, _workspace.GetDirectory(TargetDirectory.Source), cloneOptions);
+                }
                 _logger.Write("Repository cloned successfully", LogType.Success);
+                
+                // Apply sparse checkout after regular clone if needed
+                if (!(_config.ShallowCloneDepth > 0) && _config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
+                {
+                    ConfigureSparseCheckout(_workspace.GetDirectory(TargetDirectory.Source));
+                }
             }
         }
         catch (LibGit2SharpException e)
@@ -343,22 +365,40 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             _logger.Write($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}", LogType.SmallBullet);
             _logger.Write($"Repository: {_config.RepositoryURL}", LogType.Debug);
 
-            var pullOptions = new PullOptions
-            {
-                FetchOptions = new FetchOptions
-                {
-                    CredentialsProvider = _credentialsHandler
-                },
-                MergeOptions = new MergeOptions
-                {
-                    FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
-                    FileConflictStrategy = CheckoutFileConflictStrategy.Theirs,
-                    MergeFileFavor = MergeFileFavor.Theirs,
-                    FailOnConflict = false
-                }
-            };
+            // Check if this is a shallow repository
+            bool isShallow = IsShallowRepository(repo);
+            MergeResult? mergeResult = null;
             
-            var mergeResult = Commands.Pull(repo, _signature, pullOptions);
+            if (isShallow && _config.ShallowCloneDepth > 0)
+            {
+                _logger.Write("Updating shallow repository with limited depth", LogType.Debug);
+                // For shallow repositories, we need to use git fetch with depth
+                var branch = repo.Head.FriendlyName;
+                repo.Dispose();
+                repo = null;
+                ExecuteGitCommand($"fetch --depth {_config.ShallowCloneDepth} origin {branch}:{branch}");
+                ExecuteGitCommand("reset --hard FETCH_HEAD");
+                repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source));
+            }
+            else
+            {
+                var pullOptions = new PullOptions
+                {
+                    FetchOptions = new FetchOptions
+                    {
+                        CredentialsProvider = _credentialsHandler
+                    },
+                    MergeOptions = new MergeOptions
+                    {
+                        FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
+                        FileConflictStrategy = CheckoutFileConflictStrategy.Theirs,
+                        MergeFileFavor = MergeFileFavor.Theirs,
+                        FailOnConflict = false
+                    }
+                };
+                
+                mergeResult = Commands.Pull(repo, _signature, pullOptions);
+            }
 
             if (_config.UseLFS)
             {
@@ -368,23 +408,30 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
                 ExecuteLFSCommand("checkout");
             }
 
-            switch (mergeResult.Status)
+            if (mergeResult != null)
             {
-                case MergeStatus.UpToDate:
-                    _logger.Write("Repository is already up-to-date", LogType.SmallBullet);
-                    break;
-                case MergeStatus.FastForward:
-                    _logger.Write($"Fast-forwarded to commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
-                    break;
-                case MergeStatus.NonFastForward:
-                    _logger.Write($"Merged commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
-                    break;
-                case MergeStatus.Conflicts:
-                    _logger.Write("Merge completed with conflicts (resolved using remote version)", LogType.Alert);
-                    break;
-                default:
-                    _logger.Write($"Pull completed with status: {mergeResult.Status}", LogType.SmallBullet);
-                    break;
+                switch (mergeResult.Status)
+                {
+                    case MergeStatus.UpToDate:
+                        _logger.Write("Repository is already up-to-date", LogType.SmallBullet);
+                        break;
+                    case MergeStatus.FastForward:
+                        _logger.Write($"Fast-forwarded to commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
+                        break;
+                    case MergeStatus.NonFastForward:
+                        _logger.Write($"Merged commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
+                        break;
+                    case MergeStatus.Conflicts:
+                        _logger.Write("Merge completed with conflicts (resolved using remote version)", LogType.Alert);
+                        break;
+                    default:
+                        _logger.Write($"Pull completed with status: {mergeResult.Status}", LogType.SmallBullet);
+                        break;
+                }
+            }
+            else if (isShallow)
+            {
+                _logger.Write("Shallow repository updated successfully", LogType.Success);
             }
         }
         catch (LibGit2SharpException e)
@@ -504,6 +551,168 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             // Note: This is still not ideal but better than URL embedding
             var authString = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{_config.Username}:{_config.Password}"));
             Environment.SetEnvironmentVariable("GIT_AUTH_HEADER", $"Authorization: Basic {authString}");
+        }
+    }
+    
+    private void PerformShallowClone()
+    {
+        try
+        {
+            var targetDir = _workspace.GetDirectory(TargetDirectory.Source);
+            var branch = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "master" : _config.RepositoryBranchName;
+            
+            // Build git clone command
+            var cloneArgs = "clone";
+            
+            // Add shallow depth if specified
+            if (_config.ShallowCloneDepth > 0)
+            {
+                cloneArgs += $" --depth {_config.ShallowCloneDepth}";
+            }
+            
+            cloneArgs += $" -b {branch}";
+            
+            // Add sparse checkout initialization if enabled
+            if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
+            {
+                cloneArgs += " --no-checkout --filter=blob:none";
+            }
+            
+            cloneArgs += $" {_config.RepositoryURL} {targetDir}";
+            
+            // Execute git clone
+            ExecuteGitCommand(cloneArgs);
+            
+            // Configure sparse checkout if enabled
+            if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
+            {
+                ConfigureSparseCheckout(targetDir);
+            }
+            
+            if (_config.ShallowCloneDepth > 0)
+            {
+                _logger.Write($"Shallow clone completed with depth {_config.ShallowCloneDepth}", LogType.Success);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException($"Failed to perform clone: {e.Message}", e);
+        }
+    }
+    
+    private void ConfigureSparseCheckout(string repoPath)
+    {
+        try
+        {
+            _logger.Write("Configuring sparse checkout", LogType.Debug);
+            
+            // Enable sparse checkout
+            ExecuteGitCommand("config core.sparseCheckout true", repoPath);
+            
+            // Write sparse-checkout file
+            var sparseCheckoutPath = Path.Combine(repoPath, ".git", "info", "sparse-checkout");
+            var sparseCheckoutDir = Path.GetDirectoryName(sparseCheckoutPath);
+            
+            if (!Directory.Exists(sparseCheckoutDir))
+            {
+                Directory.CreateDirectory(sparseCheckoutDir);
+            }
+            
+            // Write paths to sparse-checkout file
+            File.WriteAllLines(sparseCheckoutPath, _config.SparseCheckoutPaths);
+            
+            _logger.Write($"Sparse checkout configured with {_config.SparseCheckoutPaths.Count} paths:", LogType.Debug);
+            foreach (var path in _config.SparseCheckoutPaths)
+            {
+                _logger.Write($"  - {path}", LogType.Debug);
+            }
+            
+            // Perform the checkout
+            ExecuteGitCommand("checkout", repoPath);
+            
+            _logger.Write("Sparse checkout completed successfully", LogType.Success);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException($"Failed to configure sparse checkout: {e.Message}", e);
+        }
+    }
+    
+    private void ExecuteGitCommand(string arguments, string workingDirectory = null)
+    {
+        _logger.Write($"Executing git {arguments.Split(' ')[0]}", LogType.Debug);
+        
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "git",
+            Arguments = arguments,
+            WorkingDirectory = workingDirectory ?? _workspace.GetDirectory(TargetDirectory.Source),
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true,
+            UseShellExecute = false
+        };
+        
+        // Apply authentication environment variables if needed
+        if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword || 
+            _config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
+        {
+            ConfigureGitCredentialHelper();
+        }
+        
+        using var process = new Process { StartInfo = startInfo };
+        
+        try
+        {
+            process.Start();
+            
+            // Read output asynchronously to prevent deadlocks
+            var output = process.StandardOutput.ReadToEndAsync();
+            var error = process.StandardError.ReadToEndAsync();
+            
+            if (!process.WaitForExit(300000)) // 5 minute timeout
+            {
+                process.Kill();
+                throw new TimeoutException($"Git command timed out after 5 minutes: git {arguments}");
+            }
+            
+            var outputText = output.Result;
+            var errorText = error.Result;
+            
+            if (!string.IsNullOrWhiteSpace(outputText))
+            {
+                _logger.Write(outputText, LogType.Debug);
+            }
+            
+            if (process.ExitCode != 0)
+            {
+                var errorMessage = $"Git command failed with exit code {process.ExitCode}: git {arguments}";
+                if (!string.IsNullOrWhiteSpace(errorText))
+                {
+                    errorMessage += $"\nError output: {errorText}";
+                    _logger.Write(errorText, LogType.Failure);
+                }
+                throw new InvalidOperationException(errorMessage);
+            }
+        }
+        catch (Exception e) when (!(e is TimeoutException || e is InvalidOperationException))
+        {
+            throw new InvalidOperationException($"Failed to execute git command: {e.Message}", e);
+        }
+    }
+    
+    private bool IsShallowRepository(Repository repo)
+    {
+        try
+        {
+            // Check if .git/shallow file exists
+            var shallowFile = Path.Combine(repo.Info.Path, "shallow");
+            return File.Exists(shallowFile);
+        }
+        catch
+        {
+            return false;
         }
     }
 }
