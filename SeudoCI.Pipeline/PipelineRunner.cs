@@ -55,7 +55,8 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         var pipeline = new ProjectPipeline(projectConfig, buildTargetName);
         pipeline.LoadBuildStepModules(moduleLoader, targetWorkspace, logger);
 
-        var macros = projectWorkspace.Macros;
+        // Set runtime macros on the target workspace (which inherits from project workspace)
+        var macros = targetWorkspace.Macros;
         macros["project_name"] = pipeline.ProjectConfig.ProjectName;
         macros["build_target_name"] = pipeline.TargetConfig.TargetName;
         macros["build_date"] = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
@@ -68,7 +69,7 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), targetWorkspace);
         if (sourceResults.StepResults.Count > 0 && sourceResults.StepResults[0] != null && !string.IsNullOrEmpty(sourceResults.StepResults[0].CommitIdentifier)) 
         {
-            macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier;
+            targetWorkspace.Macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier;
         }
         
         var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, targetWorkspace);

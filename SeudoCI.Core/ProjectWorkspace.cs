@@ -55,7 +55,8 @@ public class ProjectWorkspace(string projectDirectory, IFileSystem fileSystem) :
     public ITargetWorkspace CreateTarget(string targetName)
     {
         var targetsDirectory = GetDirectory(ProjectDirectory.Targets);
-        var targetWorkspace = new TargetWorkspace($"{targetsDirectory}/{targetName.SanitizeFilename()}", FileSystem);
+        var targetWorkspace = new TargetWorkspace($"{targetsDirectory}/{targetName.SanitizeFilename()}", FileSystem, Macros);
+        targetWorkspace.ProjectWorkspace = this;
         targetWorkspace.InitializeDirectories();
         return targetWorkspace;
     }

@@ -14,15 +14,18 @@ public class TargetWorkspace : ITargetWorkspace
 {
     private readonly string _baseDirectory;
         
-    public IMacros Macros { get; } = new Macros();
+    public IMacros Macros { get; }
 
     public IFileSystem FileSystem { get; }
+    
+    public IProjectWorkspace ProjectWorkspace { get; set; }
         
-    public TargetWorkspace(string baseDirectory, IFileSystem fileSystem)
+    public TargetWorkspace(string baseDirectory, IFileSystem fileSystem, IMacros? parentMacros = null)
     {
         _baseDirectory = baseDirectory;
         FileSystem = fileSystem;
-            
+        Macros = new ChainedMacros(parentMacros);
+        
         Macros["working_directory"] = GetDirectory(TargetDirectory.Source);
         Macros["build_output_directory"] = GetDirectory(TargetDirectory.Output);
         Macros["archives_directory"] = GetDirectory(TargetDirectory.Archives);
