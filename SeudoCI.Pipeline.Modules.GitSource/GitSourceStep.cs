@@ -22,13 +22,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         _workspace = workspace;
         _logger = logger;
 
-        _credentials = new UsernamePasswordCredentials
-        {
-            Username = config.Username,
-            Password = config.Password
-        };
-        _credentialsHandler = (url, usernameFromUrl, types) => new UsernamePasswordCredentials { Username = config.Username, Password = config.Password };
-        _signature = new Signature(new Identity("SeudoCI", "info@basenjigames.com"), DateTimeOffset.UtcNow);
+        _credentialsHandler = CreateCredentialsHandler(config);
+        _signature = new Signature(new Identity("SeudoCI", "noreply@seudoci.local"), DateTimeOffset.UtcNow);
 
         // Set up LFS filter
         if (config.UseLFS)
@@ -71,6 +66,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         {
             results.IsSuccess = false;
             results.Exception = e;
+            _logger.Write($"Git operation failed: {e.Message}", LogType.Failure);
+            return results;
         }
 
         results.CommitIdentifier = CurrentCommitShortHash;
@@ -79,7 +76,6 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     }
 
 
-    private UsernamePasswordCredentials _credentials = null!;
     private FilterRegistration? _lfsFilter;
     private Signature _signature = null!;
     private CredentialsHandler _credentialsHandler = null!;
@@ -103,22 +99,59 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             return commit.Length == 0 ? "" : commit[..7];
         }
     }
-
-    private void StoreCredentials()
+    
+    private CredentialsHandler CreateCredentialsHandler(GitSourceConfig config)
     {
-        string credentialsPath = $"{_workspace.GetDirectory(TargetDirectory.Source)}/../git-credentials";
-
-        var uri = new Uri(_config.RepositoryURL);
-        // Should use UriBuilder, but it doesn't include the password in the resulting uri string
-        string urlWithCredentials = $"{uri.Scheme}://{_config.Username}:{_config.Password}@{uri.Host}{uri.AbsolutePath}";
-
-        // FIXME abstract using IFileSystem
-
-        File.WriteAllText(credentialsPath, urlWithCredentials);
-        credentialsPath = Path.GetFullPath(credentialsPath);
-        // FIXME escape spaces in path
-        //repo.Config.Set("credential.helper", $"store --file={credentialsPath}", ConfigurationLevel.Local);
+        return (url, usernameFromUrl, types) =>
+        {
+            switch (config.AuthenticationType)
+            {
+                case GitAuthenticationType.UsernamePassword:
+                    if (string.IsNullOrEmpty(config.Username) || string.IsNullOrEmpty(config.Password))
+                    {
+                        throw new InvalidOperationException("Username and Password are required for UsernamePassword authentication.");
+                    }
+                    return new UsernamePasswordCredentials 
+                    { 
+                        Username = config.Username, 
+                        Password = config.Password 
+                    };
+                    
+                case GitAuthenticationType.PersonalAccessToken:
+                    if (string.IsNullOrEmpty(config.PersonalAccessToken))
+                    {
+                        throw new InvalidOperationException("PersonalAccessToken is required for PersonalAccessToken authentication.");
+                    }
+                    // For token auth, username can be anything (often 'x-access-token' or the actual username)
+                    return new UsernamePasswordCredentials 
+                    { 
+                        Username = string.IsNullOrEmpty(config.Username) ? "x-access-token" : config.Username,
+                        Password = config.PersonalAccessToken 
+                    };
+                    
+                case GitAuthenticationType.SSHKey:
+                    // SSH support is not available in LibGit2Sharp 0.30.0 standard package
+                    // For SSH authentication, users should:
+                    // 1. Use SSH agent with proper SSH keys loaded
+                    // 2. Configure git to use SSH through system git config
+                    // 3. Use git:// or ssh:// URLs which will use system SSH
+                    throw new NotSupportedException(
+                        "SSH key authentication requires system Git with SSH configured. " +
+                        "Please ensure your SSH keys are properly configured in ~/.ssh/ " +
+                        "and that you can clone the repository using command-line git.");
+                    
+                case GitAuthenticationType.SSHAgent:
+                    // SSH agent support is not available in LibGit2Sharp 0.30.0 standard package
+                    throw new NotSupportedException(
+                        "SSH agent authentication requires system Git with SSH agent running. " +
+                        "Please ensure ssh-agent is running and your keys are loaded.");
+                    
+                default:
+                    throw new NotSupportedException($"Authentication type {config.AuthenticationType} is not supported.");
+            }
+        };
     }
+
 
     // Clone
     public void Download()
@@ -129,13 +162,17 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         {
             _logger.Write($"Cloning LFS repository:  {_config.RepositoryURL}", LogType.SmallBullet);
 
-            // FIXME extremely insecure to include password in the URL, but it's the only way I've
-            // found to circumvent the manual password prompt when running git-lfs
-            // TODO investigate git credential managers on Mac and Windows
-            var uri = new Uri(_config.RepositoryURL);
-            string repoUrlWithPassword = $"{uri.Scheme}://{_config.Username}:{_config.Password}@{uri.Host}:{uri.Port}{uri.AbsolutePath}";
-
-            ExecuteLFSCommand($"clone {repoUrlWithPassword} {_workspace.GetDirectory(TargetDirectory.Source)}");
+            // For LFS with authentication, we need to handle credentials differently based on auth type
+            string cloneUrl = _config.RepositoryURL;
+            
+            if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword || 
+                _config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
+            {
+                // Use git credential helper instead of embedding in URL
+                ConfigureGitCredentialHelper();
+            }
+            
+            ExecuteLFSCommand($"clone {cloneUrl} {_workspace.GetDirectory(TargetDirectory.Source)}");
         }
         else
         {
@@ -238,5 +275,52 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         process.WaitForExit();
 
         Console.ResetColor();
+    }
+    
+    private void ConfigureGitCredentialHelper()
+    {
+        // Configure git to use a temporary credential helper for this operation
+        // This avoids embedding passwords in URLs
+        var gitConfigCommands = new List<string>();
+        
+        if (_config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
+        {
+            // For tokens, configure git to use the token as password
+            var token = _config.PersonalAccessToken;
+            var username = string.IsNullOrEmpty(_config.Username) ? "x-access-token" : _config.Username;
+            
+            // Set up a temporary askpass script that returns the token
+            var askPassScript = Path.Combine(Path.GetTempPath(), $"git-askpass-{Guid.NewGuid()}.sh");
+            File.WriteAllText(askPassScript, $"#!/bin/sh\necho '{token}'");
+            
+            if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
+            {
+                // Make script executable on Unix-like systems
+                var chmod = new ProcessStartInfo("chmod", $"+x {askPassScript}")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                Process.Start(chmod)?.WaitForExit();
+            }
+            
+            Environment.SetEnvironmentVariable("GIT_ASKPASS", askPassScript);
+            
+            // Clean up after operation
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => 
+            {
+                if (File.Exists(askPassScript))
+                    File.Delete(askPassScript);
+            };
+        }
+        else if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword)
+        {
+            _logger.Write("Warning: Using username/password authentication is deprecated. Consider using SSH keys or personal access tokens.", LogType.Alert);
+            
+            // For backward compatibility, set up basic auth
+            // Note: This is still not ideal but better than URL embedding
+            var authString = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{_config.Username}:{_config.Password}"));
+            Environment.SetEnvironmentVariable("GIT_AUTH_HEADER", $"Authorization: Basic {authString}");
+        }
     }
 }

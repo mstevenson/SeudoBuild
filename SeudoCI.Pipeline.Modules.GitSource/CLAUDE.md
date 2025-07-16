@@ -327,46 +327,68 @@ Workspace/
 
 ## Configuration Examples
 
-### Basic Git Repository
+### SSH Key Authentication (Not Currently Supported)
+SSH authentication requires LibGit2Sharp to be compiled with SSH support, which is not included in the standard NuGet package.
+For SSH authentication, configure your system Git with SSH keys and use the command-line git directly.
+
+### Personal Access Token (Recommended for HTTPS)
 ```json
 {
   "Type": "Git",
   "RepositoryURL": "https://github.com/company/project.git",
-  "Username": "build-user",
-  "Password": "access-token"
+  "AuthenticationType": "PersonalAccessToken",
+  "Username": "your-username",
+  "PersonalAccessToken": "${GIT_TOKEN}"
 }
 ```
 
-### Specific Branch
+### SSH Agent Authentication (Not Currently Supported)
+SSH agent authentication requires LibGit2Sharp to be compiled with SSH support, which is not included in the standard NuGet package.
+
+### Basic Authentication (Deprecated)
+```json
+{
+  "Type": "Git",
+  "RepositoryURL": "https://github.com/company/project.git",
+  "AuthenticationType": "UsernamePassword",
+  "Username": "build-user",
+  "Password": "password"
+}
+```
+
+### Personal Access Token with Specific Branch
 ```json
 {
   "Type": "Git",
   "RepositoryURL": "https://github.com/company/project.git",
   "RepositoryBranchName": "development",
-  "Username": "build-user",
-  "Password": "access-token"
+  "AuthenticationType": "PersonalAccessToken",
+  "Username": "your-username",
+  "PersonalAccessToken": "${GIT_TOKEN}"
 }
 ```
 
-### Git LFS Repository
+### Git LFS with Personal Access Token
 ```json
 {
   "Type": "Git",
   "RepositoryURL": "https://github.com/company/game-project.git",
   "UseLFS": true,
-  "Username": "build-user",
-  "Password": "access-token"
+  "AuthenticationType": "PersonalAccessToken",
+  "Username": "your-username",
+  "PersonalAccessToken": "${GIT_TOKEN}"
 }
 ```
 
-### Private Repository with Authentication
+### Private GitLab with Token
 ```json
 {
   "Type": "Git",
   "RepositoryURL": "https://gitlab.company.com/internal/project.git",
   "RepositoryBranchName": "release/v2.0",
+  "AuthenticationType": "PersonalAccessToken",
   "Username": "ci-bot",
-  "Password": "personal-access-token"
+  "PersonalAccessToken": "${GITLAB_TOKEN}"
 }
 ```
 
