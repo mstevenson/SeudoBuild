@@ -12,8 +12,6 @@ public class LFSFilter(string name, string repoPath, IEnumerable<FilterAttribute
 
     protected override void Create(string path, string root, FilterMode mode)
     {
-        Console.ForegroundColor = ConsoleColor.Cyan;
-
         _mode = mode;
         string modeArg = mode == FilterMode.Clean ? "clean" : "smudge";
 
@@ -24,40 +22,66 @@ public class LFSFilter(string name, string repoPath, IEnumerable<FilterAttribute
             WorkingDirectory = repoPath,
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
+            RedirectStandardError = true,
             CreateNoWindow = true,
             UseShellExecute = false
         };
-        _process = new Process { StartInfo = startInfo };
-        _process.Start();
+        
+        try
+        {
+            _process = new Process { StartInfo = startInfo };
+            _process.Start();
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException($"Failed to start git-lfs {modeArg} process: {e.Message}", e);
+        }
     }
 
     protected override void Complete(string path, string root, Stream output)
     {
-        // Wait for git-lfs to finish
-        _process.StandardInput.Flush();
-        _process.StandardInput.Close();
-
-        if (_mode == FilterMode.Clean)
+        try
         {
-            _process.WaitForExit();
+            // Wait for git-lfs to finish
+            _process.StandardInput.Flush();
+            _process.StandardInput.Close();
+
+            if (_mode == FilterMode.Clean)
+            {
+                if (!_process.WaitForExit(60000)) // 1 minute timeout
+                {
+                    _process.Kill();
+                    throw new TimeoutException($"Git LFS {_mode} operation timed out for {path}");
+                }
+            }
+
+            // For smudge: save file to working copy
+            // For clean: pass git-lfs pointer to git
+            _process.StandardOutput.BaseStream.CopyTo(output);
+            _process.StandardOutput.BaseStream.Flush();
+            _process.StandardOutput.Close();
+            output.Flush();
+            output.Close();
+
+            if (_mode == FilterMode.Smudge)
+            {
+                if (!_process.WaitForExit(60000)) // 1 minute timeout
+                {
+                    _process.Kill();
+                    throw new TimeoutException($"Git LFS {_mode} operation timed out for {path}");
+                }
+            }
+
+            if (_process.ExitCode != 0)
+            {
+                var errorOutput = _process.StandardError.ReadToEnd();
+                throw new InvalidOperationException($"Git LFS {_mode} failed with exit code {_process.ExitCode}. Error: {errorOutput}");
+            }
         }
-
-        // For smudge: save file to working copy
-        // For clean: pass git-lfs pointer to git
-        _process.StandardOutput.BaseStream.CopyTo(output);
-        _process.StandardOutput.BaseStream.Flush();
-        _process.StandardOutput.Close();
-        output.Flush();
-        output.Close();
-
-        if (_mode == FilterMode.Smudge)
+        finally
         {
-            _process.WaitForExit();
+            _process?.Dispose();
         }
-
-        _process.Dispose();
-
-        Console.ResetColor();
     }
 
     protected override void Smudge(string path, string root, Stream input, Stream output)

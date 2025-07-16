@@ -53,6 +53,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
 
         try
         {
+            ValidateConfiguration();
+            
             if (IsWorkingCopyInitialized)
             {
                 Update();
@@ -61,17 +63,34 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             {
                 Download();
             }
+            
+            results.CommitIdentifier = CurrentCommitShortHash;
+            results.IsSuccess = true;
+        }
+        catch (ArgumentException e)
+        {
+            results.IsSuccess = false;
+            results.Exception = e;
+            _logger.Write($"Configuration error: {e.Message}", LogType.Failure);
+        }
+        catch (LibGit2SharpException e)
+        {
+            results.IsSuccess = false;
+            results.Exception = e;
+            _logger.Write($"Git operation failed: {e.Message}", LogType.Failure);
         }
         catch (Exception e)
         {
             results.IsSuccess = false;
             results.Exception = e;
-            _logger.Write($"Git operation failed: {e.Message}", LogType.Failure);
-            return results;
+            _logger.Write($"Unexpected error during Git operation: {e.Message}", LogType.Failure);
+            
+            if (e.InnerException != null)
+            {
+                _logger.Write($"Inner exception: {e.InnerException.Message}", LogType.Failure);
+            }
         }
 
-        results.CommitIdentifier = CurrentCommitShortHash;
-        results.IsSuccess = true;
         return results;
     }
 
@@ -81,6 +100,58 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     private CredentialsHandler _credentialsHandler = null!;
 
     public bool IsWorkingCopyInitialized => Repository.IsValid(_workspace.GetDirectory(TargetDirectory.Source));
+
+    private void ValidateConfiguration()
+    {
+        if (string.IsNullOrWhiteSpace(_config.RepositoryURL))
+        {
+            throw new ArgumentException("Repository URL cannot be empty");
+        }
+
+        if (!Uri.TryCreate(_config.RepositoryURL, UriKind.Absolute, out var uri))
+        {
+            throw new ArgumentException($"Invalid repository URL: {_config.RepositoryURL}");
+        }
+
+        if (!uri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) && 
+            !uri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase) &&
+            !uri.Scheme.Equals("ssh", StringComparison.OrdinalIgnoreCase) &&
+            !uri.Scheme.Equals("git", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException($"Unsupported repository URL scheme: {uri.Scheme}");
+        }
+
+        if (_config.UseLFS && !IsLFSAvailable())
+        {
+            throw new InvalidOperationException("Git LFS is not installed or not available in PATH");
+        }
+    }
+
+    private bool IsLFSAvailable()
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "git-lfs",
+                Arguments = "version",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            
+            using var process = new Process { StartInfo = startInfo };
+            process.Start();
+            process.WaitForExit(5000); // 5 second timeout
+            
+            return process.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     public string CurrentCommit
     {
@@ -156,70 +227,121 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     // Clone
     public void Download()
     {
-        _workspace.CleanDirectory(TargetDirectory.Source);
-
-        if (_config.UseLFS)
+        try
         {
-            _logger.Write($"Cloning LFS repository:  {_config.RepositoryURL}", LogType.SmallBullet);
+            _logger.Write("Preparing workspace for clone operation", LogType.Debug);
+            _workspace.CleanDirectory(TargetDirectory.Source);
 
-            // For LFS with authentication, we need to handle credentials differently based on auth type
-            string cloneUrl = _config.RepositoryURL;
-            
-            if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword || 
-                _config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
+            if (_config.UseLFS)
             {
-                // Use git credential helper instead of embedding in URL
-                ConfigureGitCredentialHelper();
+                _logger.Write($"Cloning LFS repository: {_config.RepositoryURL}", LogType.SmallBullet);
+                _logger.Write($"Target branch: {_config.RepositoryBranchName ?? "default"}", LogType.Debug);
+
+                // For LFS with authentication, we need to handle credentials differently based on auth type
+                string cloneUrl = _config.RepositoryURL;
+                
+                if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword || 
+                    _config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
+                {
+                    // Use git credential helper instead of embedding in URL
+                    ConfigureGitCredentialHelper();
+                }
+                
+                var branchArg = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "" : $" -b {_config.RepositoryBranchName}";
+                ExecuteLFSCommand($"clone{branchArg} {cloneUrl} {_workspace.GetDirectory(TargetDirectory.Source)}");
+                _logger.Write("LFS clone completed successfully", LogType.Success);
+            }
+            else
+            {
+                _logger.Write($"Cloning repository: {_config.RepositoryURL}", LogType.SmallBullet);
+                _logger.Write($"Target branch: {_config.RepositoryBranchName ?? "master"}", LogType.Debug);
+
+                var cloneOptions = new CloneOptions
+                {
+                    BranchName = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "master" : _config.RepositoryBranchName,
+                    Checkout = true,
+                    RecurseSubmodules = true
+                };
+                cloneOptions.FetchOptions.CredentialsProvider = _credentialsHandler;
+
+                Repository.Clone(_config.RepositoryURL, _workspace.GetDirectory(TargetDirectory.Source), cloneOptions);
+                _logger.Write("Repository cloned successfully", LogType.Success);
+            }
+        }
+        catch (LibGit2SharpException e)
+        {
+            _logger.Write($"Git clone failed: {e.Message}", LogType.Failure);
+            
+            // Provide more specific error messages for common issues
+            if (e.Message.Contains("401") || e.Message.Contains("authentication", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Write("Authentication failed. Please check your credentials.", LogType.Failure);
+            }
+            else if (e.Message.Contains("404") || e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Write("Repository not found. Please check the URL and your access permissions.", LogType.Failure);
+            }
+            else if (e.Message.Contains("timeout", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Write("Network timeout. Please check your internet connection.", LogType.Failure);
             }
             
-            ExecuteLFSCommand($"clone {cloneUrl} {_workspace.GetDirectory(TargetDirectory.Source)}");
+            throw new InvalidOperationException($"Failed to clone repository from {_config.RepositoryURL}: {e.Message}", e);
         }
-        else
+        catch (Exception e)
         {
-            _logger.Write($"Cloning repository:  {_config.RepositoryURL}", LogType.SmallBullet);
-
-            var cloneOptions = new CloneOptions
-            {
-                BranchName = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "master" : _config.RepositoryBranchName,
-                Checkout = true,
-                RecurseSubmodules = true
-            };
-            cloneOptions.FetchOptions.CredentialsProvider = _credentialsHandler;
-
-            Repository.Clone(_config.RepositoryURL, _workspace.GetDirectory(TargetDirectory.Source), cloneOptions);
+            _logger.Write($"Unexpected error during clone: {e.Message}", LogType.Failure);
+            throw;
         }
-
-        // TODO Handle sub-module credentials
     }
 
     // Pull
     public void Update()
     {
-        _logger.Write("Cleaning working copy", LogType.SmallBullet);
-
-        // Clean the repo
-        using (var repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source)))
+        Repository? repo = null;
+        try
         {
-            //// Skip the LFS smudge filter when resetting the repo.
-            //// LFS files will be integrated manually.
-            //repo.Config.Set("filter.lfs.smudge", "git-lfs smudge --skip %f", ConfigurationLevel.Local);
-            //repo.Config.Set("filter.lfs.required", false);
+            _logger.Write("Cleaning working copy", LogType.SmallBullet);
 
+            repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source));
+            
+            // Validate repository state
+            if (!repo.Head.IsTracking)
+            {
+                throw new InvalidOperationException($"Current branch '{repo.Head.FriendlyName}' is not tracking a remote branch");
+            }
+
+            var remoteName = repo.Head.RemoteName;
+            if (string.IsNullOrEmpty(remoteName))
+            {
+                throw new InvalidOperationException("Current branch has no remote configured");
+            }
+
+            var currentRemote = repo.Network.Remotes[remoteName];
+            if (currentRemote == null)
+            {
+                throw new InvalidOperationException($"Remote '{remoteName}' not found in repository");
+            }
+
+            // Clean the repo
+            _logger.Write("Resetting repository to clean state", LogType.Debug);
             repo.Reset(ResetMode.Hard);
             repo.RemoveUntrackedFiles();
 
             // Clone a new copy if necessary
-
-            if (!IsWorkingCopyInitialized || repo.Network.Remotes[repo.Head.RemoteName].Url != _config.RepositoryURL)
+            if (currentRemote.Url != _config.RepositoryURL)
             {
-                _logger.Write($"Repository URL has changed, cloning a new copy:  {_config.RepositoryURL}", LogType.SmallBullet);
+                _logger.Write($"Repository URL has changed from '{currentRemote.Url}' to '{_config.RepositoryURL}'", LogType.Alert);
+                _logger.Write($"Cloning a new copy: {_config.RepositoryURL}", LogType.SmallBullet);
+                repo.Dispose();
+                repo = null;
                 Download();
                 return;
             }
 
             // Pull changes
-
-            _logger.Write($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}:  {_config.RepositoryURL}", LogType.SmallBullet);
+            _logger.Write($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}", LogType.SmallBullet);
+            _logger.Write($"Repository: {_config.RepositoryURL}", LogType.Debug);
 
             var pullOptions = new PullOptions
             {
@@ -235,6 +357,7 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
                     FailOnConflict = false
                 }
             };
+            
             var mergeResult = Commands.Pull(repo, _signature, pullOptions);
 
             if (_config.UseLFS)
@@ -245,21 +368,45 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
                 ExecuteLFSCommand("checkout");
             }
 
-            if (mergeResult.Status == MergeStatus.UpToDate)
+            switch (mergeResult.Status)
             {
-                _logger.Write("Repository is already up-to-date", LogType.SmallBullet);
+                case MergeStatus.UpToDate:
+                    _logger.Write("Repository is already up-to-date", LogType.SmallBullet);
+                    break;
+                case MergeStatus.FastForward:
+                    _logger.Write($"Fast-forwarded to commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
+                    break;
+                case MergeStatus.NonFastForward:
+                    _logger.Write($"Merged commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
+                    break;
+                case MergeStatus.Conflicts:
+                    _logger.Write("Merge completed with conflicts (resolved using remote version)", LogType.Alert);
+                    break;
+                default:
+                    _logger.Write($"Pull completed with status: {mergeResult.Status}", LogType.SmallBullet);
+                    break;
             }
-            else
-            {
-                _logger.Write($"Merged commit {mergeResult.Commit.Sha}: {mergeResult.Commit.MessageShort}", LogType.SmallBullet);
-            }
+        }
+        catch (LibGit2SharpException e)
+        {
+            _logger.Write($"Git update failed: {e.Message}", LogType.Failure);
+            throw new InvalidOperationException($"Failed to update repository: {e.Message}", e);
+        }
+        catch (Exception e)
+        {
+            _logger.Write($"Unexpected error during update: {e.Message}", LogType.Failure);
+            throw;
+        }
+        finally
+        {
+            repo?.Dispose();
         }
     }
 
     private void ExecuteLFSCommand(string arguments)
     {
-        Console.ForegroundColor = ConsoleColor.Cyan;
-
+        _logger.Write($"Executing git-lfs {arguments.Split(' ')[0]}", LogType.Debug);
+        
         var startInfo = new ProcessStartInfo
         {
             FileName = "git-lfs",
@@ -267,14 +414,50 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             WorkingDirectory = _workspace.GetDirectory(TargetDirectory.Source),
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
+            RedirectStandardError = true,
             CreateNoWindow = true,
             UseShellExecute = false
         };
-        var process = new Process { StartInfo = startInfo };
-        process.Start();
-        process.WaitForExit();
-
-        Console.ResetColor();
+        
+        using var process = new Process { StartInfo = startInfo };
+        
+        try
+        {
+            process.Start();
+            
+            // Read output asynchronously to prevent deadlocks
+            var output = process.StandardOutput.ReadToEndAsync();
+            var error = process.StandardError.ReadToEndAsync();
+            
+            if (!process.WaitForExit(300000)) // 5 minute timeout
+            {
+                process.Kill();
+                throw new TimeoutException($"Git LFS command timed out after 5 minutes: git-lfs {arguments}");
+            }
+            
+            var outputText = output.Result;
+            var errorText = error.Result;
+            
+            if (!string.IsNullOrWhiteSpace(outputText))
+            {
+                _logger.Write(outputText, LogType.Debug);
+            }
+            
+            if (process.ExitCode != 0)
+            {
+                var errorMessage = $"Git LFS command failed with exit code {process.ExitCode}: git-lfs {arguments}";
+                if (!string.IsNullOrWhiteSpace(errorText))
+                {
+                    errorMessage += $"\nError output: {errorText}";
+                    _logger.Write(errorText, LogType.Failure);
+                }
+                throw new InvalidOperationException(errorMessage);
+            }
+        }
+        catch (Exception e) when (!(e is TimeoutException || e is InvalidOperationException))
+        {
+            throw new InvalidOperationException($"Failed to execute git-lfs command: {e.Message}", e);
+        }
     }
     
     private void ConfigureGitCredentialHelper()
