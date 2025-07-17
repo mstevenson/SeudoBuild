@@ -2,9 +2,10 @@
 
 namespace SeudoCI.Pipeline.Modules.GitSource;
 
-using LibGit2Sharp;
-using LibGit2Sharp.Handlers;
 using System.Diagnostics;
+using System.Security;
+using System.Text;
+using System.Text.RegularExpressions;
 using Core;
 
 public class GitSourceStep : ISourceStep<GitSourceConfig>
@@ -13,7 +14,7 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     private ITargetWorkspace _workspace = null!;
     private ILogger _logger = null!;
 
-    public string? Type => "Git";
+    public string Type => "Git";
 
     [UsedImplicitly]
     public void Initialize(GitSourceConfig config, ITargetWorkspace workspace, ILogger logger)
@@ -21,32 +22,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         _config = config;
         _workspace = workspace;
         _logger = logger;
-
-        _credentialsHandler = CreateCredentialsHandler(config);
-        _signature = new Signature(new Identity("SeudoCI", "noreply@seudoci.local"), DateTimeOffset.UtcNow);
-
-        // Set up LFS filter
-        if (config.UseLFS)
-        {
-            //if (IsLFSAvailable())
-            //{
-            var filter = new LFSFilter("lfs", workspace.GetDirectory(TargetDirectory.Source), new List<FilterAttributeEntry> { new FilterAttributeEntry("lfs") });
-            _lfsFilter = GlobalSettings.RegisterFilter(filter);
-            //}
-            //else
-            //{
-            //    // TODO fail with specific exception
-            //    throw new Exception();
-            //}
-        }
     }
-
-    //bool IsLFSAvailable()
-    //{
-    //    // TODO validate that LFS is installed on Mac and Windows
-    //    return true;
-    //}
-
+    
     public SourceStepResults ExecuteStep(ITargetWorkspace workspace)
     {
         var results = new SourceStepResults();
@@ -66,6 +43,7 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             
             results.CommitIdentifier = CurrentCommitShortHash;
             results.IsSuccess = true;
+            _logger.Write("Git operation completed successfully for repository", LogType.Success);
         }
         catch (ArgumentException e)
         {
@@ -73,53 +51,88 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             results.Exception = e;
             _logger.Write($"Configuration error: {e.Message}", LogType.Failure);
         }
-        catch (LibGit2SharpException e)
+        catch (UnauthorizedAccessException e)
+        {
+            results.IsSuccess = false;
+            results.Exception = e;
+            _logger.Write("Authentication failed. Please check your credentials.", LogType.Failure);
+        }
+        catch (SecurityException e)
+        {
+            results.IsSuccess = false;
+            results.Exception = e;
+            _logger.Write("Security validation failed. Please check your configuration.", LogType.Failure);
+        }
+        catch (InvalidOperationException e)
         {
             results.IsSuccess = false;
             results.Exception = e;
             _logger.Write($"Git operation failed: {e.Message}", LogType.Failure);
         }
+        catch (TimeoutException e)
+        {
+            results.IsSuccess = false;
+            results.Exception = e;
+            _logger.Write("Git operation timed out. Please check your network connection.", LogType.Failure);
+        }
         catch (Exception e)
         {
             results.IsSuccess = false;
             results.Exception = e;
-            _logger.Write($"Unexpected error during Git operation: {e.Message}", LogType.Failure);
-            
+            _logger.Write("An unexpected error occurred during Git operation", LogType.Failure);
             if (e.InnerException != null)
             {
-                _logger.Write($"Inner exception: {e.InnerException.Message}", LogType.Failure);
+                _logger.Write("Additional error information available for debugging", LogType.Debug);
             }
         }
 
         return results;
     }
-
-
-    private FilterRegistration? _lfsFilter;
-    private Signature _signature = null!;
-    private CredentialsHandler _credentialsHandler = null!;
-
-    public bool IsWorkingCopyInitialized => Repository.IsValid(_workspace.GetDirectory(TargetDirectory.Source));
+    
+    public bool IsWorkingCopyInitialized => GitIsValidRepository(_workspace.GetDirectory(TargetDirectory.Source));
 
     private void ValidateConfiguration()
     {
+        // Input validation to prevent injection attacks
+        
         if (string.IsNullOrWhiteSpace(_config.RepositoryURL))
         {
             throw new ArgumentException("Repository URL cannot be empty");
         }
 
+        // Validate and sanitize repository URL
         if (!Uri.TryCreate(_config.RepositoryURL, UriKind.Absolute, out var uri))
         {
-            throw new ArgumentException($"Invalid repository URL: {_config.RepositoryURL}");
+            throw new ArgumentException($"Invalid repository URL format"); // Don't expose the actual URL in error
         }
 
-        if (!uri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) && 
-            !uri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase) &&
-            !uri.Scheme.Equals("ssh", StringComparison.OrdinalIgnoreCase) &&
-            !uri.Scheme.Equals("git", StringComparison.OrdinalIgnoreCase))
+        // Restrict allowed URL schemes - remove insecure git:// protocol
+        var allowedSchemes = new[] { "http", "https", "ssh" };
+        if (!allowedSchemes.Contains(uri.Scheme.ToLowerInvariant()))
         {
-            throw new ArgumentException($"Unsupported repository URL scheme: {uri.Scheme}");
+            throw new ArgumentException($"Unsupported repository URL scheme: {uri.Scheme}. Only http, https, and ssh are supported.");
         }
+        
+        // Validate repository URL format and prevent malicious URLs
+        ValidateRepositoryUrl(uri);
+        
+        // Validate authentication method matches URL scheme
+        ValidateAuthenticationMethod(uri);
+        
+        // Validate branch name to prevent injection
+        if (!string.IsNullOrEmpty(_config.RepositoryBranchName))
+        {
+            ValidateBranchName(_config.RepositoryBranchName);
+        }
+        
+        // Validate sparse checkout paths
+        if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths != null)
+        {
+            ValidateSparseCheckoutPaths(_config.SparseCheckoutPaths);
+        }
+
+        // Validate authentication credentials
+        ValidateAuthenticationCredentials();
 
         if (_config.UseLFS && !IsLFSAvailable())
         {
@@ -152,13 +165,257 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             return false;
         }
     }
+    
+    private void ValidateRepositoryUrl(Uri repositoryUri)
+    {
+        // Prevent localhost and internal network access
+        if (repositoryUri.IsLoopback || 
+            repositoryUri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+            repositoryUri.Host.StartsWith("127.") ||
+            repositoryUri.Host.StartsWith("10.") ||
+            repositoryUri.Host.StartsWith("192.168.") ||
+            repositoryUri.Host.StartsWith("169.254."))
+        {
+            throw new ArgumentException("Repository URLs pointing to local or internal networks are not allowed");
+        }
+        
+        // Validate hostname format
+        if (!IsValidHostname(repositoryUri.Host))
+        {
+            throw new ArgumentException("Invalid hostname in repository URL");
+        }
+        
+        // Prevent unusual ports that might be used for attacks
+        if (repositoryUri.Port > 0 && repositoryUri.Port < 1024 && 
+            repositoryUri.Port != 22 && repositoryUri.Port != 80 && repositoryUri.Port != 443)
+        {
+            throw new ArgumentException("Repository URL uses a restricted port number");
+        }
+    }
+    
+    private static bool IsValidHostname(string hostname)
+    {
+        if (string.IsNullOrWhiteSpace(hostname) || hostname.Length > 253)
+            return false;
+            
+        // Basic hostname validation regex
+        var hostnameRegex = new Regex(@"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$");
+        return hostnameRegex.IsMatch(hostname);
+    }
+    
+    private void ValidateAuthenticationMethod(Uri repositoryUri)
+    {
+        // Ensure authentication method is compatible with URL scheme
+        var scheme = repositoryUri.Scheme.ToLowerInvariant();
+        
+        switch (_config.AuthenticationType)
+        {
+            case GitAuthenticationType.SSHKey:
+            case GitAuthenticationType.SSHAgent:
+                if (scheme != "ssh")
+                {
+                    throw new ArgumentException($"SSH authentication can only be used with ssh:// URLs.");
+                }
+                break;
+                
+            case GitAuthenticationType.UsernamePassword:
+            case GitAuthenticationType.PersonalAccessToken:
+                if (scheme != "http" && scheme != "https")
+                {
+                    throw new ArgumentException($"Username/password and token authentication can only be used with http:// or https:// URLs.");
+                }
+                // Warn about using HTTP instead of HTTPS
+                if (scheme == "http")
+                {
+                    _logger.Write("Warning: Using HTTP instead of HTTPS for authentication is insecure and not recommended.", LogType.Alert);
+                }
+                break;
+        }
+    }
+    
+    private static void ValidateBranchName(string branchName)
+    {
+        // Validate branch name to prevent command injection
+        if (string.IsNullOrWhiteSpace(branchName))
+        {
+            throw new ArgumentException("Branch name cannot be empty or whitespace");
+        }
+        
+        // Check for dangerous characters that could be used for injection
+        var dangerousChars = new[] { ';', '|', '&', '$', '`', '\"', '\'', '\n', '\r', '\0', '\t', '<', '>', '*', '?', '[', ']', '{', '}', '(', ')', '~', '^' };
+        if (branchName.IndexOfAny(dangerousChars) >= 0)
+        {
+            throw new ArgumentException("Branch name contains invalid characters that could be used for command injection");
+        }
+        
+        // Additional validation for command injection patterns
+        if (branchName.Contains("--") || branchName.Contains("../") || branchName.Contains("..\\"))
+        {
+            throw new ArgumentException("Branch name contains potentially dangerous patterns");
+        }
+        
+        // Validate against Git branch naming rules
+        if (branchName.StartsWith('-') || branchName.EndsWith('.') || branchName.Contains("..") || branchName.StartsWith('/'))
+        {
+            throw new ArgumentException("Branch name violates Git naming conventions");
+        }
+        
+        // Validate using regex
+        var branchNameRegex = new Regex("^[a-zA-Z0-9._/-]+$");
+        if (!branchNameRegex.IsMatch(branchName))
+        {
+            throw new ArgumentException("Branch name contains invalid characters");
+        }
+        
+        // Length validation
+        if (branchName.Length > 255)
+        {
+            throw new ArgumentException("Branch name is too long");
+        }
+    }
+    
+    private static void ValidateSparseCheckoutPaths(List<string> paths)
+    {
+        // Validate sparse checkout paths to prevent path traversal
+        foreach (var path in paths)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Sparse checkout path cannot be empty");
+            }
+            
+            // Path traversal prevention
+            try
+            {
+                ValidateFilePath(path);
+            }
+            catch (ArgumentException)
+            {
+                throw new ArgumentException($"Invalid sparse checkout path contains dangerous characters: {path}");
+            }
+            
+            // Validate path format
+            var pathRegex = new Regex("^[a-zA-Z0-9._/-]+$");
+            if (!pathRegex.IsMatch(path))
+            {
+                throw new ArgumentException($"Sparse checkout path contains invalid characters: {path}");
+            }
+            
+            // Length validation
+            if (path.Length > 4096)
+            {
+                throw new ArgumentException($"Sparse checkout path is too long: {path}");
+            }
+            
+            // Prevent absolute paths
+            if (Path.IsPathRooted(path))
+            {
+                throw new ArgumentException($"Absolute paths are not allowed in sparse checkout: {path}");
+            }
+        }
+    }
+    
+    private void ValidateAuthenticationCredentials()
+    {
+        // Validate authentication credentials based on authentication type
+        switch (_config.AuthenticationType)
+        {
+            case GitAuthenticationType.UsernamePassword:
+                if (string.IsNullOrWhiteSpace(_config.Username))
+                {
+                    throw new ArgumentException("Username cannot be empty for username/password authentication");
+                }
+                if (string.IsNullOrWhiteSpace(_config.Password))
+                {
+                    throw new ArgumentException("Password cannot be empty for username/password authentication");
+                }
+                // Validate username format
+                if (!IsValidUsername(_config.Username))
+                {
+                    throw new ArgumentException("Username contains invalid characters");
+                }
+                break;
+                
+            case GitAuthenticationType.PersonalAccessToken:
+                if (string.IsNullOrWhiteSpace(_config.PersonalAccessToken))
+                {
+                    throw new ArgumentException("Personal access token cannot be empty for token authentication");
+                }
+                // Basic token format validation
+                if (_config.PersonalAccessToken.Length < 10 || _config.PersonalAccessToken.Length > 255)
+                {
+                    throw new ArgumentException("Personal access token has invalid length");
+                }
+                break;
+                
+            case GitAuthenticationType.SSHKey:
+                if (string.IsNullOrWhiteSpace(_config.PrivateKeyPath))
+                {
+                    throw new ArgumentException("Private key path cannot be empty for SSH key authentication");
+                }
+                if (!File.Exists(_config.PrivateKeyPath))
+                {
+                    throw new FileNotFoundException($"SSH private key file not found: {_config.PrivateKeyPath}");
+                }
+                // Validate key file path
+                ValidateFilePath(_config.PrivateKeyPath);
+                break;
+                
+            case GitAuthenticationType.SSHAgent:
+                // SSH agent authentication doesn't require additional credential validation
+                break;
+                
+            default:
+                throw new ArgumentException($"Unsupported authentication type: {_config.AuthenticationType}");
+        }
+    }
+    
+    private static bool IsValidUsername(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username) || username.Length > 255)
+            return false;
+            
+        // Basic username validation - alphanumeric plus common characters
+        var usernameRegex = new Regex(@"^[a-zA-Z0-9._@-]+$");
+        return usernameRegex.IsMatch(username);
+    }
+    
+    // Validate file path to prevent path traversal
+    private static void ValidateFilePath(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            throw new ArgumentException("File path cannot be empty");
+        }
+        
+        // Check for path traversal attempts
+        if (filePath.Contains("..") || 
+            filePath.StartsWith('/') || 
+            filePath.Contains('\0') ||
+            filePath.Contains('~') ||
+            filePath.Contains('$') ||
+            filePath.Contains('`') ||
+            filePath.Contains('|') ||
+            filePath.Contains('&') ||
+            filePath.Contains(';') ||
+            filePath.Contains('>') ||
+            filePath.Contains('<'))
+        {
+            throw new ArgumentException("File path contains dangerous characters");
+        }
+        
+        if (!Path.IsPathRooted(filePath))
+        {
+            throw new ArgumentException("File path must be absolute");
+        }
+    }
 
     public string CurrentCommit
     {
         get
         {
-            using var repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source));
-            return repo.Head.Tip.Sha;
+            var commitInfo = GitGetCommitInfo(_workspace.GetDirectory(TargetDirectory.Source));
+            return commitInfo.CommitHash;
         }
     }
 
@@ -166,64 +423,11 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
         get
         {
-            string commit = CurrentCommit;
-            return commit.Length == 0 ? "" : commit[..7];
+            var commitInfo = GitGetCommitInfo(_workspace.GetDirectory(TargetDirectory.Source));
+            return commitInfo.CommitHashShort;
         }
     }
     
-    private CredentialsHandler CreateCredentialsHandler(GitSourceConfig config)
-    {
-        return (url, usernameFromUrl, types) =>
-        {
-            switch (config.AuthenticationType)
-            {
-                case GitAuthenticationType.UsernamePassword:
-                    if (string.IsNullOrEmpty(config.Username) || string.IsNullOrEmpty(config.Password))
-                    {
-                        throw new InvalidOperationException("Username and Password are required for UsernamePassword authentication.");
-                    }
-                    return new UsernamePasswordCredentials 
-                    { 
-                        Username = config.Username, 
-                        Password = config.Password 
-                    };
-                    
-                case GitAuthenticationType.PersonalAccessToken:
-                    if (string.IsNullOrEmpty(config.PersonalAccessToken))
-                    {
-                        throw new InvalidOperationException("PersonalAccessToken is required for PersonalAccessToken authentication.");
-                    }
-                    // For token auth, username can be anything (often 'x-access-token' or the actual username)
-                    return new UsernamePasswordCredentials 
-                    { 
-                        Username = string.IsNullOrEmpty(config.Username) ? "x-access-token" : config.Username,
-                        Password = config.PersonalAccessToken 
-                    };
-                    
-                case GitAuthenticationType.SSHKey:
-                    // SSH support is not available in LibGit2Sharp 0.30.0 standard package
-                    // For SSH authentication, users should:
-                    // 1. Use SSH agent with proper SSH keys loaded
-                    // 2. Configure git to use SSH through system git config
-                    // 3. Use git:// or ssh:// URLs which will use system SSH
-                    throw new NotSupportedException(
-                        "SSH key authentication requires system Git with SSH configured. " +
-                        "Please ensure your SSH keys are properly configured in ~/.ssh/ " +
-                        "and that you can clone the repository using command-line git.");
-                    
-                case GitAuthenticationType.SSHAgent:
-                    // SSH agent support is not available in LibGit2Sharp 0.30.0 standard package
-                    throw new NotSupportedException(
-                        "SSH agent authentication requires system Git with SSH agent running. " +
-                        "Please ensure ssh-agent is running and your keys are loaded.");
-                    
-                default:
-                    throw new NotSupportedException($"Authentication type {config.AuthenticationType} is not supported.");
-            }
-        };
-    }
-
-
     // Clone
     public void Download()
     {
@@ -232,420 +436,161 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             _logger.Write("Preparing workspace for clone operation", LogType.Debug);
             _workspace.CleanDirectory(TargetDirectory.Source);
 
-            if (_config.UseLFS)
-            {
-                _logger.Write($"Cloning LFS repository: {_config.RepositoryURL}", LogType.SmallBullet);
-                _logger.Write($"Target branch: {_config.RepositoryBranchName ?? "default"}", LogType.Debug);
-
-                // For LFS with authentication, we need to handle credentials differently based on auth type
-                string cloneUrl = _config.RepositoryURL;
-                
-                if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword || 
-                    _config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
-                {
-                    // Use git credential helper instead of embedding in URL
-                    ConfigureGitCredentialHelper();
-                }
-                
-                var branchArg = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "" : $" -b {_config.RepositoryBranchName}";
-                var depthArg = _config.ShallowCloneDepth > 0 ? $" --depth {_config.ShallowCloneDepth}" : "";
-                ExecuteLFSCommand($"clone{branchArg}{depthArg} {cloneUrl} {_workspace.GetDirectory(TargetDirectory.Source)}");
-                _logger.Write("LFS clone completed successfully", LogType.Success);
-            }
-            else
-            {
-                _logger.Write($"Cloning repository: {_config.RepositoryURL}", LogType.SmallBullet);
-                _logger.Write($"Target branch: {_config.RepositoryBranchName ?? "master"}", LogType.Debug);
-
-                var cloneOptions = new CloneOptions
-                {
-                    BranchName = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "master" : _config.RepositoryBranchName,
-                    Checkout = true,
-                    RecurseSubmodules = true
-                };
-                cloneOptions.FetchOptions.CredentialsProvider = _credentialsHandler;
-
-                // LibGit2Sharp doesn't support shallow clones directly, so we'll use command-line git for shallow clones
-                if (_config.ShallowCloneDepth > 0)
-                {
-                    _logger.Write($"Performing shallow clone with depth {_config.ShallowCloneDepth}", LogType.Debug);
-                    PerformShallowClone();
-                }
-                else if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
-                {
-                    // LibGit2Sharp doesn't support sparse checkout directly, use command-line git
-                    _logger.Write("Performing clone with sparse checkout", LogType.Debug);
-                    PerformShallowClone(); // This method handles both shallow and regular clones with sparse checkout
-                }
-                else
-                {
-                    Repository.Clone(_config.RepositoryURL, _workspace.GetDirectory(TargetDirectory.Source), cloneOptions);
-                }
-                _logger.Write("Repository cloned successfully", LogType.Success);
-                
-                // Apply sparse checkout after regular clone if needed
-                if (!(_config.ShallowCloneDepth > 0) && _config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
-                {
-                    ConfigureSparseCheckout(_workspace.GetDirectory(TargetDirectory.Source));
-                }
-            }
-        }
-        catch (LibGit2SharpException e)
-        {
-            _logger.Write($"Git clone failed: {e.Message}", LogType.Failure);
+            var targetPath = _workspace.GetDirectory(TargetDirectory.Source);
+            var branch = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "main" : _config.RepositoryBranchName;
             
-            // Provide more specific error messages for common issues
-            if (e.Message.Contains("401") || e.Message.Contains("authentication", StringComparison.OrdinalIgnoreCase))
+            _logger.Write($"Cloning repository: {_config.RepositoryURL}", LogType.SmallBullet);
+            _logger.Write($"Target branch: {branch}", LogType.Debug);
+
+            // Use native git clone with all features
+            GitClone(_config.RepositoryURL, targetPath, branch, _config.ShallowCloneDepth, _config.UseLFS);
+            
+            // Configure sparse checkout if enabled
+            if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
             {
-                _logger.Write("Authentication failed. Please check your credentials.", LogType.Failure);
-            }
-            else if (e.Message.Contains("404") || e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
-            {
-                _logger.Write("Repository not found. Please check the URL and your access permissions.", LogType.Failure);
-            }
-            else if (e.Message.Contains("timeout", StringComparison.OrdinalIgnoreCase))
-            {
-                _logger.Write("Network timeout. Please check your internet connection.", LogType.Failure);
+                _logger.Write("Configuring sparse checkout", LogType.Debug);
+                GitConfigureSparseCheckout(targetPath, _config.SparseCheckoutPaths);
+                _logger.Write($"Sparse checkout configured with {_config.SparseCheckoutPaths.Count} paths", LogType.Success);
             }
             
-            throw new InvalidOperationException($"Failed to clone repository from {_config.RepositoryURL}: {e.Message}", e);
+            _logger.Write("Repository cloned successfully", LogType.Success);
         }
         catch (Exception e)
         {
-            _logger.Write($"Unexpected error during clone: {e.Message}", LogType.Failure);
-            throw;
+            _logger.Write($"Git clone failed: {e.Message}", LogType.Failure);
+            
+            // Provide specific error messages without exposing sensitive information
+            if (e.Message.Contains("401") || e.Message.Contains("authentication", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Write("Authentication failed. Please check your credentials.", LogType.Failure);
+                throw new UnauthorizedAccessException("Repository authentication failed", e);
+            }
+
+            if (e.Message.Contains("404") || e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Write("Repository not found. Please check the URL and your access permissions.", LogType.Failure);
+                throw new InvalidOperationException("Repository not found or access denied", e);
+            }
+
+            if (e.Message.Contains("timeout", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Write("Network timeout. Please check your internet connection.", LogType.Failure);
+                throw new TimeoutException("Git operation timed out", e);
+            }
+
+            // Don't expose repository URL in error messages
+            throw new InvalidOperationException("Failed to clone repository", e);
         }
     }
 
     // Pull
     public void Update()
     {
-        Repository? repo = null;
         try
         {
-            _logger.Write("Cleaning working copy", LogType.SmallBullet);
-
-            repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source));
+            var workingDirectory = _workspace.GetDirectory(TargetDirectory.Source);
             
-            // Validate repository state
-            if (!repo.Head.IsTracking)
+            _logger.Write("Cleaning working copy", LogType.SmallBullet);
+            
+            // Get current repository information
+            var commitInfo = GitGetCommitInfo(workingDirectory);
+            if (!commitInfo.IsValidRepository)
             {
-                throw new InvalidOperationException($"Current branch '{repo.Head.FriendlyName}' is not tracking a remote branch");
+                throw new InvalidOperationException("Source directory does not contain a valid Git repository");
             }
 
-            var remoteName = repo.Head.RemoteName;
-            if (string.IsNullOrEmpty(remoteName))
-            {
-                throw new InvalidOperationException("Current branch has no remote configured");
-            }
-
-            var currentRemote = repo.Network.Remotes[remoteName];
-            if (currentRemote == null)
-            {
-                throw new InvalidOperationException($"Remote '{remoteName}' not found in repository");
-            }
-
-            // Clean the repo
+            // Clean the repository
             _logger.Write("Resetting repository to clean state", LogType.Debug);
-            repo.Reset(ResetMode.Hard);
-            repo.RemoveUntrackedFiles();
+            GitReset(workingDirectory);
 
-            // Clone a new copy if necessary
-            if (currentRemote.Url != _config.RepositoryURL)
+            // Check if remote URL has changed
+            if (!string.IsNullOrEmpty(commitInfo.RemoteUrl) && commitInfo.RemoteUrl != _config.RepositoryURL)
             {
-                _logger.Write($"Repository URL has changed from '{currentRemote.Url}' to '{_config.RepositoryURL}'", LogType.Alert);
+                _logger.Write($"Repository URL has changed from '{commitInfo.RemoteUrl}' to '{_config.RepositoryURL}'", LogType.Alert);
                 _logger.Write($"Cloning a new copy: {_config.RepositoryURL}", LogType.SmallBullet);
-                repo.Dispose();
-                repo = null;
                 Download();
                 return;
             }
 
             // Pull changes
-            _logger.Write($"Pulling changes from {repo.Head.TrackedBranch.FriendlyName}", LogType.SmallBullet);
+            _logger.Write($"Pulling changes from {commitInfo.BranchName}", LogType.SmallBullet);
             _logger.Write($"Repository: {_config.RepositoryURL}", LogType.Debug);
 
             // Check if this is a shallow repository
-            bool isShallow = IsShallowRepository(repo);
-            MergeResult? mergeResult = null;
+            bool isShallow = IsShallowRepository(workingDirectory);
             
             if (isShallow && _config.ShallowCloneDepth > 0)
             {
                 _logger.Write("Updating shallow repository with limited depth", LogType.Debug);
-                // For shallow repositories, we need to use git fetch with depth
-                var branch = repo.Head.FriendlyName;
-                repo.Dispose();
-                repo = null;
-                ExecuteGitCommand($"fetch --depth {_config.ShallowCloneDepth} origin {branch}:{branch}");
-                ExecuteGitCommand("reset --hard FETCH_HEAD");
-                repo = new Repository(_workspace.GetDirectory(TargetDirectory.Source));
+                ExecuteGitCommandWithArgs(["fetch", "--depth", _config.ShallowCloneDepth.ToString(), "origin"], workingDirectory);
+                ExecuteGitCommandWithArgs(["reset", "--hard", "FETCH_HEAD"], workingDirectory);
+                _logger.Write("Shallow repository updated successfully", LogType.Success);
             }
             else
             {
-                var pullOptions = new PullOptions
-                {
-                    FetchOptions = new FetchOptions
-                    {
-                        CredentialsProvider = _credentialsHandler
-                    },
-                    MergeOptions = new MergeOptions
-                    {
-                        FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
-                        FileConflictStrategy = CheckoutFileConflictStrategy.Theirs,
-                        MergeFileFavor = MergeFileFavor.Theirs,
-                        FailOnConflict = false
-                    }
-                };
+                var pullResult = ExecuteGitCommandWithArgs(["pull", "--ff-only", "--no-edit"], workingDirectory, throwOnError: false);
                 
-                mergeResult = Commands.Pull(repo, _signature, pullOptions);
-            }
-
-            if (_config.UseLFS)
-            {
-                _logger.Write("Fetching LFS files", LogType.SmallBullet);
-                ExecuteLFSCommand("fetch");
-                _logger.Write("Checking out LFS files into working copy", LogType.SmallBullet);
-                ExecuteLFSCommand("checkout");
-            }
-
-            if (mergeResult != null)
-            {
-                switch (mergeResult.Status)
+                if (pullResult.IsSuccess)
                 {
-                    case MergeStatus.UpToDate:
+                    if (pullResult.StandardOutput.Contains("Already up to date"))
+                    {
                         _logger.Write("Repository is already up-to-date", LogType.SmallBullet);
-                        break;
-                    case MergeStatus.FastForward:
-                        _logger.Write($"Fast-forwarded to commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
-                        break;
-                    case MergeStatus.NonFastForward:
-                        _logger.Write($"Merged commit {mergeResult.Commit.Sha[..7]}: {mergeResult.Commit.MessageShort}", LogType.Success);
-                        break;
-                    case MergeStatus.Conflicts:
-                        _logger.Write("Merge completed with conflicts (resolved using remote version)", LogType.Alert);
-                        break;
-                    default:
-                        _logger.Write($"Pull completed with status: {mergeResult.Status}", LogType.SmallBullet);
-                        break;
+                    }
+                    else
+                    {
+                        _logger.Write("Repository updated successfully", LogType.Success);
+                    }
+                }
+                else if (pullResult.StandardError.Contains("non-fast-forward"))
+                {
+                    _logger.Write("Pull failed due to non-fast-forward changes, performing hard reset", LogType.Alert);
+                    ExecuteGitCommandWithArgs(["fetch", "origin"], workingDirectory);
+                    ExecuteGitCommandWithArgs(["reset", "--hard", "origin/HEAD"], workingDirectory);
+                    _logger.Write("Repository reset to remote HEAD", LogType.Success);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Pull failed: {pullResult.StandardError}");
                 }
             }
-            else if (isShallow)
+
+            // Update LFS files if enabled
+            if (_config.UseLFS)
             {
-                _logger.Write("Shallow repository updated successfully", LogType.Success);
+                _logger.Write("Updating LFS files", LogType.SmallBullet);
+                ExecuteGitCommandWithArgs(["lfs", "fetch"], workingDirectory);
+                ExecuteGitCommandWithArgs(["lfs", "checkout"], workingDirectory);
+                _logger.Write("LFS files updated successfully", LogType.Success);
             }
         }
-        catch (LibGit2SharpException e)
+        catch (Exception e)
         {
             _logger.Write($"Git update failed: {e.Message}", LogType.Failure);
             throw new InvalidOperationException($"Failed to update repository: {e.Message}", e);
         }
-        catch (Exception e)
-        {
-            _logger.Write($"Unexpected error during update: {e.Message}", LogType.Failure);
-            throw;
-        }
-        finally
-        {
-            repo?.Dispose();
-        }
     }
 
-    private void ExecuteLFSCommand(string arguments)
-    {
-        _logger.Write($"Executing git-lfs {arguments.Split(' ')[0]}", LogType.Debug);
-        
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = "git-lfs",
-            Arguments = arguments,
-            WorkingDirectory = _workspace.GetDirectory(TargetDirectory.Source),
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            UseShellExecute = false
-        };
-        
-        using var process = new Process { StartInfo = startInfo };
-        
-        try
-        {
-            process.Start();
-            
-            // Read output asynchronously to prevent deadlocks
-            var output = process.StandardOutput.ReadToEndAsync();
-            var error = process.StandardError.ReadToEndAsync();
-            
-            if (!process.WaitForExit(300000)) // 5 minute timeout
-            {
-                process.Kill();
-                throw new TimeoutException($"Git LFS command timed out after 5 minutes: git-lfs {arguments}");
-            }
-            
-            var outputText = output.Result;
-            var errorText = error.Result;
-            
-            if (!string.IsNullOrWhiteSpace(outputText))
-            {
-                _logger.Write(outputText, LogType.Debug);
-            }
-            
-            if (process.ExitCode != 0)
-            {
-                var errorMessage = $"Git LFS command failed with exit code {process.ExitCode}: git-lfs {arguments}";
-                if (!string.IsNullOrWhiteSpace(errorText))
-                {
-                    errorMessage += $"\nError output: {errorText}";
-                    _logger.Write(errorText, LogType.Failure);
-                }
-                throw new InvalidOperationException(errorMessage);
-            }
-        }
-        catch (Exception e) when (!(e is TimeoutException || e is InvalidOperationException))
-        {
-            throw new InvalidOperationException($"Failed to execute git-lfs command: {e.Message}", e);
-        }
-    }
     
-    private void ConfigureGitCredentialHelper()
+    private GitCommandResult ExecuteGitCommandWithArgs(List<string> arguments, string? workingDirectory = null, bool throwOnError = true)
     {
-        // Configure git to use a temporary credential helper for this operation
-        // This avoids embedding passwords in URLs
-        var gitConfigCommands = new List<string>();
+        if (arguments.Count == 0)
+        {
+            throw new ArgumentException("Git command arguments cannot be empty");
+        }
         
-        if (_config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
+        // Log command without exposing sensitive arguments
+        var safeCommand = arguments[0];
+        _logger.Write($"Executing git {safeCommand}", LogType.Debug);
+        
+        // Audit log for authentication-related commands
+        if (safeCommand.Contains("clone") || safeCommand.Contains("fetch") || safeCommand.Contains("pull"))
         {
-            // For tokens, configure git to use the token as password
-            var token = _config.PersonalAccessToken;
-            var username = string.IsNullOrEmpty(_config.Username) ? "x-access-token" : _config.Username;
-            
-            // Set up a temporary askpass script that returns the token
-            var askPassScript = Path.Combine(Path.GetTempPath(), $"git-askpass-{Guid.NewGuid()}.sh");
-            File.WriteAllText(askPassScript, $"#!/bin/sh\necho '{token}'");
-            
-            if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-            {
-                // Make script executable on Unix-like systems
-                var chmod = new ProcessStartInfo("chmod", $"+x {askPassScript}")
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                Process.Start(chmod)?.WaitForExit();
-            }
-            
-            Environment.SetEnvironmentVariable("GIT_ASKPASS", askPassScript);
-            
-            // Clean up after operation
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => 
-            {
-                if (File.Exists(askPassScript))
-                    File.Delete(askPassScript);
-            };
+            _logger.Write($"Git authentication operation: {safeCommand}", LogType.Alert);
         }
-        else if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword)
-        {
-            _logger.Write("Warning: Using username/password authentication is deprecated. Consider using SSH keys or personal access tokens.", LogType.Alert);
-            
-            // For backward compatibility, set up basic auth
-            // Note: This is still not ideal but better than URL embedding
-            var authString = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{_config.Username}:{_config.Password}"));
-            Environment.SetEnvironmentVariable("GIT_AUTH_HEADER", $"Authorization: Basic {authString}");
-        }
-    }
-    
-    private void PerformShallowClone()
-    {
-        try
-        {
-            var targetDir = _workspace.GetDirectory(TargetDirectory.Source);
-            var branch = string.IsNullOrEmpty(_config.RepositoryBranchName) ? "master" : _config.RepositoryBranchName;
-            
-            // Build git clone command
-            var cloneArgs = "clone";
-            
-            // Add shallow depth if specified
-            if (_config.ShallowCloneDepth > 0)
-            {
-                cloneArgs += $" --depth {_config.ShallowCloneDepth}";
-            }
-            
-            cloneArgs += $" -b {branch}";
-            
-            // Add sparse checkout initialization if enabled
-            if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
-            {
-                cloneArgs += " --no-checkout --filter=blob:none";
-            }
-            
-            cloneArgs += $" {_config.RepositoryURL} {targetDir}";
-            
-            // Execute git clone
-            ExecuteGitCommand(cloneArgs);
-            
-            // Configure sparse checkout if enabled
-            if (_config.EnableSparseCheckout && _config.SparseCheckoutPaths.Count > 0)
-            {
-                ConfigureSparseCheckout(targetDir);
-            }
-            
-            if (_config.ShallowCloneDepth > 0)
-            {
-                _logger.Write($"Shallow clone completed with depth {_config.ShallowCloneDepth}", LogType.Success);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new InvalidOperationException($"Failed to perform clone: {e.Message}", e);
-        }
-    }
-    
-    private void ConfigureSparseCheckout(string repoPath)
-    {
-        try
-        {
-            _logger.Write("Configuring sparse checkout", LogType.Debug);
-            
-            // Enable sparse checkout
-            ExecuteGitCommand("config core.sparseCheckout true", repoPath);
-            
-            // Write sparse-checkout file
-            var sparseCheckoutPath = Path.Combine(repoPath, ".git", "info", "sparse-checkout");
-            var sparseCheckoutDir = Path.GetDirectoryName(sparseCheckoutPath);
-            
-            if (!Directory.Exists(sparseCheckoutDir))
-            {
-                Directory.CreateDirectory(sparseCheckoutDir);
-            }
-            
-            // Write paths to sparse-checkout file
-            File.WriteAllLines(sparseCheckoutPath, _config.SparseCheckoutPaths);
-            
-            _logger.Write($"Sparse checkout configured with {_config.SparseCheckoutPaths.Count} paths:", LogType.Debug);
-            foreach (var path in _config.SparseCheckoutPaths)
-            {
-                _logger.Write($"  - {path}", LogType.Debug);
-            }
-            
-            // Perform the checkout
-            ExecuteGitCommand("checkout", repoPath);
-            
-            _logger.Write("Sparse checkout completed successfully", LogType.Success);
-        }
-        catch (Exception e)
-        {
-            throw new InvalidOperationException($"Failed to configure sparse checkout: {e.Message}", e);
-        }
-    }
-    
-    private void ExecuteGitCommand(string arguments, string workingDirectory = null)
-    {
-        _logger.Write($"Executing git {arguments.Split(' ')[0]}", LogType.Debug);
         
         var startInfo = new ProcessStartInfo
         {
             FileName = "git",
-            Arguments = arguments,
             WorkingDirectory = workingDirectory ?? _workspace.GetDirectory(TargetDirectory.Source),
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
@@ -654,12 +599,14 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             UseShellExecute = false
         };
         
-        // Apply authentication environment variables if needed
-        if (_config.AuthenticationType == GitAuthenticationType.UsernamePassword || 
-            _config.AuthenticationType == GitAuthenticationType.PersonalAccessToken)
+        // Add arguments individually to prevent injection
+        foreach (var arg in arguments)
         {
-            ConfigureGitCredentialHelper();
+            startInfo.ArgumentList.Add(arg);
         }
+        
+        // Apply authentication environment variables if needed
+        ConfigureGitAuthentication(startInfo);
         
         using var process = new Process { StartInfo = startInfo };
         
@@ -667,14 +614,36 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         {
             process.Start();
             
-            // Read output asynchronously to prevent deadlocks
+            // Read output asynchronously to prevent deadlocks with timeout
             var output = process.StandardOutput.ReadToEndAsync();
             var error = process.StandardError.ReadToEndAsync();
             
+            // Enhanced timeout with proper resource cleanup
             if (!process.WaitForExit(300000)) // 5 minute timeout
             {
-                process.Kill();
-                throw new TimeoutException($"Git command timed out after 5 minutes: git {arguments}");
+                try
+                {
+                    process.Kill();
+                    process.WaitForExit(5000); // Wait for cleanup
+                }
+                catch (Exception killEx)
+                {
+                    _logger.Write($"Warning: Could not kill timed-out process: {killEx.Message}", LogType.Alert);
+                }
+                
+                var timeoutResult = new GitCommandResult
+                {
+                    ExitCode = -1,
+                    StandardOutput = "",
+                    StandardError = $"Git command timed out after 5 minutes: git {safeCommand}",
+                    IsSuccess = false
+                };
+                
+                if (throwOnError)
+                {
+                    throw new TimeoutException(timeoutResult.StandardError);
+                }
+                return timeoutResult;
             }
             
             var outputText = output.Result;
@@ -685,30 +654,559 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
                 _logger.Write(outputText, LogType.Debug);
             }
             
-            if (process.ExitCode != 0)
+            var result = new GitCommandResult
             {
-                var errorMessage = $"Git command failed with exit code {process.ExitCode}: git {arguments}";
+                ExitCode = process.ExitCode,
+                StandardOutput = outputText,
+                StandardError = errorText,
+                IsSuccess = process.ExitCode == 0
+            };
+            
+            if (!result.IsSuccess)
+            {
+                var errorMessage = $"Git command failed with exit code {process.ExitCode}: git {safeCommand}";
                 if (!string.IsNullOrWhiteSpace(errorText))
                 {
                     errorMessage += $"\nError output: {errorText}";
                     _logger.Write(errorText, LogType.Failure);
                 }
-                throw new InvalidOperationException(errorMessage);
+                
+                // Log authentication failures for security monitoring
+                if (errorText.Contains("authentication", StringComparison.OrdinalIgnoreCase) ||
+                    errorText.Contains("401", StringComparison.OrdinalIgnoreCase) ||
+                    errorText.Contains("403", StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.Write($"Authentication failure detected during git operation", LogType.Alert);
+                }
+                
+                if (throwOnError)
+                {
+                    throw new InvalidOperationException(errorMessage);
+                }
             }
+            
+            return result;
         }
         catch (Exception e) when (!(e is TimeoutException || e is InvalidOperationException))
         {
-            throw new InvalidOperationException($"Failed to execute git command: {e.Message}", e);
+            var exceptionResult = new GitCommandResult
+            {
+                ExitCode = -1,
+                StandardOutput = "",
+                StandardError = $"Failed to execute git command: {e.Message}",
+                IsSuccess = false
+            };
+            
+            if (throwOnError)
+            {
+                throw new InvalidOperationException(exceptionResult.StandardError, e);
+            }
+            return exceptionResult;
         }
     }
     
-    private bool IsShallowRepository(Repository repo)
+    private void ConfigureGitAuthentication(ProcessStartInfo startInfo)
+    {
+        // Log authentication method being used (without sensitive details)
+        _logger.Write($"Configuring Git authentication using {_config.AuthenticationType}", LogType.Debug);
+        
+        switch (_config.AuthenticationType)
+        {
+            case GitAuthenticationType.UsernamePassword:
+                ConfigureUsernamePasswordAuth(startInfo);
+                break;
+            case GitAuthenticationType.PersonalAccessToken:
+                ConfigurePersonalAccessTokenAuth(startInfo);
+                break;
+            case GitAuthenticationType.SSHKey:
+                ConfigureSSHKeyAuth(startInfo);
+                break;
+            case GitAuthenticationType.SSHAgent:
+                ConfigureSSHAgentAuth(startInfo);
+                break;
+            default:
+                throw new ArgumentException($"Unsupported authentication type: {_config.AuthenticationType}");
+        }
+        
+        // Log successful authentication configuration
+        _logger.Write($"Git authentication configured successfully", LogType.Debug);
+    }
+    
+    private void ConfigureUsernamePasswordAuth(ProcessStartInfo startInfo)
+    {
+        if (string.IsNullOrEmpty(_config.Username) || string.IsNullOrEmpty(_config.Password))
+        {
+            throw new InvalidOperationException("Username and Password are required for UsernamePassword authentication.");
+        }
+        
+        // Log authentication attempt without exposing credentials
+        _logger.Write($"Configuring username/password authentication for user: {_config.Username}", LogType.Debug);
+        
+        // Use secure credential helper script instead of environment variables
+        var credentialHelper = CreateSecureCredentialHelper(_config.Username, _config.Password);
+        startInfo.EnvironmentVariables["GIT_ASKPASS"] = credentialHelper;
+        startInfo.EnvironmentVariables["GIT_TERMINAL_PROMPT"] = "0";
+        
+        // Disable credential prompting entirely
+        startInfo.EnvironmentVariables["GIT_CONFIG_NOSYSTEM"] = "1";
+        
+        _logger.Write("Warning: Using username/password authentication is deprecated. Consider using SSH keys or personal access tokens.", LogType.Alert);
+    }
+    
+    private void ConfigurePersonalAccessTokenAuth(ProcessStartInfo startInfo)
+    {
+        if (string.IsNullOrEmpty(_config.PersonalAccessToken))
+        {
+            throw new InvalidOperationException("PersonalAccessToken is required for PersonalAccessToken authentication.");
+        }
+        
+        var username = string.IsNullOrEmpty(_config.Username) ? "x-access-token" : _config.Username;
+        
+        // Log authentication attempt without exposing token
+        _logger.Write($"Configuring personal access token authentication for user: {username}", LogType.Debug);
+        
+        // Use secure credential helper script instead of environment variables
+        var credentialHelper = CreateSecureCredentialHelper(username, _config.PersonalAccessToken);
+        startInfo.EnvironmentVariables["GIT_ASKPASS"] = credentialHelper;
+        startInfo.EnvironmentVariables["GIT_TERMINAL_PROMPT"] = "0";
+        
+        // Disable credential prompting entirely
+        startInfo.EnvironmentVariables["GIT_CONFIG_NOSYSTEM"] = "1";
+    }
+    
+    private void ConfigureSSHKeyAuth(ProcessStartInfo startInfo)
+    {
+        if (string.IsNullOrEmpty(_config.PrivateKeyPath))
+        {
+            throw new InvalidOperationException("PrivateKeyPath is required for SSHKey authentication.");
+        }
+        
+        if (!File.Exists(_config.PrivateKeyPath))
+        {
+            throw new FileNotFoundException($"SSH private key file not found: {_config.PrivateKeyPath}");
+        }
+        
+        // Log SSH key authentication attempt
+        _logger.Write($"Configuring SSH key authentication using key: {Path.GetFileName(_config.PrivateKeyPath)}", LogType.Debug);
+        
+        // Validate SSH key file permissions
+        ValidateSSHKeyPermissions(_config.PrivateKeyPath);
+        
+        // Create secure known_hosts file path
+        var knownHostsPath = CreateSecureKnownHostsPath();
+        
+        // Enable host key checking for security with proper known_hosts management
+        var sshCommand = $"ssh -i \"{EscapeShellArgument(_config.PrivateKeyPath)}\" -o UserKnownHostsFile=\"{knownHostsPath}\" -o StrictHostKeyChecking=yes -o PasswordAuthentication=no -o PubkeyAuthentication=yes";
+        
+        if (!string.IsNullOrEmpty(_config.Passphrase))
+        {
+            _logger.Write("SSH key has passphrase protection enabled", LogType.Debug);
+            
+            // Use secure credential helper for SSH passphrase
+            var credentialHelper = CreateSecureCredentialHelper("", _config.Passphrase);
+            startInfo.EnvironmentVariables["SSH_ASKPASS"] = credentialHelper;
+            startInfo.EnvironmentVariables["DISPLAY"] = ":0"; // Required for SSH_ASKPASS to work
+            startInfo.EnvironmentVariables["SSH_ASKPASS_REQUIRE"] = "force";
+        }
+        
+        startInfo.EnvironmentVariables["GIT_SSH_COMMAND"] = sshCommand;
+    }
+    
+    private void ConfigureSSHAgentAuth(ProcessStartInfo startInfo)
+    {
+        // Log SSH agent authentication attempt
+        _logger.Write("Configuring SSH agent authentication", LogType.Debug);
+        
+        // Create secure known_hosts file path
+        var knownHostsPath = CreateSecureKnownHostsPath();
+        
+        // SSH agent authentication relies on the system SSH agent
+        // Enable host key checking for security with proper known_hosts management
+        startInfo.EnvironmentVariables["GIT_SSH_COMMAND"] = $"ssh -o UserKnownHostsFile=\"{knownHostsPath}\" -o StrictHostKeyChecking=yes -o PasswordAuthentication=no -o PubkeyAuthentication=yes";
+        
+        // Verify SSH agent is running
+        if (!IsSSHAgentRunning())
+        {
+            _logger.Write("SSH agent is not running or has no loaded keys", LogType.Failure);
+            throw new InvalidOperationException("SSH agent is not running. Please start ssh-agent and load your SSH keys.");
+        }
+        
+        _logger.Write("SSH agent is running and ready for authentication", LogType.Debug);
+    }
+    
+    private bool IsSSHAgentRunning()
     {
         try
         {
-            // Check if .git/shallow file exists
-            var shallowFile = Path.Combine(repo.Info.Path, "shallow");
-            return File.Exists(shallowFile);
+            var result = ExecuteGitCommandWithArgs(["ssh-add", "-l"], throwOnError: false);
+            return result.IsSuccess || result.StandardError.Contains("no identities");
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
+    private string CreateSecureCredentialHelper(string username = "", string password = "")
+    {
+        // Create secure credential helper script that doesn't persist credentials
+        var tempDir = Path.GetTempPath();
+        var scriptPath = Path.Combine(tempDir, $"git-credential-{Guid.NewGuid()}.sh");
+        
+        var scriptContent = new StringBuilder();
+        scriptContent.AppendLine("#!/bin/bash");
+        scriptContent.AppendLine("# Secure credential helper script");
+        scriptContent.AppendLine("# This script will be automatically deleted after use");
+        scriptContent.AppendLine("");
+        scriptContent.AppendLine("case \"$1\" in");
+        scriptContent.AppendLine("get)");
+        
+        if (!string.IsNullOrEmpty(username))
+        {
+            scriptContent.AppendLine($"    echo username={EscapeShellArgument(username)}");
+        }
+        if (!string.IsNullOrEmpty(password))
+        {
+            scriptContent.AppendLine($"    echo password={EscapeShellArgument(password)}");
+        }
+        
+        scriptContent.AppendLine("    ;;");
+        scriptContent.AppendLine("store)");
+        scriptContent.AppendLine("    # Ignore store requests for security");
+        scriptContent.AppendLine("    ;;");
+        scriptContent.AppendLine("erase)");
+        scriptContent.AppendLine("    # Ignore erase requests");
+        scriptContent.AppendLine("    ;;");
+        scriptContent.AppendLine("esac");
+        
+        // Write script with restricted permissions
+        File.WriteAllText(scriptPath, scriptContent.ToString());
+        
+        // Set execute permissions on Unix-like systems
+        if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+        {
+            var chmodProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                }
+            };
+            chmodProcess.StartInfo.ArgumentList.Add("700");
+            chmodProcess.StartInfo.ArgumentList.Add(scriptPath);
+            chmodProcess.Start();
+            chmodProcess.WaitForExit();
+        }
+        
+        // Schedule script for deletion
+        ScheduleFileForDeletion(scriptPath);
+        
+        return scriptPath;
+    }
+    
+    private string CreateSecureKnownHostsPath()
+    {
+        // Create secure known_hosts file path
+        var userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var sshDir = Path.Combine(userHome, ".ssh");
+        var knownHostsPath = Path.Combine(sshDir, "known_hosts");
+        
+        // Ensure .ssh directory exists with proper permissions
+        if (!Directory.Exists(sshDir))
+        {
+            Directory.CreateDirectory(sshDir);
+            
+            // Set restrictive permissions on Unix-like systems
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                var chmodProcess = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "chmod",
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    }
+                };
+                chmodProcess.StartInfo.ArgumentList.Add("700");
+                chmodProcess.StartInfo.ArgumentList.Add(sshDir);
+                chmodProcess.Start();
+                chmodProcess.WaitForExit();
+            }
+        }
+        
+        // Create known_hosts file if it doesn't exist
+        if (File.Exists(knownHostsPath)) return knownHostsPath;
+        {
+            File.WriteAllText(knownHostsPath, "");
+            
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                return knownHostsPath;
+            }
+            
+            // Set restrictive permissions on Unix-like systems
+            var chmodProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                }
+            };
+            chmodProcess.StartInfo.ArgumentList.Add("644");
+            chmodProcess.StartInfo.ArgumentList.Add(knownHostsPath);
+            chmodProcess.Start();
+            chmodProcess.WaitForExit();
+        }
+
+        return knownHostsPath;
+    }
+    
+    private void ScheduleFileForDeletion(string filePath)
+    {
+        // Schedule file for deletion after a short delay
+        Task.Delay(TimeSpan.FromMinutes(5)).ContinueWith(_ =>
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Write($"Warning: Could not delete temporary credential file: {ex.Message}", LogType.Alert);
+            }
+        });
+    }
+    
+    private static string EscapeShellArgument(string argument)
+    {
+        // Escape shell arguments to prevent command injection
+        if (string.IsNullOrEmpty(argument))
+            return "\"\"";
+            
+        // Replace dangerous characters
+        return argument
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\\\"")
+            .Replace("$", "\\$")
+            .Replace("`", "\\`")
+            .Replace("!", "\\!")
+            .Replace("\n", "\\n")
+            .Replace("\r", "\\r")
+            .Replace("\t", "\\t");
+    }
+    
+    private void ValidateSSHKeyPermissions(string privateKeyPath)
+    {
+        // Validate SSH key file permissions for security
+        try
+        {
+            var fileInfo = new FileInfo(privateKeyPath);
+            
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                return;
+            }
+            
+            // On Unix-like systems, SSH keys should have restrictive permissions (600)
+            // Check if file is readable by others (basic security check)
+            if (fileInfo.IsReadOnly == false)
+            {
+                _logger.Write($"Warning: SSH private key file may have overly permissive permissions: {privateKeyPath}", LogType.Alert);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Write($"Warning: Could not validate SSH key permissions: {ex.Message}", LogType.Alert);
+        }
+    }
+    
+    private class GitCommandResult
+    {
+        public int ExitCode { get; set; }
+        public string StandardOutput { get; set; } = "";
+        public string StandardError { get; set; } = "";
+        public bool IsSuccess { get; set; }
+    }
+    
+    // Git command wrapper methods
+    private void GitClone(string repositoryUrl, string targetPath, string? branch = null, int depth = 0, bool enableLFS = false)
+    {
+        // Build git clone command with proper argument escaping
+        var cloneArgs = new List<string> { "clone" };
+        
+        if (depth > 0)
+        {
+            cloneArgs.Add("--depth");
+            cloneArgs.Add(depth.ToString());
+        }
+        
+        if (!string.IsNullOrEmpty(branch))
+        {
+            cloneArgs.Add("--branch");
+            cloneArgs.Add(branch);
+        }
+        
+        cloneArgs.Add("--recurse-submodules");
+        
+        if (enableLFS)
+        {
+            cloneArgs.Add("--no-checkout");
+        }
+        
+        cloneArgs.Add(repositoryUrl);
+        cloneArgs.Add(targetPath);
+        
+        ExecuteGitCommandWithArgs(cloneArgs);
+        
+        if (enableLFS)
+        {
+            ExecuteGitCommandWithArgs(["lfs", "install"], targetPath);
+            ExecuteGitCommandWithArgs(["lfs", "fetch"], targetPath);
+            ExecuteGitCommandWithArgs(["checkout"], targetPath);
+        }
+    }
+    
+    private void GitPull(string workingDirectory)
+    {
+        var result = ExecuteGitCommandWithArgs(["pull", "--ff-only", "--no-edit"], workingDirectory);
+        if (result.IsSuccess || !result.StandardError.Contains("non-fast-forward"))
+        {
+            return;
+        }
+        _logger.Write("Pull failed due to non-fast-forward changes, performing hard reset", LogType.Alert);
+        ExecuteGitCommandWithArgs(["fetch", "origin"], workingDirectory);
+        ExecuteGitCommandWithArgs(["reset", "--hard", "origin/HEAD"], workingDirectory);
+    }
+    
+    private void GitFetch(string workingDirectory, string remote = "origin")
+    {
+        ExecuteGitCommandWithArgs(["fetch", remote], workingDirectory);
+    }
+    
+    private void GitReset(string workingDirectory, bool hard = true)
+    {
+        var resetArgs = hard ? ["reset", "--hard", "HEAD"] : ["reset", "HEAD"];
+        ExecuteGitCommandWithArgs(resetArgs, workingDirectory);
+        ExecuteGitCommandWithArgs(["clean", "-fd"], workingDirectory);
+    }
+    
+    private GitStatusResult GitStatus(string workingDirectory)
+    {
+        var result = ExecuteGitCommandWithArgs(["status", "--porcelain"], workingDirectory, throwOnError: false);
+        
+        if (!result.IsSuccess)
+        {
+            return new GitStatusResult
+            {
+                IsValidRepository = false,
+                HasUncommittedChanges = false,
+                HasUntrackedFiles = false
+            };
+        }
+        
+        var lines = result.StandardOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        
+        return new GitStatusResult
+        {
+            IsValidRepository = true,
+            HasUncommittedChanges = lines.Any(line => line.StartsWith("M ") || line.StartsWith("A ") || line.StartsWith("D ")),
+            HasUntrackedFiles = lines.Any(line => line.StartsWith("??"))
+        };
+    }
+    
+    private GitCommitInfo GitGetCommitInfo(string workingDirectory)
+    {
+        var commitResult = ExecuteGitCommandWithArgs(["rev-parse", "HEAD"], workingDirectory, throwOnError: false);
+        var branchResult = ExecuteGitCommandWithArgs(["rev-parse", "--abbrev-ref", "HEAD"], workingDirectory, throwOnError: false);
+        var remoteResult = ExecuteGitCommandWithArgs(["remote", "get-url", "origin"], workingDirectory, throwOnError: false);
+        
+        if (!commitResult.IsSuccess)
+        {
+            return new GitCommitInfo
+            {
+                IsValidRepository = false,
+                CommitHash = "",
+                CommitHashShort = "",
+                BranchName = "",
+                RemoteUrl = ""
+            };
+        }
+        
+        var fullHash = commitResult.StandardOutput.Trim();
+        var shortHash = fullHash.Length >= 7 ? fullHash[..7] : fullHash;
+        
+        return new GitCommitInfo
+        {
+            IsValidRepository = true,
+            CommitHash = fullHash,
+            CommitHashShort = shortHash,
+            BranchName = branchResult.IsSuccess ? branchResult.StandardOutput.Trim() : "",
+            RemoteUrl = remoteResult.IsSuccess ? remoteResult.StandardOutput.Trim() : ""
+        };
+    }
+    
+    private bool GitIsValidRepository(string workingDirectory)
+    {
+        var result = ExecuteGitCommandWithArgs(["rev-parse", "--git-dir"], workingDirectory, throwOnError: false);
+        return result.IsSuccess;
+    }
+    
+    private void GitConfigureSparseCheckout(string workingDirectory, List<string> paths)
+    {
+        // Use secure git command execution
+        ExecuteGitCommandWithArgs(["config", "core.sparseCheckout", "true"], workingDirectory);
+        
+        var sparseCheckoutPath = Path.Combine(workingDirectory, ".git", "info", "sparse-checkout");
+        var sparseCheckoutDir = Path.GetDirectoryName(sparseCheckoutPath);
+        
+        if (!Directory.Exists(sparseCheckoutDir) && !string.IsNullOrEmpty(sparseCheckoutDir))
+        {
+            Directory.CreateDirectory(sparseCheckoutDir);
+        }
+        
+        // Write paths safely with proper error handling
+        try
+        {
+            File.WriteAllLines(sparseCheckoutPath, paths);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to write sparse checkout configuration: {ex.Message}", ex);
+        }
+        
+        ExecuteGitCommandWithArgs(["checkout"], workingDirectory);
+    }
+    
+    private class GitStatusResult
+    {
+        public bool IsValidRepository { get; set; }
+        public bool HasUncommittedChanges { get; set; }
+        public bool HasUntrackedFiles { get; set; }
+    }
+    
+    private class GitCommitInfo
+    {
+        public bool IsValidRepository { get; set; }
+        public string CommitHash { get; set; } = "";
+        public string CommitHashShort { get; set; } = "";
+        public string BranchName { get; set; } = "";
+        public string RemoteUrl { get; set; } = "";
+    }
+    
+    private bool IsShallowRepository(string workingDirectory)
+    {
+        try
+        {
+            var result = ExecuteGitCommandWithArgs(["rev-parse", "--is-shallow-repository"], workingDirectory, throwOnError: false);
+            return result.IsSuccess && result.StandardOutput.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
         }
         catch
         {

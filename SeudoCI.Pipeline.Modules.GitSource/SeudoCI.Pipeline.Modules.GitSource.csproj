@@ -14,7 +14,6 @@
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
-      <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
     </ItemGroup>
 
 </Project>
