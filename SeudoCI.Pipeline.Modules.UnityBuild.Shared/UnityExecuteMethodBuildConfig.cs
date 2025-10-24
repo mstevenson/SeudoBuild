@@ -12,5 +12,5 @@ public class UnityExecuteMethodBuildConfig : UnityBuildConfig
     /// <summary>
     /// A static method in the UnityEditor namespace matching this name will be executed.
     /// </summary>
-    public string MethodName { get; } = "";
+    public string MethodName { get; set; } = string.Empty;
 }

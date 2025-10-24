@@ -7,39 +7,50 @@ public class UnityStandardBuildStep : UnityBuildStep<UnityStandardBuildConfig>
 {
     public override string? Type => "Unity Standard Build";
 
-    protected override string GetBuildArgs(UnityStandardBuildConfig config, ITargetWorkspace workspace)
+    protected override IReadOnlyList<string> GetBuildArgs(UnityStandardBuildConfig config, ITargetWorkspace workspace)
     {
-        var args = new List<string>();
-        args.Add("-quit");
-        args.Add("-batchmode");
-        args.Add("-projectPath");
-        args.Add(Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory));
-        args.Add("-logfile");
-        args.Add(workspace.FileSystem.StandardOutputPath);
+        var args = new List<string>
+        {
+            "-quit",
+            "-batchmode",
+            "-projectPath",
+            Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory),
+            "-logfile",
+            workspace.FileSystem.StandardOutputPath
+        };
 
         string executableExtension = "";
 
         switch (config.TargetPlatform)
         {
             case UnityPlatform.Mac:
-                args.Add("-buildTarget osx");
+                args.Add("-buildTarget");
+                args.Add("StandaloneOSX");
                 args.Add("-buildOSX64Player");
                 executableExtension = ".app";
                 break;
             case UnityPlatform.Windows:
-                args.Add("-buildTarget win64");
+                args.Add("-buildTarget");
+                args.Add("StandaloneWindows64");
                 args.Add("-buildWindows64Player");
                 executableExtension = ".exe";
                 break;
             case UnityPlatform.Linux:
-                args.Add("-buildTarget linux64");
+                args.Add("-buildTarget");
+                args.Add("StandaloneLinux64");
                 args.Add("-buildLinux64Player");
                 break;
         }
 
-        string exePath = $"{workspace.GetDirectory(TargetDirectory.Output)}/{config.OutputName}{executableExtension}";
-        args.Add(exePath);
+        var executableName = config.OutputName;
+        if (!string.IsNullOrWhiteSpace(executableExtension))
+        {
+            executableName += executableExtension;
+        }
 
-        return string.Join(" ", args.ToArray());
+        var outputPath = Path.Combine(workspace.GetDirectory(TargetDirectory.Output), executableName);
+        args.Add(outputPath);
+
+        return args;
     }
 }
