@@ -3,6 +3,7 @@
 namespace SeudoCI.Pipeline.Modules.ShellBuild;
 
 using System.Diagnostics;
+using System.Text;
 using Core;
 
 /// <summary>
@@ -31,59 +32,79 @@ public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
 
     public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, ITargetWorkspace workspace)
     {
+        var results = new BuildStepResults();
+
         try
         {
+            if (string.IsNullOrWhiteSpace(_config.Command))
+            {
+                throw new InvalidOperationException("Shell command cannot be empty.");
+            }
+
             // Replace variables in string that begin and end with the % character
             var command = workspace.Macros.ReplaceVariablesInText(_config.Command);
-            // Escape quotes
-            command = command.Replace(@"""", @"\""");
 
             var startInfo = new ProcessStartInfo
             {
                 FileName = "bash",
-                Arguments = $"-c \"{command}\"",
+                Arguments = $"-c \"{command.Replace("\"", "\\\"")}\"",
                 WorkingDirectory = workspace.GetDirectory(TargetDirectory.Source),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             };
 
-            var process = new Process { StartInfo = startInfo };
-            process.Start();
+            using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
+            var stderr = new StringBuilder();
 
-            while (!process.StandardOutput.EndOfStream)
+            process.OutputDataReceived += (_, args) =>
             {
-                string? line = process.StandardOutput.ReadLine();
-                if (line != null)
+                if (!string.IsNullOrEmpty(args.Data))
                 {
-                    _logger.Write(line);
+                    _logger.Write(args.Data);
                 }
-            }
+            };
 
+            process.ErrorDataReceived += (_, args) =>
+            {
+                if (!string.IsNullOrEmpty(args.Data))
+                {
+                    stderr.AppendLine(args.Data);
+                    _logger.Write(args.Data, LogType.Failure);
+                }
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
             process.WaitForExit();
-            Console.ResetColor();
 
-            // FIXME fill in more build step result properties?
-
-            var results = new BuildStepResults();
-            int exitCode = process.ExitCode;
-            if (exitCode == 0)
+            if (process.ExitCode == 0)
             {
                 results.IsSuccess = true;
-                results.Exception = new Exception("Build process exited abnormally");
+                _logger.Write("Shell command completed successfully.", LogType.Success);
             }
             else
             {
                 results.IsSuccess = false;
-            }
+                var errorMessage = new StringBuilder($"Shell command exited with code {process.ExitCode}.");
+                if (stderr.Length > 0)
+                {
+                    errorMessage.Append(' ').Append(stderr.ToString().Trim());
+                }
 
-            return results;
+                results.Exception = new InvalidOperationException(errorMessage.ToString());
+            }
         }
         catch (Exception e)
         {
-            return new BuildStepResults { IsSuccess = false, Exception = e };
+            results.IsSuccess = false;
+            results.Exception = e;
+            _logger.Write($"Shell command failed: {e.Message}", LogType.Failure);
         }
+
+        return results;
     }
 }
