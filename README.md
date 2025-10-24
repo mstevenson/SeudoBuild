@@ -6,6 +6,23 @@ Cake is a generalized distributed build system created with the Unity game engin
 
 SeudoBuild uses a JSON build configuration file that define project and target parameters.
 
+## Unity installation discovery
+
+Unity build steps attempt to locate the appropriate Unity editor automatically.
+On macOS the editor is discovered under `/Applications`, while on Windows and Linux the
+search starts from a set of common Unity Hub and standalone install locations.
+The lookup can be customized with the following environment variables:
+
+* `UNITY_WINDOWS_EDITOR_PATH` – full path to a specific `Unity.exe`.
+* `UNITY_WINDOWS_INSTALLATION_ROOT` – directory that contains Unity versions (for example `C\\Program Files\Unity\Hub\Editor`).
+* `UNITY_LINUX_EDITOR_PATH` – full path to the Unity binary on Linux.
+* `UNITY_LINUX_INSTALLATION_ROOT` – directory that contains Unity versions on Linux (for example `~/Unity/Hub/Editor`).
+
+When the root variables are provided, the build step expects each Unity version to reside in a
+subdirectory named after the version string (e.g. `2022.1.0f1`) with the editor binary located in
+`Editor/Unity[.exe]`.
+
+
 ## Modes
 
 ### Build

@@ -25,6 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.UnityBuild\SeudoCI.Pipeline.Modules.UnityBuild.csproj" />
       <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
       <ProjectReference Include="..\SeudoCI.Pipeline\SeudoCI.Pipeline.csproj" />
     </ItemGroup>
