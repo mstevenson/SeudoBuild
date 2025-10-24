@@ -3,7 +3,7 @@
 namespace SeudoCI.Pipeline.Modules.FTPDistribute;
 
 using FluentFTP;
-using Core;
+using SeudoCI.Core;
 
 public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
 {
@@ -28,8 +28,9 @@ public class FTPDistributeStep : IDistributeStep<FTPDistributeConfig>
             // Upload all archived files using modern async FTP client
             var uploadTask = UploadFilesAsync(archiveResults, workspace, results);
             uploadTask.GetAwaiter().GetResult();
-            
-            return new DistributeStepResults { IsSuccess = true };
+
+            results.IsSuccess = true;
+            return results;
         }
         catch (Exception e)
         {
