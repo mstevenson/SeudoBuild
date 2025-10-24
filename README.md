@@ -2,6 +2,16 @@
 
 Cake is a generalized distributed build system created with the Unity game engine in mind.
 
+## Prerequisites
+
+Use the provided helper script to install the required .NET SDK after cloning the repository on macOS or Linux:
+
+```bash
+./install-dotnet.sh
+```
+
+Set the `DOTNET_SDK_VERSION` environment variable if you need to pin to a specific SDK version. Pass `--help` for additional options.
+
 ## Configuration
 
 SeudoBuild uses a JSON build configuration file that define project and target parameters.
