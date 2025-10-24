@@ -2,6 +2,7 @@
 
 namespace SeudoCI.Pipeline.Modules.UnityBuild;
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using Core;
 
@@ -20,7 +21,7 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
 
     public abstract string? Type { get; }
 
-    protected abstract string GetBuildArgs(T config, ITargetWorkspace workspace);
+    protected abstract IReadOnlyList<string> GetBuildArgs(T config, ITargetWorkspace workspace);
 
     public BuildStepResults ExecuteStep(SourceSequenceResults vcsResults, ITargetWorkspace workspace)
     {
@@ -40,12 +41,18 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
         return buildResult;
     }
 
-    private BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, string arguments,
+    private BuildStepResults ExecuteUnity(UnityInstallation unityInstallation, IReadOnlyList<string> arguments,
         ITargetWorkspace workspace, string relativeUnityProjectFolder)
     {
-        if (!workspace.FileSystem.FileExists(unityInstallation.ExePath))
+        var exePath = unityInstallation.ExePath;
+        if (string.IsNullOrWhiteSpace(exePath))
         {
-            throw new Exception("Unity executable does not exist at path " + unityInstallation.ExePath);
+            throw new Exception("Unity executable path was not resolved.");
+        }
+
+        if (!workspace.FileSystem.FileExists(exePath))
+        {
+            throw new Exception("Unity executable does not exist at path " + exePath);
         }
 
         _logger.Write($"Building with Unity {unityInstallation.Version}", LogType.SmallBullet);
@@ -65,13 +72,17 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
 
         var startInfo = new ProcessStartInfo
         {
-            FileName = unityInstallation.ExePath,
-            Arguments = arguments,
+            FileName = exePath,
             WorkingDirectory = workspace.GetDirectory(TargetDirectory.Source),
             RedirectStandardOutput = true,
             CreateNoWindow = true,
             UseShellExecute = false
         };
+
+        foreach (var argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
 
         using var unityProcess = new Process();
         unityProcess.StartInfo = startInfo;
@@ -80,34 +91,27 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
         string now = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
         string logPath = $"{workspace.GetDirectory(TargetDirectory.Logs)}/Unity_Build_Log_{now}.txt";
                 
-        var writer = new StreamWriter(logPath);
-        try
+        using var writer = new StreamWriter(logPath);
+        unityProcess.OutputDataReceived += (sender, e) =>
         {
-            unityProcess.OutputDataReceived += (sender, e) =>
+            //Console.WriteLine(e.Data);
+            writer.WriteLine(e.Data);
+            writer.Flush();
+            string? logOutput = logParser.ProcessLogLine(e.Data);
+            if (logOutput != null)
             {
-                //Console.WriteLine(e.Data);
-                writer.WriteLine(e.Data);
-                writer.Flush();
-                string? logOutput = logParser.ProcessLogLine(e.Data);
-                if (logOutput != null)
-                {
-                    _logger.Write(logOutput, LogType.SmallBullet);
-                }
-            };
-                    
-            //unityProcess.ErrorDataReceived += (sender, e) =>
-            //{
-            //    // TODO return error
-            //};
-                    
-            unityProcess.Start();
-            unityProcess.BeginOutputReadLine();
-            unityProcess.WaitForExit();
-        }
-        finally
-        {
-            writer.Close();
-        }
+                _logger.Write(logOutput, LogType.SmallBullet);
+            }
+        };
+
+        //unityProcess.ErrorDataReceived += (sender, e) =>
+        //{
+        //    // TODO return error
+        //};
+
+        unityProcess.Start();
+        unityProcess.BeginOutputReadLine();
+        unityProcess.WaitForExit();
 
         var results = new BuildStepResults();
 

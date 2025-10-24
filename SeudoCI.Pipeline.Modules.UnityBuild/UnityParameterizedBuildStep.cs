@@ -6,7 +6,7 @@ public class UnityParameterizedBuildStep : UnityBuildStep<UnityParameterizedBuil
 {
     public override string? Type => "Unity Parameterized Build";
 
-    protected override string GetBuildArgs(UnityParameterizedBuildConfig config, ITargetWorkspace workspace)
+    protected override IReadOnlyList<string> GetBuildArgs(UnityParameterizedBuildConfig config, ITargetWorkspace workspace)
     {
         // FIXME match this to the Unity build script method name
         const string methodName = "Builder.RemoteBuild";
@@ -22,7 +22,7 @@ public class UnityParameterizedBuildStep : UnityBuildStep<UnityParameterizedBuil
             Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory),
             "-logfile",
             workspace.FileSystem.StandardOutputPath,
-            
+
             // Custom args
             "-executableName",
             config.ExecutableName,
@@ -70,8 +70,6 @@ public class UnityParameterizedBuildStep : UnityBuildStep<UnityParameterizedBuil
             args.Add(config.PostExportMethod);
         }
 
-        var argString = string.Join(" ", args.ToArray());
-
-        return argString;
+        return args;
     }
 }
