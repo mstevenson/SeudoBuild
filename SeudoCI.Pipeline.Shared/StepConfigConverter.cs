@@ -1,18 +1,16 @@
-﻿namespace SeudoCI.Pipeline;
+namespace SeudoCI.Pipeline;
 
 using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using SeudoCI.Core.Serialization;
 
-/// <inheritdoc />
 /// <summary>
-/// Converts a StepConfig object to and from a serialized JSON representation.
+/// Tracks the available configuration types for a specific <see cref="StepConfig"/> hierarchy.
 /// </summary>
-public class StepConfigConverter : JsonConverter
+public class StepConfigConverter : ITypeDiscriminator
 {
     private readonly Type _configBaseType;
-    private readonly Dictionary<string, Type> _configTypeMap = new Dictionary<string, Type>();
+    private readonly Dictionary<string, Type> _configTypeMap = new(StringComparer.OrdinalIgnoreCase);
 
     public StepConfigConverter(Type configBaseType)
     {
@@ -20,61 +18,44 @@ public class StepConfigConverter : JsonConverter
         {
             throw new ArgumentException("StepConfigConverter must be given a type that inherits from StepConfig");
         }
+
         _configBaseType = configBaseType;
     }
 
-    public void RegisterConfigType(string jsonName, Type type)
+    public Type BaseType => _configBaseType;
+
+    public IEnumerable<KeyValuePair<string, Type>> Mappings => _configTypeMap;
+
+    public void RegisterConfigType(string name, Type type)
     {
         if (!_configBaseType.IsAssignableFrom(type))
         {
             throw new ArgumentException($"Type {type} is not assignable from {_configBaseType}");
         }
-        _configTypeMap.Add(jsonName, type);
+
+        _configTypeMap.Add(name, type);
     }
 
-    public override bool CanConvert(Type objectType)
+    public bool TryResolve(string value, out Type type)
     {
-        return (objectType == _configBaseType);
-    }
-
-    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
-    {
-        JObject jobj = JObject.Load(reader);
-        string? jsonType = jobj["Type"]?.Value<string>();
-        if (jsonType == null)
+        if (_configTypeMap.TryGetValue(value, out var resolved))
         {
-            throw new Exception("Missing 'Type' property in step configuration");
+            type = resolved;
+            return true;
         }
-        bool found = _configTypeMap.TryGetValue(jsonType, out var configType);
 
-        if (found)
-        {
-            return jobj.ToObject(configType, serializer) ?? throw new Exception($"Failed to deserialize step configuration of type '{jsonType}'");
-        }
-        else
-        {
-            throw new Exception($"Could not deserialize pipeline step of type '{jsonType}'");
-        }
-    }
-
-    public override bool CanWrite
-    {
-        get { return false; }
-    }
-
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
-    {
-        throw new NotImplementedException();
+        type = null!;
+        return false;
     }
 }
 
-/// <inheritdoc />
 /// <summary>
-/// Converts a StepConfig object of the given subtype to and from
-/// a serialized JSON representation.
+/// Convenience helper to create a <see cref="StepConfigConverter"/> for a specific config type hierarchy.
 /// </summary>
 public class StepConfigConverter<T> : StepConfigConverter
     where T : StepConfig
 {
-    public StepConfigConverter() : base(typeof(T)) {}
+    public StepConfigConverter() : base(typeof(T))
+    {
+    }
 }

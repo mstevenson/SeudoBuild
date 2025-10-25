@@ -64,14 +64,14 @@ public class BuildController(
 
     private async Task<ProjectConfig> ProcessReceivedBuildRequestAsync(string? target)
     {
-        // Read JSON from request body
+        // Read YAML from request body
         using var reader = new StreamReader(Request.Body, Encoding.UTF8);
-        var json = await reader.ReadToEndAsync();
+        var yaml = await reader.ReadToEndAsync();
 
-        // Deserialize with custom converters
-        var converters = moduleLoader.Registry.GetJsonConverters();
+        // Deserialize with custom type discriminators
+        var discriminators = moduleLoader.Registry.GetStepConfigConverters();
         var serializer = new Serializer(filesystem);
-        var config = serializer.Deserialize<ProjectConfig>(json, converters);
+        var config = serializer.Deserialize<ProjectConfig>(yaml, discriminators);
 
         // Validate target exists if specified
         if (!string.IsNullOrEmpty(target))

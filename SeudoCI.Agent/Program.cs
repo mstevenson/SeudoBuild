@@ -108,8 +108,8 @@ public static class Program
         {
             var fs = new WindowsFileSystem();
             var serializer = new Serializer(fs);
-            var converters = moduleLoader.Registry.GetJsonConverters();
-            projectConfig = serializer.DeserializeFromFile<ProjectConfig>(opts.ProjectConfigPath, converters);
+            var discriminators = moduleLoader.Registry.GetStepConfigConverters();
+            projectConfig = serializer.DeserializeFromFile<ProjectConfig>(opts.ProjectConfigPath, discriminators);
         }
         catch (Exception e)
         {
@@ -184,10 +184,10 @@ public static class Program
         Console.Title = "SeudoCI • Submit";
         Console.WriteLine(Header);
 
-        string? configJson = null;
+        string? configYaml = null;
         try
         {
-            configJson = File.ReadAllText(opts.ProjectConfigPath);
+            configYaml = File.ReadAllText(opts.ProjectConfigPath);
         }
         catch
         {
@@ -202,7 +202,7 @@ public static class Program
         {
             // Find agent on the network, with timeout
             var discoveryClient = new AgentDiscoveryClient();
-            var success = buildSubmitter.SubmitAsync(discoveryClient, configJson, opts.BuildTarget, opts.AgentName).GetAwaiter().GetResult();
+            var success = buildSubmitter.SubmitAsync(discoveryClient, configYaml, opts.BuildTarget, opts.AgentName).GetAwaiter().GetResult();
             return success ? 0 : 1;
         }
         catch (Exception e)

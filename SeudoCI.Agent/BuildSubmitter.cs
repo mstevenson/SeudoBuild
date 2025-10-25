@@ -19,7 +19,7 @@ public class BuildSubmitter(ILogger logger, HttpClient httpClient)
     /// Submit the given project configuration and build target to a build
     /// agent on the network.
     /// </summary>
-    public async Task<bool> SubmitAsync(AgentDiscoveryClient agentDiscoveryClient, string projectJson, string target, string agentName, CancellationToken cancellationToken = default)
+    public async Task<bool> SubmitAsync(AgentDiscoveryClient agentDiscoveryClient, string projectYaml, string target, string agentName, CancellationToken cancellationToken = default)
     {
         logger.Write("Submitting build to " + agentName);
 
@@ -78,7 +78,7 @@ public class BuildSubmitter(ILogger logger, HttpClient httpClient)
         }
     }
 
-    private async Task<bool> SubmitBuildRequestAsync(string address, int port, string projectJson, string target, CancellationToken cancellationToken)
+    private async Task<bool> SubmitBuildRequestAsync(string address, int port, string projectYaml, string target, CancellationToken cancellationToken)
     {
         try
         {
@@ -87,7 +87,7 @@ public class BuildSubmitter(ILogger logger, HttpClient httpClient)
 
             logger.Write($"Sending build request to {requestUri}");
             
-            var content = new StringContent(projectJson, System.Text.Encoding.UTF8, "application/json");
+            var content = new StringContent(projectYaml, System.Text.Encoding.UTF8, "application/x-yaml");
             var response = await httpClient.PostAsync(requestUri, content, cancellationToken);
             
             if (response.IsSuccessStatusCode)

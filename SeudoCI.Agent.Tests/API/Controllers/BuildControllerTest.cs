@@ -48,12 +48,16 @@ public class BuildControllerTest
     public async Task BuildDefaultTarget_ValidProject_ReturnsBuildId()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject", "BuildTargets": [{"TargetName": "Debug"}]}""";
-        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectJson));
+        var projectYaml = """
+projectName: TestProject
+buildTargets:
+  - targetName: Debug
+""";
+        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectYaml));
         _mockHttpContext.Request.Body.Returns(requestBody);
 
         var mockRegistry = Substitute.For<IModuleRegistry>();
-        mockRegistry.GetJsonConverters().Returns([]);
+        mockRegistry.GetStepConfigConverters().Returns([]);
         _mockModuleLoader.Registry.Returns(mockRegistry);
 
         var mockSerializer = Substitute.For<Serializer>(_mockFileSystem);
@@ -87,12 +91,12 @@ public class BuildControllerTest
     public async Task BuildDefaultTarget_InvalidJson_ReturnsBadRequest()
     {
         // Arrange
-        var invalidJson = """{"invalid json}""";
-        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(invalidJson));
+        var invalidYaml = "projectName: [";
+        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(invalidYaml));
         _mockHttpContext.Request.Body.Returns(requestBody);
 
         var mockRegistry = Substitute.For<IModuleRegistry>();
-        mockRegistry.GetJsonConverters().Returns([]);
+        mockRegistry.GetStepConfigConverters().Returns([]);
         _mockModuleLoader.Registry.Returns(mockRegistry);
 
         // Act
@@ -107,12 +111,15 @@ public class BuildControllerTest
     public async Task BuildDefaultTarget_EmptyProjectName_ReturnsBadRequest()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "", "BuildTargets": []}""";
-        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectJson));
+        var projectYaml = """
+projectName: ""
+buildTargets: []
+""";
+        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectYaml));
         _mockHttpContext.Request.Body.Returns(requestBody);
 
         var mockRegistry = Substitute.For<IModuleRegistry>();
-        mockRegistry.GetJsonConverters().Returns([]);
+        mockRegistry.GetStepConfigConverters().Returns([]);
         _mockModuleLoader.Registry.Returns(mockRegistry);
 
         // Act
@@ -129,12 +136,16 @@ public class BuildControllerTest
     {
         // Arrange
         var target = "Release";
-        var projectJson = """{"ProjectName": "TestProject", "BuildTargets": [{"TargetName": "Release"}]}""";
-        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectJson));
+        var projectYaml = """
+projectName: TestProject
+buildTargets:
+  - targetName: Release
+""";
+        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectYaml));
         _mockHttpContext.Request.Body.Returns(requestBody);
 
         var mockRegistry = Substitute.For<IModuleRegistry>();
-        mockRegistry.GetJsonConverters().Returns([]);
+        mockRegistry.GetStepConfigConverters().Returns([]);
         _mockModuleLoader.Registry.Returns(mockRegistry);
 
         var projectConfig = new ProjectConfig 
@@ -169,12 +180,16 @@ public class BuildControllerTest
     {
         // Arrange
         var target = "NonExistentTarget";
-        var projectJson = """{"ProjectName": "TestProject", "BuildTargets": [{"TargetName": "Debug"}]}""";
-        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectJson));
+        var projectYaml = """
+projectName: TestProject
+buildTargets:
+  - targetName: Debug
+""";
+        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectYaml));
         _mockHttpContext.Request.Body.Returns(requestBody);
 
         var mockRegistry = Substitute.For<IModuleRegistry>();
-        mockRegistry.GetJsonConverters().Returns([]);
+        mockRegistry.GetStepConfigConverters().Returns([]);
         _mockModuleLoader.Registry.Returns(mockRegistry);
 
         // Act
@@ -191,12 +206,16 @@ public class BuildControllerTest
     {
         // Arrange
         var target = "Debug";
-        var projectJson = """{"ProjectName": "TestProject", "BuildTargets": [{"TargetName": "Debug"}]}""";
-        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectJson));
+        var projectYaml = """
+projectName: TestProject
+buildTargets:
+  - targetName: Debug
+""";
+        var requestBody = new MemoryStream(Encoding.UTF8.GetBytes(projectYaml));
         _mockHttpContext.Request.Body.Returns(requestBody);
 
         var mockRegistry = Substitute.For<IModuleRegistry>();
-        mockRegistry.GetJsonConverters().Returns([]);
+        mockRegistry.GetStepConfigConverters().Returns([]);
         _mockModuleLoader.Registry.Returns(mockRegistry);
 
         _mockBuildQueue.When(x => x.EnqueueBuild(Arg.Any<ProjectConfig>(), target))

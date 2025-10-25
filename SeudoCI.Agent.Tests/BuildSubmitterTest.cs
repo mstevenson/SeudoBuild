@@ -33,12 +33,12 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_StartsDiscoveryClient()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
 
         // Act
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         _mockDiscoveryClient.Received(1).Start();
@@ -49,7 +49,7 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_DiscoveryStartThrowsSocketException_ReturnsFalse()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
 
@@ -57,7 +57,7 @@ public class BuildSubmitterTest
             .Do(x => throw new System.Net.Sockets.SocketException(10048)); // Address already in use
 
         // Act
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         Assert.That(result, Is.False);
@@ -68,14 +68,14 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_CancellationRequested_ReturnsFalse()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
         var cts = new CancellationTokenSource();
         cts.Cancel();
 
         // Act
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName, cts.Token);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName, cts.Token);
 
         // Assert
         Assert.That(result, Is.False);
@@ -87,12 +87,12 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_NormalExecution_StopsDiscoveryClient()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
 
         // Act
-        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         _mockDiscoveryClient.Received(1).Stop();
@@ -102,12 +102,12 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_LogsExpectedMessages()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
 
         // Act
-        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         _mockLogger.Received(1).Write("Submitting build to test-agent");
@@ -120,14 +120,14 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_WithTimeout_CompletesWithinReasonableTime()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
 
         // Act
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName, cts.Token);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName, cts.Token);
         stopwatch.Stop();
 
         // Assert
@@ -140,12 +140,12 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_WithEmptyAgentName_StillProcesses()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "";
 
         // Act
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         Assert.That(result, Is.False);
@@ -158,12 +158,12 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_WithNullTarget_StillProcesses()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         string target = null;
         var agentName = "test-agent";
 
         // Act
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         Assert.That(result, Is.False);
@@ -176,12 +176,12 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_WithSpecialCharactersInAgentName_HandlesCorrectly()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent-123_special.name";
 
         // Act
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         Assert.That(result, Is.False);
@@ -192,13 +192,13 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_MultipleCalls_EachCallStartsAndStopsDiscovery()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
 
         // Act
-        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
-        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
+        await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         _mockDiscoveryClient.Received(2).Start();
@@ -210,7 +210,7 @@ public class BuildSubmitterTest
     public async Task SubmitAsync_DiscoveryThrowsException_StillStopsDiscovery()
     {
         // Arrange
-        var projectJson = """{"ProjectName": "TestProject"}""";
+        var projectYaml = "projectName: TestProject";
         var target = "Debug";
         var agentName = "test-agent";
 
@@ -218,7 +218,7 @@ public class BuildSubmitterTest
             .Do(x => throw new InvalidOperationException("Discovery error"));
 
         // Act
-        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectJson, target, agentName);
+        var result = await _buildSubmitter.SubmitAsync(_mockDiscoveryClient, projectYaml, target, agentName);
 
         // Assert
         Assert.That(result, Is.False);

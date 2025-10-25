@@ -79,7 +79,7 @@ public class ModuleRegistry : IModuleRegistry
         }
     }
 
-    public StepConfigConverter[] GetJsonConverters()
+    public StepConfigConverter[] GetStepConfigConverters()
     {
         var converters = new Dictionary<Type, StepConfigConverter>();
         foreach (var category in _moduleCategories)
