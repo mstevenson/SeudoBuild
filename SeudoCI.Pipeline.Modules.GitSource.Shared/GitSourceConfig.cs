@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Pipeline.Modules.GitSource;
+﻿using System.Collections.Generic;
+
+namespace SeudoCI.Pipeline.Modules.GitSource;
 
 /// <summary>
 /// Configuration values for a source pipeline step that clones a git repository.
@@ -72,4 +74,10 @@ public class GitSourceConfig : SourceStepConfig
     /// Only used when EnableSparseCheckout is true.
     /// </summary>
     public List<string> SparseCheckoutPaths { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Optional SSH known_hosts entries that should be pre-populated before connecting.
+    /// Entries must use the standard known_hosts format.
+    /// </summary>
+    public List<string> KnownHostsEntries { get; set; } = new List<string>();
 }
