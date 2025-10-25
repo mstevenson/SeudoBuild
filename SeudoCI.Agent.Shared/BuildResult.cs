@@ -10,6 +10,7 @@ public class BuildResult
     public enum Status
     {
         Queued,
+        Running,
         Complete,
         Failed,
         Cancelled

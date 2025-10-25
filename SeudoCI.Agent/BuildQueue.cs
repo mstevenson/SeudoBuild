@@ -73,8 +73,32 @@ public class BuildQueue(Builder builder, IModuleLoader moduleLoader, ILogger log
                     logger.QueueNotification($"Building project '{build.ProjectConfiguration.ProjectName}', {printableTarget}");
 
                     ActiveBuild = build;
-                    var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputPath }, logger);
-                    builder.Build(pipeline, ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName ?? string.Empty);
+                    build.BuildStatus = BuildResult.Status.Running;
+
+                    try
+                    {
+                        var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputPath }, logger);
+                        var success = builder.Build(pipeline, build.ProjectConfiguration, build.TargetName ?? string.Empty);
+
+                        if (build.BuildStatus == BuildResult.Status.Cancelled)
+                        {
+                            continue;
+                        }
+
+                        build.BuildStatus = success ? BuildResult.Status.Complete : BuildResult.Status.Failed;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (build.BuildStatus != BuildResult.Status.Cancelled)
+                        {
+                            build.BuildStatus = BuildResult.Status.Failed;
+                            logger.QueueNotification($"Build failed for project '{build.ProjectConfiguration.ProjectName}': {ex.Message}");
+                        }
+                    }
+                    finally
+                    {
+                        ActiveBuild = null;
+                    }
                 }
             }
             Thread.Sleep(200);

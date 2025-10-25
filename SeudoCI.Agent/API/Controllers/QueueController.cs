@@ -26,7 +26,7 @@ public class QueueController(IBuildQueue buildQueue) : ControllerBase
                 Builds = results,
                 TotalBuilds = results.Length,
                 QueuedBuilds = results.Count(r => r.BuildStatus == BuildResult.Status.Queued),
-                RunningBuilds = 0, // TODO: Add Running status to BuildResult.Status enum
+                RunningBuilds = results.Count(r => r.BuildStatus == BuildResult.Status.Running),
                 CompletedBuilds = results.Count(r => r.BuildStatus == BuildResult.Status.Complete || r.BuildStatus == BuildResult.Status.Cancelled)
             };
             return Ok(response);

@@ -53,33 +53,40 @@ public class QueueControllerTest
         var projectConfig = new ProjectConfig { ProjectName = "TestProject" };
         var builds = new[]
         {
-            new BuildResult 
-            { 
-                Id = 1, 
-                ProjectConfiguration = projectConfig, 
+            new BuildResult
+            {
+                Id = 1,
+                ProjectConfiguration = projectConfig,
                 TargetName = "Debug",
-                BuildStatus = BuildResult.Status.Queued 
+                BuildStatus = BuildResult.Status.Queued
             },
-            new BuildResult 
-            { 
-                Id = 2, 
-                ProjectConfiguration = projectConfig, 
+            new BuildResult
+            {
+                Id = 2,
+                ProjectConfiguration = projectConfig,
                 TargetName = "Release",
-                BuildStatus = BuildResult.Status.Complete 
+                BuildStatus = BuildResult.Status.Complete
             },
-            new BuildResult 
-            { 
-                Id = 3, 
-                ProjectConfiguration = projectConfig, 
+            new BuildResult
+            {
+                Id = 3,
+                ProjectConfiguration = projectConfig,
                 TargetName = "Test",
-                BuildStatus = BuildResult.Status.Cancelled 
+                BuildStatus = BuildResult.Status.Cancelled
             },
-            new BuildResult 
-            { 
-                Id = 4, 
-                ProjectConfiguration = projectConfig, 
+            new BuildResult
+            {
+                Id = 4,
+                ProjectConfiguration = projectConfig,
                 TargetName = "Deploy",
-                BuildStatus = BuildResult.Status.Failed 
+                BuildStatus = BuildResult.Status.Failed
+            },
+            new BuildResult
+            {
+                Id = 5,
+                ProjectConfiguration = projectConfig,
+                TargetName = "Hotfix",
+                BuildStatus = BuildResult.Status.Running
             }
         };
         _mockBuildQueue.GetAllBuildResults().Returns(builds);
@@ -97,11 +104,11 @@ public class QueueControllerTest
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
         
-        Assert.That(root.GetProperty("TotalBuilds").GetInt32(), Is.EqualTo(4));
+        Assert.That(root.GetProperty("TotalBuilds").GetInt32(), Is.EqualTo(5));
         Assert.That(root.GetProperty("QueuedBuilds").GetInt32(), Is.EqualTo(1)); // Only the Queued status
-        Assert.That(root.GetProperty("RunningBuilds").GetInt32(), Is.EqualTo(0)); // No Running status in current enum
+        Assert.That(root.GetProperty("RunningBuilds").GetInt32(), Is.EqualTo(1));
         Assert.That(root.GetProperty("CompletedBuilds").GetInt32(), Is.EqualTo(2)); // Complete + Cancelled
-        Assert.That(root.GetProperty("Builds").GetArrayLength(), Is.EqualTo(4));
+        Assert.That(root.GetProperty("Builds").GetArrayLength(), Is.EqualTo(5));
         
         // Verify build results (access through the original response)
         var originalResponse = okResult.Value!;
