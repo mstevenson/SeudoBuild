@@ -83,8 +83,11 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
             cancellationToken);
         var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults,
             targetWorkspace, cancellationToken);
-        var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, targetWorkspace,
-            cancellationToken);
+
+        var pipelineRunResults = new PipelineRunResults(sourceResults, buildResults, archiveResults, distributeResults);
+        bool shouldRunNotifyOnFailure = pipeline.TargetConfig.NotifySteps.Any(step => step.RunOnFailure);
+        var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), pipelineRunResults, targetWorkspace,
+            cancellationToken, shouldRunNotifyOnFailure);
 
         // Determine overall pipeline success
         bool overallSuccess = sourceResults.IsSuccess && buildResults.IsSuccess && archiveResults.IsSuccess && distributeResults.IsSuccess && notifyResults.IsSuccess;
@@ -154,7 +157,7 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
     // Pipeline execution step that had a step before it
     private TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string? sequenceName,
         IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence,
-        ITargetWorkspace workspace, CancellationToken cancellationToken)
+        ITargetWorkspace workspace, CancellationToken cancellationToken, bool allowExecutionOnPreviousFailure = false)
         where TInSeq : PipelineSequenceResults // previous sequence results
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
@@ -171,25 +174,35 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         // Verify that the pipeline has not previously failed
         if (!previousSequence.IsSuccess)
         {
-            logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
-            logger.IndentLevel--;
-            results = new TOutSeq
+            if (!allowExecutionOnPreviousFailure)
             {
-                IsSuccess = false,
-                Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.")
-            };
-            return results;
+                logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
+                logger.IndentLevel--;
+                results = new TOutSeq
+                {
+                    IsSuccess = false,
+                    Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.")
+                };
+                return results;
+            }
+
+            logger.Write("Previous pipeline sequence failed, continuing execution due to configuration", LogType.Alert);
         }
 
         if (previousSequence.IsSkipped)
         {
-            logger.Write($"Skipping {sequenceName} sequence, previous sequence was skipped.", LogType.Alert);
-            logger.IndentLevel--;
-            return new TOutSeq
+            if (!allowExecutionOnPreviousFailure)
             {
-                IsSuccess = true,
-                IsSkipped = true
-            };
+                logger.Write($"Skipping {sequenceName} sequence, previous sequence was skipped.", LogType.Alert);
+                logger.IndentLevel--;
+                return new TOutSeq
+                {
+                    IsSuccess = true,
+                    IsSkipped = true
+                };
+            }
+
+            logger.Write($"Previous sequence was skipped, continuing {sequenceName} due to configuration", LogType.Alert);
         }
 
         // Run the sequence
