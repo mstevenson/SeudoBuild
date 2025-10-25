@@ -4,6 +4,7 @@ namespace SeudoCI.Pipeline.Modules.UnityBuild;
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using Core;
 
 public abstract class UnityBuildStep<T> : IBuildStep<T>
@@ -75,6 +76,7 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
             FileName = exePath,
             WorkingDirectory = workspace.GetDirectory(TargetDirectory.Source),
             RedirectStandardOutput = true,
+            RedirectStandardError = true,
             CreateNoWindow = true,
             UseShellExecute = false
         };
@@ -92,11 +94,22 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
         string logPath = $"{workspace.GetDirectory(TargetDirectory.Logs)}/Unity_Build_Log_{now}.txt";
                 
         using var writer = new StreamWriter(logPath);
+        var stderr = new StringBuilder();
+        var writerLock = new object();
+
         unityProcess.OutputDataReceived += (sender, e) =>
         {
-            //Console.WriteLine(e.Data);
-            writer.WriteLine(e.Data);
-            writer.Flush();
+            if (e.Data == null)
+            {
+                return;
+            }
+
+            lock (writerLock)
+            {
+                writer.WriteLine(e.Data);
+                writer.Flush();
+            }
+
             string? logOutput = logParser.ProcessLogLine(e.Data);
             if (logOutput != null)
             {
@@ -104,25 +117,63 @@ public abstract class UnityBuildStep<T> : IBuildStep<T>
             }
         };
 
-        //unityProcess.ErrorDataReceived += (sender, e) =>
-        //{
-        //    // TODO return error
-        //};
+        var errorDetected = false;
+
+        unityProcess.ErrorDataReceived += (_, e) =>
+        {
+            if (string.IsNullOrEmpty(e.Data))
+            {
+                return;
+            }
+
+            lock (writerLock)
+            {
+                writer.WriteLine(e.Data);
+                writer.Flush();
+            }
+
+            stderr.AppendLine(e.Data);
+            errorDetected = true;
+            _logger.Write(e.Data, LogType.Failure);
+        };
 
         unityProcess.Start();
         unityProcess.BeginOutputReadLine();
+        unityProcess.BeginErrorReadLine();
         unityProcess.WaitForExit();
 
         var results = new BuildStepResults();
 
-        if (unityProcess.ExitCode == 0)
+        if (unityProcess.ExitCode == 0 && !errorDetected)
         {
             results.IsSuccess = true;
         }
         else
         {
             results.IsSuccess = false;
-            results.Exception = new Exception("Build process exited abnormally");
+            var errorMessage = new StringBuilder();
+
+            if (unityProcess.ExitCode != 0)
+            {
+                errorMessage.Append($"Build process exited with code {unityProcess.ExitCode}.");
+            }
+
+            if (stderr.Length > 0)
+            {
+                if (errorMessage.Length > 0)
+                {
+                    errorMessage.Append(' ');
+                }
+
+                errorMessage.Append(stderr.ToString().Trim());
+            }
+
+            if (errorMessage.Length == 0)
+            {
+                errorMessage.Append("Build process exited abnormally");
+            }
+
+            results.Exception = new Exception(errorMessage.ToString());
         }
 
         return results;
