@@ -8,5 +8,5 @@ public class ProjectConfig
 {
     public string ProjectName { get; set; } = string.Empty;
         
-    public List<BuildTargetConfig> BuildTargets { get; } = [];
+    public List<BuildTargetConfig> BuildTargets { get; set; } = [];
 }

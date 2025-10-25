@@ -34,7 +34,7 @@ public class MockFile
 
     public byte[] Data { get; private set; }
 
-    private MockMemoryStream _writeStream;
+    private MockMemoryStream? _writeStream;
 
     public MockFile()
     {
@@ -48,15 +48,18 @@ public class MockFile
 
     public Stream OpenRead()
     {
-        _writeStream.Flush();
-        Data = _writeStream.ToArray();
+        if (_writeStream is { CanWrite: true })
+        {
+            _writeStream.Flush();
+            Data = _writeStream.ToArray();
+        }
         var readStream = new MockMemoryStream(Data, OnFlush);
         return readStream;
     }
 
     public Stream OpenWrite()
     {
-        if (_writeStream.CanWrite)
+        if (_writeStream is { CanWrite: true })
         {
             throw new IOException("Can't write to mock file, the mock file stream is already open");
         }

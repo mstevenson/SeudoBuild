@@ -2,6 +2,7 @@
 
 namespace SeudoCI.Pipeline;
 
+using System;
 using System.Reflection;
 using System.Diagnostics;
 using Core;
@@ -19,7 +20,9 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
         try
         {
             // Get all module interface types using reflection instead of hard-coded names
-            Assembly coreAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name.Equals(PipelineAssemblyName));
+            Assembly coreAssembly = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Single(x => string.Equals(x.GetName().Name, PipelineAssemblyName, StringComparison.Ordinal));
             var moduleInterfaceTypes = coreAssembly.GetTypes()
                 .Where(t => t.IsInterface && typeof(IModule).IsAssignableFrom(t) && t != typeof(IModule))
                 .Where(t => t.GetCustomAttribute<ModuleCategoryAttribute>() != null);
@@ -99,7 +102,7 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
         DebugWrite("");
     }
 
-    public T CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace, ILogger logger)
+    public T? CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace, ILogger logger)
         where T : IPipelineStep
     {
         foreach (var module in Registry.GetModulesForStepType<T>())
@@ -127,20 +130,29 @@ public class ModuleLoader(ILogger logger) : IModuleLoader
             try
             {
                 var pipelineStepObj = Activator.CreateInstance(module.StepType);
+                if (pipelineStepObj == null)
+                {
+                    logger.Write($"Loading module step failed:\n Unable to create instance of {module.StepType}", LogType.Failure);
+                    continue;
+                }
 
                 // Initialize the pipeline step with the config object
                 var method = pipelineStepWithConfigType.GetMethod("Initialize");
                 method?.Invoke(pipelineStepObj, [config, workspace, logger]);
 
-                var step = (T)pipelineStepObj;
-                return step;
+                if (pipelineStepObj is T step)
+                {
+                    return step;
+                }
+
+                logger.Write($"Loading module step failed:\n Created instance of {module.StepType} does not implement {typeof(T)}", LogType.Failure);
             }
             catch (TypeLoadException e)
             {
                 logger.Write($"Loading module step failed:\n {e.Message}", LogType.Failure);
             }
         }
-        return default(T);
+        return default;
     }
 
     [Conditional("DEBUG_ASSEMBLIES")]
