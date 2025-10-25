@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Core;
 using Core.FileSystems;
 
@@ -12,7 +13,8 @@ using Core.FileSystems;
 /// </summary>
 public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRunner
 {
-    public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, IModuleLoader moduleLoader)
+    public void ExecutePipeline(ProjectConfig projectConfig, string buildTargetName, IModuleLoader moduleLoader,
+        CancellationToken cancellationToken = default)
     {
         if (projectConfig == null)
         {
@@ -22,6 +24,8 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         {
             throw new ArgumentNullException(nameof(buildTargetName), "A build target name must be specified.");
         }
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         BuildTargetConfig? targetConfig = projectConfig.BuildTargets.FirstOrDefault(t => t.TargetName == buildTargetName);
         if (targetConfig == null)
@@ -66,16 +70,21 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         targetWorkspace.CleanDirectory(TargetDirectory.Output);
 
         // Run pipeline
-        var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), targetWorkspace);
+        var sourceResults = ExecuteSequence("Update Source", pipeline.GetPipelineSteps<ISourceStep>(), targetWorkspace,
+            cancellationToken);
         if (sourceResults.StepResults.Count > 0 && sourceResults.StepResults[0] != null && !string.IsNullOrEmpty(sourceResults.StepResults[0].CommitIdentifier)) 
         {
             targetWorkspace.Macros["commit_id"] = sourceResults.StepResults[0].CommitIdentifier;
         }
         
-        var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, targetWorkspace);
-        var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, targetWorkspace);
-        var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults, targetWorkspace);
-        var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, targetWorkspace);
+        var buildResults = ExecuteSequence("Build", pipeline.GetPipelineSteps<IBuildStep>(), sourceResults, targetWorkspace,
+            cancellationToken);
+        var archiveResults = ExecuteSequence("Archive", pipeline.GetPipelineSteps<IArchiveStep>(), buildResults, targetWorkspace,
+            cancellationToken);
+        var distributeResults = ExecuteSequence("Distribute", pipeline.GetPipelineSteps<IDistributeStep>(), archiveResults,
+            targetWorkspace, cancellationToken);
+        var notifyResults = ExecuteSequence("Notify", pipeline.GetPipelineSteps<INotifyStep>(), distributeResults, targetWorkspace,
+            cancellationToken);
 
         // Determine overall pipeline success
         bool overallSuccess = sourceResults.IsSuccess && buildResults.IsSuccess && archiveResults.IsSuccess && distributeResults.IsSuccess && notifyResults.IsSuccess;
@@ -121,11 +130,15 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
     }
 
     // First step of pipeline execution
-    private TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string? sequenceName, IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, ITargetWorkspace workspace)
+    private TOutSeq ExecuteSequence<TOutSeq, TOutStep>(string? sequenceName,
+        IReadOnlyCollection<IPipelineStep<TOutSeq, TOutStep>> sequenceSteps, ITargetWorkspace workspace,
+        CancellationToken cancellationToken)
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
     {
         // Initialize the sequence
+        cancellationToken.ThrowIfCancellationRequested();
+
         TOutSeq results = InitializeSequence<TOutSeq>(sequenceName, sequenceSteps);
         if (!results.IsSuccess || results.IsSkipped)
         {
@@ -133,20 +146,22 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         }
 
         // Run the sequence
-        results = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TOutSeq, TOutStep>>(sequenceName, sequenceSteps, (step) =>
-        {
-            return step.ExecuteStep(workspace);
-        });
+        results = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TOutSeq, TOutStep>>(sequenceName, sequenceSteps,
+            cancellationToken, step => step.ExecuteStep(workspace));
         return results;
     }
 
     // Pipeline execution step that had a step before it
-    private TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string? sequenceName, IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence, ITargetWorkspace workspace)
+    private TOutSeq ExecuteSequence<TInSeq, TOutSeq, TOutStep>(string? sequenceName,
+        IReadOnlyCollection<IPipelineStep<TInSeq, TOutSeq, TOutStep>> sequenceSteps, TInSeq previousSequence,
+        ITargetWorkspace workspace, CancellationToken cancellationToken)
         where TInSeq : PipelineSequenceResults // previous sequence results
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
     {
         // Initialize the sequence
+        cancellationToken.ThrowIfCancellationRequested();
+
         TOutSeq results = InitializeSequence<TOutSeq>(sequenceName, sequenceSteps);
         if (!results.IsSuccess || results.IsSkipped)
         {
@@ -179,11 +194,13 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
 
         // Run the sequence
         results = ExecuteSequenceInternal<TOutSeq, TOutStep, IPipelineStep<TInSeq, TOutSeq, TOutStep>>(sequenceName,
-            sequenceSteps, step => step.ExecuteStep(previousSequence, workspace));
+            sequenceSteps, cancellationToken, step => step.ExecuteStep(previousSequence, workspace));
         return results;
     }
 
-    private TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string? sequenceName, IReadOnlyCollection<TPipeStep> sequenceSteps, Func<TPipeStep, TOutStep?> stepExecuteCallback)
+    private TOutSeq ExecuteSequenceInternal<TOutSeq, TOutStep, TPipeStep>(string? sequenceName,
+        IReadOnlyCollection<TPipeStep> sequenceSteps, CancellationToken cancellationToken,
+        Func<TPipeStep, TOutStep?> stepExecuteCallback)
         where TOutSeq : PipelineSequenceResults<TOutStep>, new() // current sequence results
         where TOutStep : PipelineStepResults, new() // current step results
         where TPipeStep : class, IPipelineStep
@@ -196,6 +213,7 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
 
         foreach (var step in sequenceSteps)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             logger.Write(step.Type, LogType.Bullet);
             logger.IndentLevel++;
 

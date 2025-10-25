@@ -1,5 +1,6 @@
 ﻿namespace SeudoCI.Agent;
 
+using System.Threading;
 using Pipeline;
 using Core;
 
@@ -18,7 +19,8 @@ public class Builder(IModuleLoader moduleLoader, ILogger logger)
     /// <summary>
     /// Execute a build for the given project and target.
     /// </summary>
-    public bool Build(IPipelineRunner pipeline, ProjectConfig projectConfig, string target)
+    public bool Build(IPipelineRunner pipeline, ProjectConfig projectConfig, string target,
+        CancellationToken cancellationToken = default)
     {
         if (projectConfig == null)
         {
@@ -40,9 +42,18 @@ public class Builder(IModuleLoader moduleLoader, ILogger logger)
 
         // Execute build
         IsRunning = true;
-        pipeline.ExecutePipeline(projectConfig, target, moduleLoader);
-        IsRunning = false;
-            
-        return true;
+        try
+        {
+            pipeline.ExecutePipeline(projectConfig, target, moduleLoader, cancellationToken);
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+        finally
+        {
+            IsRunning = false;
+        }
     }
 }

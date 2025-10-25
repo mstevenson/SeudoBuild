@@ -1,5 +1,6 @@
 namespace SeudoCI.Agent.Tests;
 
+using System.Threading;
 using NSubstitute;
 using Pipeline;
 using Core;
@@ -51,6 +52,6 @@ public class BuilderTest
 
         builder.Build(_mockPipeline, config, target);
             
-        _mockPipeline.Received().ExecutePipeline(config, target, _mockLoader);
+        _mockPipeline.Received().ExecutePipeline(config, target, _mockLoader, Arg.Any<CancellationToken>());
     }
 }
