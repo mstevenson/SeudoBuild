@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Core.Tests;
+﻿using System.Text;
+
+namespace SeudoCI.Core.Tests;
 
 /// <summary>
 /// A file stream that isn't closed after reading or writing, and flushes to a byte array.
@@ -34,7 +36,7 @@ public class MockFile
 
     public byte[] Data { get; private set; }
 
-    private MockMemoryStream _writeStream;
+    private MockMemoryStream? _writeStream;
 
     public MockFile()
     {
@@ -48,15 +50,18 @@ public class MockFile
 
     public Stream OpenRead()
     {
-        _writeStream.Flush();
-        Data = _writeStream.ToArray();
-        var readStream = new MockMemoryStream(Data, OnFlush);
-        return readStream;
+        if (_writeStream is { })
+        {
+            _writeStream.Flush();
+            Data = _writeStream.ToArray();
+        }
+
+        return new MockMemoryStream(Data, OnFlush);
     }
 
     public Stream OpenWrite()
     {
-        if (_writeStream.CanWrite)
+        if (_writeStream is { CanWrite: true })
         {
             throw new IOException("Can't write to mock file, the mock file stream is already open");
         }
@@ -76,7 +81,8 @@ public class MockFile
 /// </summary>
 public class MockFileSystem : IFileSystem
 {
-    private readonly Dictionary<string, MockFile> _allFiles = new Dictionary<string, MockFile>();
+    private readonly Dictionary<string, MockFile> _allFiles = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _directories = new(StringComparer.Ordinal);
 
     public string TemporaryFilesPath => "/temp";
 
@@ -87,10 +93,12 @@ public class MockFileSystem : IFileSystem
     public IEnumerable<string> GetFiles(string directoryPath, string? searchPattern = null)
     {
         var foundFiles = new List<string>();
+        var normalizedDirectory = NormalizePath(directoryPath);
+
         foreach (var file in _allFiles.Keys)
         {
             // TODO implement search string
-            if (file.StartsWith(directoryPath))
+            if (file.StartsWith(normalizedDirectory, StringComparison.Ordinal))
             {
                 foundFiles.Add(file);
             }
@@ -100,101 +108,142 @@ public class MockFileSystem : IFileSystem
 
     public bool FileExists(string path)
     {
-        return _allFiles.ContainsKey(path);
+        return _allFiles.ContainsKey(NormalizePath(path));
     }
 
     public void MoveFile(string source, string destination)
     {
-        if (!_allFiles.ContainsKey(source))
+        var normalizedSource = NormalizePath(source);
+        var normalizedDestination = NormalizePath(destination);
+
+        if (!_allFiles.ContainsKey(normalizedSource))
         {
             throw new FileNotFoundException("Couldn't move file, source file does not exist: " + source);
         }
-        if (_allFiles.ContainsKey(destination))
+        if (_allFiles.ContainsKey(normalizedDestination))
         {
             throw new IOException("Destination exists, could not move file");
         }
-        var data = _allFiles[source];
-        _allFiles.Remove(source);
-        _allFiles.Add(destination, data);
+        var data = _allFiles[normalizedSource];
+        _allFiles.Remove(normalizedSource);
+        _allFiles.Add(normalizedDestination, data);
     }
 
     public void CopyFile(string source, string destination)
     {
-        if (!_allFiles.ContainsKey(source))
+        var normalizedSource = NormalizePath(source);
+        var normalizedDestination = NormalizePath(destination);
+
+        if (!_allFiles.ContainsKey(normalizedSource))
         {
             throw new FileNotFoundException("Could not copy file, it does not exist: " + source);
         }
         // Overwrite old file
-        if (_allFiles.ContainsKey(destination))
+        if (_allFiles.ContainsKey(normalizedDestination))
         {
-            _allFiles.Remove(destination);
+            _allFiles.Remove(normalizedDestination);
         }
-        byte[] originalData = _allFiles[source].Data;
+        byte[] originalData = _allFiles[normalizedSource].Data;
         int length = originalData.Length;
         byte[] dataCopy = new byte[length];
         Array.Copy(originalData, dataCopy, length);
-        _allFiles.Add(destination, new MockFile(dataCopy));
+        _allFiles.Add(normalizedDestination, new MockFile(dataCopy));
     }
 
     public void DeleteFile(string path)
     {
-        if (_allFiles.ContainsKey(path))
+        var normalizedPath = NormalizePath(path);
+        if (_allFiles.ContainsKey(normalizedPath))
         {
-            _allFiles.Remove(path);
+            _allFiles.Remove(normalizedPath);
         }
     }
 
     public void ReplaceFile(string source, string destination, string backupDestination)
     {
-        if (_allFiles.ContainsKey(destination))
+        var normalizedSource = NormalizePath(source);
+        var normalizedDestination = NormalizePath(destination);
+        var normalizedBackupDestination = NormalizePath(backupDestination);
+
+        if (_allFiles.ContainsKey(normalizedDestination))
         {
-            _allFiles[backupDestination] = _allFiles[destination];
+            _allFiles[normalizedBackupDestination] = _allFiles[normalizedDestination];
         }
-        _allFiles[destination] = _allFiles[source];
+        _allFiles[normalizedDestination] = _allFiles[normalizedSource];
     }
 
     public IEnumerable<string> GetDirectories(string directoryPath, string? searchPattern = null)
     {
-        throw new NotImplementedException();
+        var normalizedDirectory = NormalizePath(directoryPath).TrimEnd('/');
+        var prefix = normalizedDirectory.Length == 0 ? string.Empty : normalizedDirectory + "/";
+
+        return _directories
+            .Where(dir => dir.Equals(normalizedDirectory, StringComparison.Ordinal)
+                          || dir.StartsWith(prefix, StringComparison.Ordinal))
+            .ToList();
     }
 
     public bool DirectoryExists(string directoryPath)
     {
-        throw new NotImplementedException();
+        var normalizedDirectory = NormalizePath(directoryPath);
+        return _directories.Contains(normalizedDirectory);
     }
 
     public void CreateDirectory(string directoryPath)
     {
-        throw new NotImplementedException();
+        var normalizedDirectory = NormalizePath(directoryPath);
+        _directories.Add(normalizedDirectory);
     }
 
     public void DeleteDirectory(string directoryPath)
     {
-        throw new NotImplementedException();
+        var normalizedDirectory = NormalizePath(directoryPath).TrimEnd('/');
+        var prefix = normalizedDirectory.Length == 0 ? string.Empty : normalizedDirectory + "/";
+
+        _directories.RemoveWhere(dir => dir.Equals(normalizedDirectory, StringComparison.Ordinal)
+                                        || dir.StartsWith(prefix, StringComparison.Ordinal));
+
+        var filesToRemove = _allFiles.Keys
+            .Where(file => file.Equals(normalizedDirectory, StringComparison.Ordinal)
+                           || file.StartsWith(prefix, StringComparison.Ordinal))
+            .ToList();
+
+        foreach (var file in filesToRemove)
+        {
+            _allFiles.Remove(file);
+        }
     }
 
     public Stream OpenRead(string path)
     {
-        if (!_allFiles.ContainsKey(path))
+        var normalizedPath = NormalizePath(path);
+
+        if (!_allFiles.ContainsKey(normalizedPath))
         {
             throw new FileNotFoundException("File not found: " + path);
         }
-        var file = _allFiles[path].OpenRead();
-        return file;
+        return _allFiles[normalizedPath].OpenRead();
     }
 
     public Stream OpenWrite(string path)
     {
-        if (!_allFiles.TryGetValue(path, out var file))
+        var normalizedPath = NormalizePath(path);
+
+        if (!_allFiles.TryGetValue(normalizedPath, out var file))
         {
             file = new MockFile();
-            _allFiles.Add(path, file);
+            _allFiles.Add(normalizedPath, file);
         }
         return file.OpenWrite();
     }
 
     public void WriteAllText(string path, string contents)
     {
-        throw new NotImplementedException();
+        _allFiles[NormalizePath(path)] = new MockFile(Encoding.UTF8.GetBytes(contents));
+    }
+
+    private static string NormalizePath(string path)
+    {
+        return path.Replace('\\', '/');
     }
 }
