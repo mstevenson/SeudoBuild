@@ -2,10 +2,14 @@
 
 namespace SeudoCI.Pipeline.Modules.GitSource;
 
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Core;
 
 public class GitSourceStep : ISourceStep<GitSourceConfig>
@@ -13,6 +17,9 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     private GitSourceConfig _config = null!;
     private ITargetWorkspace _workspace = null!;
     private ILogger _logger = null!;
+    private Uri? _repositoryUri;
+    private bool _knownHostsInitialized;
+    private static readonly UTF8Encoding Utf8NoBom = new UTF8Encoding(false);
 
     public string Type => "Git";
 
@@ -22,6 +29,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         _config = config;
         _workspace = workspace;
         _logger = logger;
+        _repositoryUri = null;
+        _knownHostsInitialized = false;
     }
     
     public SourceStepResults ExecuteStep(ITargetWorkspace workspace)
@@ -106,6 +115,8 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             throw new ArgumentException($"Invalid repository URL format"); // Don't expose the actual URL in error
         }
 
+        _repositoryUri = uri;
+
         // Restrict allowed URL schemes - remove insecure git:// protocol
         var allowedSchemes = new[] { "http", "https", "ssh" };
         if (!allowedSchemes.Contains(uri.Scheme.ToLowerInvariant()))
@@ -133,6 +144,11 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
 
         // Validate authentication credentials
         ValidateAuthenticationCredentials();
+
+        if (_config.KnownHostsEntries?.Count > 0)
+        {
+            ValidateKnownHostsEntries(_config.KnownHostsEntries);
+        }
 
         if (_config.UseLFS && !IsLFSAvailable())
         {
@@ -311,6 +327,34 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             if (Path.IsPathRooted(path))
             {
                 throw new ArgumentException($"Absolute paths are not allowed in sparse checkout: {path}");
+            }
+        }
+    }
+
+    private static void ValidateKnownHostsEntries(IEnumerable<string> entries)
+    {
+        foreach (var entry in entries)
+        {
+            if (string.IsNullOrWhiteSpace(entry))
+            {
+                continue;
+            }
+
+            var trimmed = entry.Trim();
+
+            if (trimmed.Contains('\0'))
+            {
+                throw new ArgumentException("Known hosts entry contains invalid null characters");
+            }
+
+            if (trimmed.Contains("\r\n"))
+            {
+                throw new ArgumentException("Known hosts entry contains Windows newline sequence");
+            }
+
+            if (trimmed.Split(' ').Length < 3)
+            {
+                throw new ArgumentException("Known hosts entry must contain host, key type, and key data");
             }
         }
     }
@@ -838,11 +882,50 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
         try
         {
-            var result = ExecuteGitCommandWithArgs(["ssh-add", "-l"], throwOnError: false);
-            return result.IsSuccess || result.StandardError.Contains("no identities");
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "ssh-add",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            startInfo.ArgumentList.Add("-l");
+
+            using var process = new Process { StartInfo = startInfo };
+            process.Start();
+
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            var errorTask = process.StandardError.ReadToEndAsync();
+
+            if (!process.WaitForExit(5000))
+            {
+                try
+                {
+                    process.Kill();
+                }
+                catch
+                {
+                    // Ignore failures when killing the process
+                }
+
+                return false;
+            }
+
+            var stdout = outputTask.Result;
+            var stderr = errorTask.Result;
+
+            if (process.ExitCode == 0)
+            {
+                return true;
+            }
+
+            return stderr.Contains("no identities", StringComparison.OrdinalIgnoreCase) ||
+                   stdout.Contains("The agent has no identities", StringComparison.OrdinalIgnoreCase);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Write($"Warning: Unable to determine ssh-agent status: {ex.Message}", LogType.Alert);
             return false;
         }
     }
@@ -851,116 +934,108 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     {
         // Create secure credential helper script that doesn't persist credentials
         var tempDir = Path.GetTempPath();
-        var scriptPath = Path.Combine(tempDir, $"git-credential-{Guid.NewGuid()}.sh");
-        
-        var scriptContent = new StringBuilder();
-        scriptContent.AppendLine("#!/bin/bash");
-        scriptContent.AppendLine("# Secure credential helper script");
-        scriptContent.AppendLine("# This script will be automatically deleted after use");
-        scriptContent.AppendLine("");
-        scriptContent.AppendLine("case \"$1\" in");
-        scriptContent.AppendLine("get)");
-        
+
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            var scriptPath = Path.Combine(tempDir, $"git-credential-{Guid.NewGuid()}.cmd");
+            var scriptContent = new StringBuilder();
+            scriptContent.AppendLine("@echo off");
+            scriptContent.AppendLine("setlocal ENABLEEXTENSIONS");
+            scriptContent.AppendLine("if \"%~1\"==\"get\" (");
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                scriptContent.AppendLine($"    echo username={EscapeWindowsCredentialValue(username)}");
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                scriptContent.AppendLine($"    echo password={EscapeWindowsCredentialValue(password)}");
+            }
+
+            scriptContent.AppendLine(")");
+            scriptContent.AppendLine("exit /b 0");
+
+            File.WriteAllText(scriptPath, scriptContent.ToString(), Utf8NoBom);
+            ScheduleFileForDeletion(scriptPath);
+            return scriptPath;
+        }
+
+        var shellScriptPath = Path.Combine(tempDir, $"git-credential-{Guid.NewGuid()}.sh");
+
+        var shellScriptContent = new StringBuilder();
+        shellScriptContent.AppendLine("#!/bin/sh");
+        shellScriptContent.AppendLine("# Secure credential helper script");
+        shellScriptContent.AppendLine("# This script will be automatically deleted after use");
+        shellScriptContent.AppendLine("");
+        shellScriptContent.AppendLine("case \"$1\" in");
+        shellScriptContent.AppendLine("get)");
+
         if (!string.IsNullOrEmpty(username))
         {
-            scriptContent.AppendLine($"    echo username={EscapeShellArgument(username)}");
+            shellScriptContent.AppendLine($"    echo username={EscapeShellArgument(username)}");
         }
         if (!string.IsNullOrEmpty(password))
         {
-            scriptContent.AppendLine($"    echo password={EscapeShellArgument(password)}");
+            shellScriptContent.AppendLine($"    echo password={EscapeShellArgument(password)}");
         }
-        
-        scriptContent.AppendLine("    ;;");
-        scriptContent.AppendLine("store)");
-        scriptContent.AppendLine("    # Ignore store requests for security");
-        scriptContent.AppendLine("    ;;");
-        scriptContent.AppendLine("erase)");
-        scriptContent.AppendLine("    # Ignore erase requests");
-        scriptContent.AppendLine("    ;;");
-        scriptContent.AppendLine("esac");
-        
-        // Write script with restricted permissions
-        File.WriteAllText(scriptPath, scriptContent.ToString());
-        
-        // Set execute permissions on Unix-like systems
+
+        shellScriptContent.AppendLine("    ;;");
+        shellScriptContent.AppendLine("store)");
+        shellScriptContent.AppendLine("    # Ignore store requests for security");
+        shellScriptContent.AppendLine("    ;;");
+        shellScriptContent.AppendLine("erase)");
+        shellScriptContent.AppendLine("    # Ignore erase requests");
+        shellScriptContent.AppendLine("    ;;");
+        shellScriptContent.AppendLine("esac");
+
+        File.WriteAllText(shellScriptPath, shellScriptContent.ToString(), Utf8NoBom);
+
         if (Environment.OSVersion.Platform != PlatformID.Win32NT)
         {
-            var chmodProcess = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "chmod",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                }
-            };
-            chmodProcess.StartInfo.ArgumentList.Add("700");
-            chmodProcess.StartInfo.ArgumentList.Add(scriptPath);
-            chmodProcess.Start();
-            chmodProcess.WaitForExit();
+            RunChmod("700", shellScriptPath);
         }
-        
-        // Schedule script for deletion
-        ScheduleFileForDeletion(scriptPath);
-        
-        return scriptPath;
+
+        ScheduleFileForDeletion(shellScriptPath);
+
+        return shellScriptPath;
     }
     
     private string CreateSecureKnownHostsPath()
     {
-        // Create secure known_hosts file path
         var userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (string.IsNullOrEmpty(userHome))
+        {
+            throw new InvalidOperationException("Unable to determine user profile directory for SSH known_hosts management.");
+        }
+
         var sshDir = Path.Combine(userHome, ".ssh");
         var knownHostsPath = Path.Combine(sshDir, "known_hosts");
-        
-        // Ensure .ssh directory exists with proper permissions
+
         if (!Directory.Exists(sshDir))
         {
             Directory.CreateDirectory(sshDir);
-            
-            // Set restrictive permissions on Unix-like systems
+
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
             {
-                var chmodProcess = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "chmod",
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    }
-                };
-                chmodProcess.StartInfo.ArgumentList.Add("700");
-                chmodProcess.StartInfo.ArgumentList.Add(sshDir);
-                chmodProcess.Start();
-                chmodProcess.WaitForExit();
+                RunChmod("700", sshDir);
             }
         }
-        
-        // Create known_hosts file if it doesn't exist
-        if (File.Exists(knownHostsPath)) return knownHostsPath;
+
+        if (!File.Exists(knownHostsPath))
         {
-            File.WriteAllText(knownHostsPath, "");
-            
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            File.WriteAllText(knownHostsPath, string.Empty, Utf8NoBom);
+
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
             {
-                return knownHostsPath;
+                RunChmod("600", knownHostsPath);
             }
-            
-            // Set restrictive permissions on Unix-like systems
-            var chmodProcess = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "chmod",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                }
-            };
-            chmodProcess.StartInfo.ArgumentList.Add("644");
-            chmodProcess.StartInfo.ArgumentList.Add(knownHostsPath);
-            chmodProcess.Start();
-            chmodProcess.WaitForExit();
+        }
+
+        if (!_knownHostsInitialized)
+        {
+            EnsureKnownHostsEntries(knownHostsPath);
+            _knownHostsInitialized = true;
         }
 
         return knownHostsPath;
@@ -984,13 +1059,13 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             }
         });
     }
-    
+
     private static string EscapeShellArgument(string argument)
     {
         // Escape shell arguments to prevent command injection
         if (string.IsNullOrEmpty(argument))
             return "\"\"";
-            
+
         // Replace dangerous characters
         return argument
             .Replace("\\", "\\\\")
@@ -1001,6 +1076,167 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
             .Replace("\n", "\\n")
             .Replace("\r", "\\r")
             .Replace("\t", "\\t");
+    }
+
+    private static string EscapeWindowsCredentialValue(string value)
+    {
+        return value
+            .Replace("%", "%%")
+            .Replace("^", "^^")
+            .Replace("&", "^&")
+            .Replace("|", "^|")
+            .Replace(">", "^>")
+            .Replace("<", "^<")
+            .Replace(")", "^)");
+    }
+
+    private void EnsureKnownHostsEntries(string knownHostsPath)
+    {
+        try
+        {
+            var existingEntries = new HashSet<string>(StringComparer.Ordinal);
+            if (File.Exists(knownHostsPath))
+            {
+                foreach (var line in File.ReadAllLines(knownHostsPath))
+                {
+                    var trimmed = line.Trim();
+                    if (!string.IsNullOrEmpty(trimmed))
+                    {
+                        existingEntries.Add(trimmed);
+                    }
+                }
+            }
+
+            var entriesToAdd = new List<string>();
+
+            if (_config.KnownHostsEntries != null)
+            {
+                foreach (var entry in _config.KnownHostsEntries)
+                {
+                    if (string.IsNullOrWhiteSpace(entry))
+                    {
+                        continue;
+                    }
+
+                    var trimmed = entry.Trim();
+                    if (!existingEntries.Contains(trimmed))
+                    {
+                        entriesToAdd.Add(trimmed);
+                        existingEntries.Add(trimmed);
+                    }
+                }
+            }
+
+            if (_repositoryUri != null && _repositoryUri.Scheme.Equals("ssh", StringComparison.OrdinalIgnoreCase))
+            {
+                foreach (var entry in FetchKnownHostEntriesFromRemote(_repositoryUri))
+                {
+                    if (!existingEntries.Contains(entry))
+                    {
+                        entriesToAdd.Add(entry);
+                        existingEntries.Add(entry);
+                    }
+                }
+            }
+
+            if (entriesToAdd.Count > 0)
+            {
+                File.AppendAllText(knownHostsPath, string.Join(Environment.NewLine, entriesToAdd) + Environment.NewLine, Utf8NoBom);
+                _logger.Write($"Added {entriesToAdd.Count} entries to known_hosts", LogType.Debug);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Write($"Warning: Failed to update known_hosts: {ex.Message}", LogType.Alert);
+        }
+    }
+
+    private IEnumerable<string> FetchKnownHostEntriesFromRemote(Uri repositoryUri)
+    {
+        var results = new List<string>();
+
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "ssh-keyscan",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            if (repositoryUri.Port > 0 && repositoryUri.Port != 22)
+            {
+                startInfo.ArgumentList.Add("-p");
+                startInfo.ArgumentList.Add(repositoryUri.Port.ToString());
+            }
+
+            startInfo.ArgumentList.Add(repositoryUri.Host);
+
+            using var process = new Process { StartInfo = startInfo };
+            process.Start();
+
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            var errorTask = process.StandardError.ReadToEndAsync();
+
+            if (!process.WaitForExit(10000))
+            {
+                try
+                {
+                    process.Kill();
+                }
+                catch
+                {
+                    // Ignore failures when killing the process
+                }
+
+                _logger.Write($"Warning: ssh-keyscan timed out for host {repositoryUri.Host}", LogType.Alert);
+                return results;
+            }
+
+            var stdout = outputTask.Result;
+            var stderr = errorTask.Result;
+
+            if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(stdout))
+            {
+                results.AddRange(stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            }
+            else if (!string.IsNullOrWhiteSpace(stderr))
+            {
+                _logger.Write($"Warning: ssh-keyscan error for {repositoryUri.Host}: {stderr.Trim()}", LogType.Alert);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Write($"Warning: Failed to run ssh-keyscan for {repositoryUri.Host}: {ex.Message}", LogType.Alert);
+        }
+
+        return results;
+    }
+
+    private static void RunChmod(string mode, string path)
+    {
+        try
+        {
+            var chmodProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                }
+            };
+            chmodProcess.StartInfo.ArgumentList.Add(mode);
+            chmodProcess.StartInfo.ArgumentList.Add(path);
+            chmodProcess.Start();
+            chmodProcess.WaitForExit();
+        }
+        catch
+        {
+            // If chmod is unavailable, ignore and continue
+        }
     }
     
     private void ValidateSSHKeyPermissions(string privateKeyPath)
@@ -1065,13 +1301,57 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
         cloneArgs.Add(targetPath);
         
         ExecuteGitCommandWithArgs(cloneArgs);
-        
+
         if (enableLFS)
         {
-            ExecuteGitCommandWithArgs(["lfs", "install"], targetPath);
-            ExecuteGitCommandWithArgs(["lfs", "fetch"], targetPath);
-            ExecuteGitCommandWithArgs(["checkout"], targetPath);
+            ExecuteGitCommandWithArgs(["lfs", "install", "--local"], targetPath);
+
+            var checkoutTarget = ResolveCheckoutBranch(targetPath, branch);
+            ExecuteGitCommandWithArgs(["checkout", checkoutTarget], targetPath);
+
+            var pullArgs = new List<string> { "lfs", "pull" };
+            if (!string.IsNullOrWhiteSpace(checkoutTarget) && !checkoutTarget.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
+            {
+                pullArgs.Add("origin");
+                pullArgs.Add(checkoutTarget);
+            }
+
+            ExecuteGitCommandWithArgs(pullArgs, targetPath);
+            ExecuteGitCommandWithArgs(["lfs", "checkout"], targetPath);
         }
+    }
+
+    private string ResolveCheckoutBranch(string repositoryPath, string? requestedBranch)
+    {
+        if (!string.IsNullOrWhiteSpace(requestedBranch))
+        {
+            return requestedBranch;
+        }
+
+        try
+        {
+            var headPath = Path.Combine(repositoryPath, ".git", "HEAD");
+            if (File.Exists(headPath))
+            {
+                var headContent = File.ReadAllText(headPath).Trim();
+                const string prefix = "ref: ";
+                if (headContent.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    var reference = headContent[prefix.Length..];
+                    var segments = reference.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                    if (segments.Length > 0)
+                    {
+                        return segments[^1];
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Write($"Warning: Unable to determine default branch from HEAD: {ex.Message}", LogType.Alert);
+        }
+
+        return "HEAD";
     }
     
     private void GitPull(string workingDirectory)
@@ -1093,7 +1373,9 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     
     private void GitReset(string workingDirectory, bool hard = true)
     {
-        var resetArgs = hard ? ["reset", "--hard", "HEAD"] : ["reset", "HEAD"];
+        var resetArgs = hard
+            ? new List<string> { "reset", "--hard", "HEAD" }
+            : new List<string> { "reset", "HEAD" };
         ExecuteGitCommandWithArgs(resetArgs, workingDirectory);
         ExecuteGitCommandWithArgs(["clean", "-fd"], workingDirectory);
     }
