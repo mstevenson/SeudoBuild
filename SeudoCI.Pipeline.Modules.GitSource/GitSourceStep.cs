@@ -2,6 +2,7 @@
 
 namespace SeudoCI.Pipeline.Modules.GitSource;
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security;
 using System.Text;
@@ -1093,7 +1094,9 @@ public class GitSourceStep : ISourceStep<GitSourceConfig>
     
     private void GitReset(string workingDirectory, bool hard = true)
     {
-        var resetArgs = hard ? ["reset", "--hard", "HEAD"] : ["reset", "HEAD"];
+        List<string> resetArgs = hard
+            ? new List<string> { "reset", "--hard", "HEAD" }
+            : new List<string> { "reset", "HEAD" };
         ExecuteGitCommandWithArgs(resetArgs, workingDirectory);
         ExecuteGitCommandWithArgs(["clean", "-fd"], workingDirectory);
     }
