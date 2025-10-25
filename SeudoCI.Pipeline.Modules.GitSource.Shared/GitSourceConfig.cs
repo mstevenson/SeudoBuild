@@ -74,9 +74,8 @@ public class GitSourceConfig : SourceStepConfig
     public List<string> SparseCheckoutPaths { get; set; } = new List<string>();
 
     /// <summary>
-    /// Optional entries to append to the SSH known_hosts file before connecting.
-    /// Each entry should be in the standard known_hosts format and will only be
-    /// added when SSH authentication is used.
+    /// Optional SSH known_hosts entries that should be pre-populated before connecting.
+    /// Entries must use the standard known_hosts format.
     /// </summary>
     public List<string> KnownHostsEntries { get; set; } = new List<string>();
 }
