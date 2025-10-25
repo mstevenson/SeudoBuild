@@ -1,4 +1,6 @@
-﻿namespace SeudoCI.Pipeline.Modules.GitSource;
+﻿using System.Collections.Generic;
+
+namespace SeudoCI.Pipeline.Modules.GitSource;
 
 /// <summary>
 /// Configuration values for a source pipeline step that clones a git repository.
