@@ -44,16 +44,17 @@ public class ShellBuildStep : IBuildStep<ShellBuildStepConfig>
             // Replace variables in string that begin and end with the % character
             var command = workspace.Macros.ReplaceVariablesInText(_config.Command);
 
-            var startInfo = new ProcessStartInfo
+            var startInfo = new ProcessStartInfo("bash")
             {
-                FileName = "bash",
-                Arguments = $"-c \"{command.Replace("\"", "\\\"")}\"",
                 WorkingDirectory = workspace.GetDirectory(TargetDirectory.Source),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true
             };
+
+            startInfo.ArgumentList.Add("-c");
+            startInfo.ArgumentList.Add(command);
 
             using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
