@@ -7,7 +7,6 @@ using Core;
 public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
 {
     private FolderArchiveConfig _config = null!;
-    private ITargetWorkspace _workspace = null!;
     private ILogger _logger = null!;
 
     public string? Type => "Folder";
@@ -16,7 +15,6 @@ public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
     public void Initialize(FolderArchiveConfig config, ITargetWorkspace workspace, ILogger logger)
     {
         _config = config;
-        _workspace = workspace;
         _logger = logger;
     }
 
@@ -24,17 +22,37 @@ public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
     {
         try
         {
-            string folderName = workspace.Macros.ReplaceVariablesInText(_config.FolderName);
-            string source = workspace.GetDirectory(TargetDirectory.Output);
-            string dest = $"{workspace.GetDirectory(TargetDirectory.Archives)}/{folderName}";
+            var fileSystem = workspace.FileSystem;
 
-            // Remove old directory
-            if (workspace.FileSystem.DirectoryExists(dest))
+            string folderName = workspace.Macros.ReplaceVariablesInText(_config.FolderName);
+
+            if (string.IsNullOrWhiteSpace(folderName))
             {
-                workspace.FileSystem.DeleteDirectory(dest);
+                throw new InvalidOperationException("Folder archive requires a non-empty folder name.");
             }
 
-            CopyDirectory(source, dest);
+            folderName = folderName.SanitizeFilename();
+
+            if (string.IsNullOrWhiteSpace(folderName))
+            {
+                throw new InvalidOperationException("Folder archive name resolves to an empty value after sanitization.");
+            }
+
+            string source = workspace.GetDirectory(TargetDirectory.Output);
+            string archivesDirectory = workspace.GetDirectory(TargetDirectory.Archives);
+            string dest = Path.Combine(archivesDirectory, folderName);
+
+            // Remove old directory
+            if (fileSystem.DirectoryExists(dest))
+            {
+                fileSystem.DeleteDirectory(dest);
+            }
+
+            _logger.Write($"Copying build output to folder archive '{folderName}'", LogType.SmallBullet);
+
+            CopyDirectory(fileSystem, source, dest);
+
+            _logger.Write("Folder archive created", LogType.SmallBullet);
 
             var results = new ArchiveStepResults { ArchiveFileName = folderName, IsSuccess = true };
             return results;
@@ -45,10 +63,8 @@ public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
         }
     }
 
-    private void CopyDirectory(string sourceDir, string destDir)
+    private static void CopyDirectory(IFileSystem fileSystem, string sourceDir, string destDir)
     {
-        var fileSystem = _workspace.FileSystem;
-
         if (!fileSystem.DirectoryExists(sourceDir))
         {
             throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDir);
@@ -57,10 +73,6 @@ public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
         if (!fileSystem.DirectoryExists(destDir))
         {
             fileSystem.CreateDirectory(destDir);
-        }
-        else
-        {
-            throw new Exception("Destination path already exists: " + destDir);
         }
 
         // Get the files in the directory and copy them to the new location.
@@ -76,7 +88,7 @@ public class FolderArchiveStep : IArchiveStep<FolderArchiveConfig>
         foreach (string subDirectory in subDirectories)
         {
             string destPath = Path.Combine(destDir, Path.GetFileName(subDirectory));
-            CopyDirectory(subDirectory, destPath);
+            CopyDirectory(fileSystem, subDirectory, destPath);
         }
     }
 }

@@ -5,7 +5,7 @@ using System;
 // Project directory structure example
 // 
 //  MyProject              // Project workspace
-//  ├─• ProjectConfig.json
+//  ├─• ProjectConfig.yaml
 //  ├─• Logs/              // high-level logs pertaining to all build targets
 //  └─• Targets/
 //    ├─• Target_A/        // a target workspace

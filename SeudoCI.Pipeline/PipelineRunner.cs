@@ -110,7 +110,8 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         {
             logger.Write($"No {sequenceName} steps configured, skipping sequence.", LogType.Alert);
             logger.IndentLevel--;
-            return new TOutSeq {
+            return new TOutSeq
+            {
                 IsSuccess = true,  // Skipped sequences are considered successful
                 IsSkipped = true,
                 Exception = null   // No exception for skipped sequences
@@ -126,7 +127,7 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
     {
         // Initialize the sequence
         TOutSeq results = InitializeSequence<TOutSeq>(sequenceName, sequenceSteps);
-        if (!results.IsSuccess)
+        if (!results.IsSuccess || results.IsSkipped)
         {
             return results;
         }
@@ -147,7 +148,7 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
     {
         // Initialize the sequence
         TOutSeq results = InitializeSequence<TOutSeq>(sequenceName, sequenceSteps);
-        if (!results.IsSuccess)
+        if (!results.IsSuccess || results.IsSkipped)
         {
             return results;
         }
@@ -156,12 +157,24 @@ public class PipelineRunner(PipelineConfig config, ILogger logger) : IPipelineRu
         if (!previousSequence.IsSuccess)
         {
             logger.Write("Skipping, previous pipeline step failed", LogType.Failure);
+            logger.IndentLevel--;
             results = new TOutSeq
             {
                 IsSuccess = false,
                 Exception = new Exception($"Skipped {sequenceName} sequence, previous sequence failed.")
             };
             return results;
+        }
+
+        if (previousSequence.IsSkipped)
+        {
+            logger.Write($"Skipping {sequenceName} sequence, previous sequence was skipped.", LogType.Alert);
+            logger.IndentLevel--;
+            return new TOutSeq
+            {
+                IsSuccess = true,
+                IsSkipped = true
+            };
         }
 
         // Run the sequence

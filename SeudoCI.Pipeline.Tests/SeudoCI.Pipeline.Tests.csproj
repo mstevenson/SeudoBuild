@@ -25,7 +25,17 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SeudoCI.Pipeilne.Modules.FTPDistribute\SeudoCI.Pipeilne.Modules.FTPDistribute.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.EmailNotify\SeudoCI.Pipeline.Modules.EmailNotify.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.FolderArchive\SeudoCI.Pipeline.Modules.FolderArchive.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.GitSource\SeudoCI.Pipeline.Modules.GitSource.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.PerforceSource\SeudoCI.Pipeline.Modules.PerforceSource.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.SFTPDistribute\SeudoCI.Pipeline.Modules.SFTPDistribute.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.SMBDistribute\SeudoCI.Pipeline.Modules.SMBDistribute.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.SteamDistribute\SeudoCI.Pipeline.Modules.SteamDistribute.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.ShellBuild\SeudoCI.Pipeline.Modules.ShellBuild.csproj" />
       <ProjectReference Include="..\SeudoCI.Pipeline.Modules.UnityBuild\SeudoCI.Pipeline.Modules.UnityBuild.csproj" />
+      <ProjectReference Include="..\SeudoCI.Pipeline.Modules.ZipArchive\SeudoCI.Pipeline.Modules.ZipArchive.csproj" />
       <ProjectReference Include="..\SeudoCI.Pipeline.Shared\SeudoCI.Pipeline.Shared.csproj" />
       <ProjectReference Include="..\SeudoCI.Pipeline\SeudoCI.Pipeline.csproj" />
     </ItemGroup>

@@ -6,11 +6,18 @@ public class UnityExecuteMethodBuildStep : UnityBuildStep<UnityExecuteMethodBuil
 {
     public override string? Type => "Unity Execute Method";
 
-    protected override string GetBuildArgs(UnityExecuteMethodBuildConfig config, ITargetWorkspace workspace)
+    protected override IReadOnlyList<string> GetBuildArgs(UnityExecuteMethodBuildConfig config, ITargetWorkspace workspace)
     {
-        string projectPath = Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory);
-        string stdout = workspace.FileSystem.StandardOutputPath;
-        string args = $"-quit -batchmode -executeMethod {config.MethodName} -projectPath {projectPath} -logfile {stdout}";
-        return args;
+        return new List<string>
+        {
+            "-quit",
+            "-batchmode",
+            "-executeMethod",
+            config.MethodName,
+            "-projectPath",
+            Path.Combine(workspace.GetDirectory(TargetDirectory.Source), config.SubDirectory),
+            "-logfile",
+            workspace.FileSystem.StandardOutputPath
+        };
     }
 }
