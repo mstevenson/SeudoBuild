@@ -1,10 +1,6 @@
 # SeudoBuild
 
-Cake is a generalized distributed build system created with the Unity game engine in mind.
-
-## Configuration
-
-SeudoBuild uses a JSON build configuration file that define project and target parameters.
+SeudoBuild is a generalized distributed build system created with the Unity game engine in mind.
 
 ## Unity installation discovery
 
