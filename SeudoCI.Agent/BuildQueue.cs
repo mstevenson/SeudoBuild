@@ -75,6 +75,8 @@ public class BuildQueue(Builder builder, IModuleLoader moduleLoader, ILogger log
                     logger.QueueNotification($"Building project '{build.ProjectConfiguration.ProjectName}', {printableTarget}");
 
                     ActiveBuild = build;
+                    ActiveBuild.BuildStatus = BuildResult.Status.Running;
+
                     var queueToken = _tokenSource?.Token ?? CancellationToken.None;
                     using var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(queueToken);
                     _activeBuildCancellationSource = cancellationSource;
