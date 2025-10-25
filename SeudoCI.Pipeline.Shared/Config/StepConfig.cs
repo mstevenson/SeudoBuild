@@ -9,4 +9,9 @@ public abstract class StepConfig
     /// The name of the step type.
     /// </summary>
     public abstract string Name { get; }
+
+    /// <summary>
+    /// Serialization discriminator for YAML documents.
+    /// </summary>
+    public string Type => Name;
 }

@@ -2,10 +2,8 @@ namespace SeudoCI.Pipeline.Tests;
 
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
 using SeudoCI.Pipeline.Modules.EmailNotify;
 using SeudoCI.Pipeline.Modules.FolderArchive;
 using SeudoCI.Pipeline.Modules.FTPDistribute;
@@ -134,7 +132,7 @@ public class ModuleMetadataTests
     }
 
     [Test]
-    public void ModuleRegistry_ShouldRegisterConvertersForAllConfigs()
+    public void ModuleRegistry_ShouldRegisterTypeDiscriminatorsForAllConfigs()
     {
         var registry = new ModuleRegistry();
 
@@ -143,23 +141,19 @@ public class ModuleMetadataTests
             registry.RegisterModule(expectation.CreateModule());
         }
 
-        var converters = registry.GetJsonConverters();
+        var discriminators = registry.GetStepConfigConverters();
 
         foreach (var expectation in Expectations)
         {
             var category = expectation.Category;
-            var converter = converters.FirstOrDefault(c => c.CanConvert(category.ConfigBaseType));
+            var discriminator = discriminators.FirstOrDefault(c => c.BaseType == category.ConfigBaseType);
 
-            Assert.That(converter, Is.Not.Null,
-                $"Expected a JSON converter for base config type {category.ConfigBaseType.Name}.");
+            Assert.That(discriminator, Is.Not.Null,
+                $"Expected a type discriminator for base config type {category.ConfigBaseType.Name}.");
 
-            var serializer = new JsonSerializer();
-            serializer.Converters.Add(converter!);
-
-            using var reader = new JsonTextReader(new StringReader($"{{ \"Type\": \"{expectation.ExpectedStepConfigName}\" }}"));
-            var deserialized = serializer.Deserialize(reader, category.ConfigBaseType);
-
-            Assert.That(deserialized, Is.InstanceOf(expectation.ExpectedStepConfigType));
+            Assert.That(discriminator!.TryResolve(expectation.ExpectedStepConfigName, out var resolvedType), Is.True,
+                $"Expected discriminator for {category.ConfigBaseType.Name} to resolve '{expectation.ExpectedStepConfigName}'.");
+            Assert.That(resolvedType, Is.EqualTo(expectation.ExpectedStepConfigType));
         }
     }
 

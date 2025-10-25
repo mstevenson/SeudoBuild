@@ -14,7 +14,6 @@
         <PackageReference Include="coverlet.collector" Version="6.0.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NSubstitute" Version="5.1.0" />
         <PackageReference Include="NUnit" Version="3.14.0"/>
         <PackageReference Include="NUnit.Analyzers" Version="3.9.0"/>

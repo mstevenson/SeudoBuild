@@ -65,7 +65,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<TestStartup>
 
             // Setup default module registry behavior
             var mockRegistry = Substitute.For<IModuleRegistry>();
-            mockRegistry.GetJsonConverters().Returns([]);
+            mockRegistry.GetStepConfigConverters().Returns([]);
             MockModuleLoader.Registry.Returns(mockRegistry);
 
             // Setup default file system behavior
@@ -144,7 +144,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<TestStartup>
     public void SetupModuleLoader()
     {
         var mockRegistry = Substitute.For<IModuleRegistry>();
-        mockRegistry.GetJsonConverters().Returns([]);
+        mockRegistry.GetStepConfigConverters().Returns([]);
         MockModuleLoader.Registry.Returns(mockRegistry);
     }
 

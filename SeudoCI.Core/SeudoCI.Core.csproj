@@ -13,7 +13,7 @@
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="YamlDotNet" Version="15.1.2" />
     </ItemGroup>
 
 </Project>

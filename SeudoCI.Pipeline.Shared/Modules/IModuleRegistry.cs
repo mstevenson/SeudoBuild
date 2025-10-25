@@ -14,5 +14,5 @@ public interface IModuleRegistry
 
     void RegisterModule(IModule module);
 
-    StepConfigConverter[] GetJsonConverters();
+    StepConfigConverter[] GetStepConfigConverters();
 }
