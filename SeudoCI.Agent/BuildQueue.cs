@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Threading;
 using SeudoCI.Core;
 using SeudoCI.Pipeline;
 
@@ -13,6 +14,7 @@ public class BuildQueue(Builder builder, IModuleLoader moduleLoader, ILogger log
     private const string OutputFolderName = "SeudoCI";
 
     private CancellationTokenSource? _tokenSource;
+    private CancellationTokenSource? _activeBuildCancellationSource;
     private int _buildIndex;
     private bool _isQueueRunning;
 
@@ -73,8 +75,35 @@ public class BuildQueue(Builder builder, IModuleLoader moduleLoader, ILogger log
                     logger.QueueNotification($"Building project '{build.ProjectConfiguration.ProjectName}', {printableTarget}");
 
                     ActiveBuild = build;
+                    var queueToken = _tokenSource?.Token ?? CancellationToken.None;
+                    using var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(queueToken);
+                    _activeBuildCancellationSource = cancellationSource;
+
                     var pipeline = new PipelineRunner(new PipelineConfig { BaseDirectory = outputPath }, logger);
-                    builder.Build(pipeline, ActiveBuild.ProjectConfiguration, ActiveBuild.TargetName ?? string.Empty);
+
+                    try
+                    {
+                        var succeeded = builder.Build(pipeline, ActiveBuild.ProjectConfiguration,
+                            ActiveBuild.TargetName ?? string.Empty, cancellationSource.Token);
+                        if (ActiveBuild.BuildStatus != BuildResult.Status.Cancelled)
+                        {
+                            ActiveBuild.BuildStatus = succeeded ? BuildResult.Status.Complete : BuildResult.Status.Failed;
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        ActiveBuild.BuildStatus = BuildResult.Status.Cancelled;
+                    }
+                    catch
+                    {
+                        ActiveBuild.BuildStatus = BuildResult.Status.Failed;
+                        throw;
+                    }
+                    finally
+                    {
+                        _activeBuildCancellationSource = null;
+                        ActiveBuild = null;
+                    }
                 }
             }
             Thread.Sleep(200);
@@ -125,8 +154,8 @@ public class BuildQueue(Builder builder, IModuleLoader moduleLoader, ILogger log
     {
         if (ActiveBuild != null && ActiveBuild.Id == buildId)
         {
-            ActiveBuild = null;
-            // TODO signal build process to stop
+            _activeBuildCancellationSource?.Cancel();
+            ActiveBuild.BuildStatus = BuildResult.Status.Cancelled;
         }
 
         if (Builds.TryGetValue(buildId, out var result))

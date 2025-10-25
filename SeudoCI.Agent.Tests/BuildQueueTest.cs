@@ -1,5 +1,6 @@
 namespace SeudoCI.Agent.Tests;
 
+using System.Threading;
 using NSubstitute;
 using Core;
 using Pipeline;
@@ -189,8 +190,10 @@ public class BuildQueueTest
         projectConfig2.BuildTargets.Add(new BuildTargetConfig { TargetName = "Debug" });
         
         // Mock builder to return success for first build, then we can check second build starts
-        _mockBuilder.Build(Arg.Any<IPipelineRunner>(), projectConfig1, Arg.Any<string>()).Returns(true);
-        _mockBuilder.Build(Arg.Any<IPipelineRunner>(), projectConfig2, Arg.Any<string>()).Returns(true);
+        _mockBuilder.Build(Arg.Any<IPipelineRunner>(), projectConfig1, Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockBuilder.Build(Arg.Any<IPipelineRunner>(), projectConfig2, Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(true);
 
         // Act
         buildQueue.EnqueueBuild(projectConfig1);
@@ -204,6 +207,6 @@ public class BuildQueueTest
         Assert.That(allBuilds.Count(), Is.EqualTo(2));
         
         // Verify builder was called for both projects
-        _mockBuilder.Received().Build(Arg.Any<IPipelineRunner>(), projectConfig1, Arg.Any<string>());
+        _mockBuilder.Received().Build(Arg.Any<IPipelineRunner>(), projectConfig1, Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 }
