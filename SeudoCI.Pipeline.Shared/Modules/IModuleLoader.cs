@@ -9,5 +9,5 @@ using Core;
 public interface IModuleLoader
 {
     IModuleRegistry Registry { get; }
-    T CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace, ILogger logger) where T : IPipelineStep;
+    T? CreatePipelineStep<T>(StepConfig config, ITargetWorkspace workspace, ILogger logger) where T : IPipelineStep;
 }

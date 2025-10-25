@@ -18,7 +18,7 @@ public class TargetWorkspace : ITargetWorkspace
 
     public IFileSystem FileSystem { get; }
     
-    public IProjectWorkspace ProjectWorkspace { get; set; }
+    public IProjectWorkspace ProjectWorkspace { get; set; } = null!;
         
     public TargetWorkspace(string baseDirectory, IFileSystem fileSystem, IMacros? parentMacros = null)
     {
